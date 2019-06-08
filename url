@@ -1,1 +1,0 @@
-ssh -i "CVmhsscel.pem" ubuntu@ec2-3-217-221-73.compute-1.amazonaws.com
