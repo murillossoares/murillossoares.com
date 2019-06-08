@@ -1,0 +1,17 @@
+This is my 30.000ft view:
+
+Gather the initial basic requirements. Don't overdo it. 70% is going to change anyway. You just need something to start of from. Preferably in the form of handful of user stories. Especially when working with clients.
+
+Model the domain classes that are required, from the user stories
+
+Build some service objects that handle some of the obvious logic from the user stories. Unit test this logic. DO NOT build a simple UI at this point just to wire up some code to see if it works! Thank me in a few days when requirements change and then again in 2 years when you have to revisit the project.
+
+Build a minimum UI based on the user stories and wire up the views, controllers, services, etc
+
+See what need edits/changes/augmentation for the user stories to complete and work on that, always writing tests for at least the service objects in the process. Refactor where needed.
+
+Show it to the people who decide and, based on what they say, edit or expand on the user stories.
+
+Start again at step 2. Rinse and repeat.
+
+Hope this helps :-)
