@@ -1,3 +1,6 @@
+ssh -i "CVmhsscel.pem" ubuntu@ec2-3-217-221-73.compute-1.amazonaws.com
+
+
 This is my 30.000ft view:
 
 Gather the initial basic requirements. Don't overdo it. 70% is going to change anyway. You just need something to start of from. Preferably in the form of handful of user stories. Especially when working with clients.
