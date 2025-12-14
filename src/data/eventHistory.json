@@ -1,0 +1,80 @@
+[
+  {
+    "id": "evt_2016_bootstrap",
+    "timestamp": "2016",
+    "level": "INFO",
+    "message": {
+      "pt": "BOOTSTRAP: Iniciando jornada profissional (Java + Web).",
+      "en": "BOOTSTRAP: Starting professional journey (Java + Web).",
+      "es": "BOOTSTRAP: Iniciando trayectoria profesional (Java + Web)."
+    },
+    "tags": ["java", "web"]
+  },
+  {
+    "id": "evt_2018_legacy",
+    "timestamp": "2018",
+    "level": "WARN",
+    "message": {
+      "pt": "LEGACY: Monólito detectado — refatoração incremental e testes.",
+      "en": "LEGACY: Monolith detected — incremental refactor and tests.",
+      "es": "LEGACY: Monolito detectado — refactor incremental y tests."
+    },
+    "tags": ["legacy", "refactor"]
+  },
+  {
+    "id": "evt_2020_microservices",
+    "timestamp": "2020",
+    "level": "SUCCESS",
+    "message": {
+      "pt": "MIGRATION: Monólito → Microservices. Pipelines CI/CD e versionamento.",
+      "en": "MIGRATION: Monolith → Microservices. CI/CD pipelines and versioning.",
+      "es": "MIGRATION: Monolito → Microservices. Pipelines CI/CD y versionado."
+    },
+    "tags": ["microservices", "ci-cd"]
+  },
+  {
+    "id": "evt_2021_backend",
+    "timestamp": "2021",
+    "level": "INFO",
+    "message": {
+      "pt": "BACKEND NODE: Java 7 → 21, Spring Boot 3.x, integrações REST/SOAP.",
+      "en": "BACKEND NODE: Java 7 → 21, Spring Boot 3.x, REST/SOAP integrations.",
+      "es": "BACKEND NODE: Java 7 → 21, Spring Boot 3.x, integraciones REST/SOAP."
+    },
+    "tags": ["java", "spring", "integrations"]
+  },
+  {
+    "id": "evt_2022_observability",
+    "timestamp": "2022",
+    "level": "INFO",
+    "message": {
+      "pt": "OBSERVABILITY: métricas, logs e tracing — redução de MTTR.",
+      "en": "OBSERVABILITY: metrics, logs and tracing — lower MTTR.",
+      "es": "OBSERVABILITY: métricas, logs y tracing — menor MTTR."
+    },
+    "tags": ["metrics", "tracing"]
+  },
+  {
+    "id": "evt_2023_frontend",
+    "timestamp": "2023",
+    "level": "INFO",
+    "message": {
+      "pt": "UI: Dashboards modernos com React/Angular e performance (SSG/SSR).",
+      "en": "UI: Modern dashboards with React/Angular and performance (SSG/SSR).",
+      "es": "UI: Dashboards modernos con React/Angular y rendimiento (SSG/SSR)."
+    },
+    "tags": ["react", "angular"]
+  },
+  {
+    "id": "evt_2025_integration",
+    "timestamp": "2025",
+    "level": "ERROR",
+    "message": {
+      "pt": "INTEGRATION: Ecossistema SOAP legado — wrappers Spring Web/Jersey + Gradle.",
+      "en": "INTEGRATION: Legacy SOAP ecosystem — Spring Web/Jersey wrappers + Gradle.",
+      "es": "INTEGRATION: Ecosistema SOAP heredado — wrappers Spring Web/Jersey + Gradle."
+    },
+    "tags": ["soap", "gradle"]
+  }
+]
+
