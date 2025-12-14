@@ -1,0 +1,269 @@
+{
+  "App": {
+    "title": "Murillo Soares",
+    "subtitle": "Java 7 → 21 • Spring Boot 3 • Microservices • React • Angular"
+  },
+  "Header": {
+    "tabs": {
+      "cv": "Overview.dashboard",
+      "skills": "Dependencies.lock",
+      "contact": "EventHistory.log"
+    },
+    "theme": "Tema",
+    "language": "Idioma",
+    "downloadCv": "Descargar CV"
+  },
+  "Boot": {
+    "skip": "Saltar boot",
+    "hint": "Esc para saltar"
+  },
+  "Dashboard": {
+    "bannerMeta": {
+      "service": "cv-service",
+      "env": "prod",
+      "status": "healthy"
+    },
+    "metrics": {
+      "uptimeLabel": "Uptime",
+      "uptimeValue": "9+ años",
+      "availabilityLabel": "Availability",
+      "availabilityValue": "99.9% SLO",
+      "latencyLabel": "p95 latency",
+      "latencyValue": "low",
+      "deployRateLabel": "Deploy rate",
+      "deployRateValue": "high"
+    },
+    "uptimeHint": "Tiempo en producción (carrera)",
+    "availabilityHint": "Calidad / fiabilidad",
+    "latencyHint": "Entrega: rápida y consistente",
+    "deployHint": "Iteración continua",
+    "networkTitle": "Network Interfaces",
+    "networkSubtitle": "conexiones_activas",
+    "dependenciesTitle": "Dependencias Activas",
+    "dependenciesGroups": {
+      "backend": "Nodo Backend",
+      "frontend": "Cliente Frontend",
+      "platform": "Plataforma"
+    },
+    "eventHistoryTitle": "Logs de Ejecución (Experiencia)",
+    "eventHistoryRight": "event_history.stream",
+    "eventHistoryEmpty": "No hay eventos cargados.",
+    "serviceMapTitle": "Service Map",
+    "serviceMapNodes": "nodes: backend → api → ui",
+    "serviceMapFlow": "trace: backend → ui",
+    "serviceMapCaption": "Backend robusto, integraciones limpias y UI pulida.",
+    "backendNodeTitle": "Backend Node",
+    "backendNodeRight": "backend@8080",
+    "backendNodeSubtitle": "runtime java/spring",
+    "backendNodeCaption": "Stack microservices-first, integraciones y rendimiento.",
+    "systemOnline": "Sistema en l\u00ednea",
+    "headline": "Ingeniero Full Stack Senior",
+    "eventHistoryHint": "Selecciona un log para inspeccionar",
+    "dependenciesEmpty": "Ninguna dependencia cargada.",
+    "architectureViewLabel": "Vista de Arquitectura",
+    "kpis": {
+      "uptimeLabel": "TIEMPO ACTIVO",
+      "uptimeValue": "9+ a\u00f1os",
+      "uptimeSub": "Experiencia profesional",
+      "stackLabel": "PROFUNDIDAD DE STACK",
+      "stackValue": "Full",
+      "stackSub": "Backend + Frontend",
+      "archLabel": "ARQ",
+      "archValue": "S\u00f3lida",
+      "archSub": "Mono -> Micro"
+    },
+    "serviceMapNodeLabels": {
+      "server": "Servidor",
+      "gateway": "Gateway",
+      "client": "Cliente"
+    }
+  },
+  "careerHistory": [
+    {
+      "id": "iefp",
+      "year": "2025",
+      "role": "Full Stack Senior",
+      "company": "RedIT | IEFP",
+      "type": "WARN",
+      "desc": "GOV PORTAL: Mantenimiento evolutivo del ecosistema Java 8 (Servlet/JSP) e integración de servicios digitales (Axis/MuleSoft).",
+      "stack": [
+        "Java 8",
+        "Spring Web",
+        "Jersey",
+        "SOAP/REST",
+        "Gradle"
+      ],
+      "archType": "soa"
+    },
+    {
+      "id": "ytech",
+      "year": "2023",
+      "role": "Desarrollador Full Stack",
+      "company": "YTech | CGI",
+      "type": "INFO",
+      "desc": "SMART GRIDS: Infraestructura de Medición Avanzada (AMI) y gestión de alto volumen de datos de energía.",
+      "stack": [
+        "Java 17",
+        "Spring Boot",
+        "Angular",
+        "Oracle",
+        "BPEL"
+      ],
+      "archType": "microservices"
+    },
+    {
+      "id": "inovaprime",
+      "year": "2022",
+      "role": "Consultor T\u00e9cnico",
+      "company": "Inovaprime",
+      "type": "INFO",
+      "desc": "AUTOMATION: Soluciones de Gobernanza de TI, dashboards dinámicos y flujo de cola de mensajes.",
+      "stack": [
+        "Java",
+        "Groovy",
+        "PostgreSQL",
+        "SQL Server",
+        "Rest"
+      ],
+      "archType": "hybrid"
+    },
+    {
+      "id": "fnx",
+      "year": "2020",
+      "role": "Analista de Desarrollo",
+      "company": "FNX Participações",
+      "type": "SUCCESS",
+      "desc": "MULTI-PLATFORM: Ecosistema Híbrido (Móvil/PWA) y personalización profunda de ERP (Financiero/Minería).",
+      "stack": [
+        "Flutter",
+        "React",
+        "Dart",
+        "Java",
+        "Oracle"
+      ],
+      "archType": "soa"
+    },
+    {
+      "id": "nbs",
+      "year": "2020",
+      "role": "Analista de Sistemas",
+      "company": "NBS Informática",
+      "type": "SUCCESS",
+      "desc": "MICROSERVICIOS: Arquitectura distribuida con Netflix OSS (Eureka/Zuul) para el sector automotriz.",
+      "stack": [
+        "Spring Cloud",
+        "Netflix Eureka",
+        "Docker",
+        "PostgreSQL"
+      ],
+      "archType": "microservices"
+    },
+    {
+      "id": "sankhya",
+      "year": "2019",
+      "role": "Analista de Sistemas",
+      "company": "Sankhya Gestão",
+      "type": "WARN",
+      "desc": "ERP CORE: Extensiones nativas de Java, integraciones complejas de PL/SQL e informes corporativos.",
+      "stack": [
+        "Java",
+        "PL/SQL",
+        "JasperReports",
+        "Angular",
+        "HTML/CSS"
+      ],
+      "archType": "monolith"
+    },
+    {
+      "id": "accurate",
+      "year": "2022",
+      "role": "Desarrollador Full Stack",
+      "company": "Accurate Software",
+      "type": "INFO",
+      "desc": "MISIÓN CRÍTICA: Mantenimiento de aplicaciones heredadas y nativas de la nube (AWS Lambda/Serverless) para grandes clientes del sector bancario y telecomunicaciones.",
+      "stack": [
+        "Spring Boot",
+        "React",
+        "AWS Lambda",
+        "Docker",
+        "Oracle",
+        "Jenkins"
+      ],
+      "archType": "microservices"
+    },
+    {
+      "id": "playmatch",
+      "year": "2021",
+      "role": "Desarrollador Back End",
+      "company": "PlayMatch",
+      "type": "SUCCESS",
+      "desc": "PLATAFORMA ESPORTS: Motor de gamificación para proyectos educativos. Entorno en contenedores con Docker y migraciones de bases de datos.",
+      "stack": [
+        "Java",
+        "Spring Boot",
+        "Docker",
+        "Flyway",
+        "Swagger"
+      ],
+      "archType": "microservices"
+    },
+    {
+      "id": "atuarial",
+      "year": "2019",
+      "role": "Desarrollador Front End",
+      "company": "Atuarial Consultoria",
+      "type": "INFO",
+      "desc": "REPORTES FINTECH: Dashboard de inversiones e informes actuariales. Gestión de estado con Redux e integración con SQL Server.",
+      "stack": [
+        "React",
+        "Redux",
+        "SQL Server",
+        "Node.js",
+        "Dashboards"
+      ],
+      "archType": "monolith"
+    },
+    {
+      "id": "datalab",
+      "year": "2018",
+      "role": "Pasante de Desarrollo",
+      "company": "Datalab Mobile",
+      "type": "WARN",
+      "desc": "MOVILIDAD ERP: Integraciones con SAP Business One/HANA. Desarrollo híbrido con C#, PHP y Java para automatización comercial.",
+      "stack": [
+        "SAP HANA",
+        "C#",
+        "Java",
+        "PHP",
+        "SQL Server"
+      ],
+      "archType": "monolith"
+    },
+    {
+      "id": "ufmt",
+      "year": "2017",
+      "role": "Pasante de TI",
+      "company": "UFMT",
+      "type": "INFO",
+      "desc": "INFRA ACADÉMICA: Mantenimiento de CMS (Joomla) y soporte a la infraestructura de TI y redes del campus universitario.",
+      "stack": [
+        "Joomla",
+        "PHP",
+        "HTML/CSS",
+        "Linux",
+        "Git"
+      ],
+      "archType": "monolith"
+    }
+  ],
+  "Persona": {
+    "buttonIdle": "MODO_SEGURO",
+    "buttonHover": "INICIAR PROTOCOLO",
+    "interestsTitle": "Intereses",
+    "statsTitle": "Stats",
+    "coreStatsTitle": "CORE_STATS",
+    "modulesTitle": "INSTALLED_MODULES",
+    "close": "Cerrar",
+    "footer": "NetWatch Systems v2.77 // Acceso no autorizado detectado // Rastreo completado"
+  }
+}
