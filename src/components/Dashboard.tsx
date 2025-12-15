@@ -2,12 +2,11 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Terminal, Server, Code, Database, Github, Linkedin, Send, Download } from "lucide-react";
-import { useLocale, useMessages, useTranslations } from "next-intl";
-import { useTheme } from "next-themes";
-import Link from "next/link";
+import { Terminal, Server, Code, Database, Github, Linkedin, Send } from "lucide-react";
+import { useMessages, useTranslations } from "next-intl";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
+import DownloadCVButton from "./DownloadCVButton";
 
 type JobData = {
   id: string;
@@ -63,8 +62,6 @@ export default function Dashboard() {
     });
   }, [messages]);
   const [activeJob, setActiveJob] = useState<JobData | null>(careerHistory[0] ?? null);
-  const { theme } = useTheme();
-  const locale = useLocale();
 
   useEffect(() => {
     if (careerHistory.length > 0) {
@@ -100,12 +97,9 @@ export default function Dashboard() {
           <SocialBadge icon={Linkedin} label="LINKEDIN" href="https://www.linkedin.com/in/murillossoares" color="text-blue-400" />
           <SocialBadge icon={Github} label="GITHUB" href="https://github.com/mhsscel" color="text-purple-400" />
           <SocialBadge icon={Send} label="TELEGRAM" href="http://t.me/murillossoares" color="text-sky-400" status="ENCRYPTED" />
+          <DownloadCVButton label="GET_CV.pdf" />
           <ThemeSwitcher />
           <LanguageSwitcher />
-          <Link href={`/${locale}/cv-print?lang=${locale}&theme=${theme}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/20 px-4 py-2 rounded text-xs font-mono transition-all text-white">
-            <Download size={14} />
-            <span>GET_CV.pdf</span>
-          </Link>
         </div>
       </header>
       

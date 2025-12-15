@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import DownloadCVButton from "@/components/DownloadCVButton";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 export default function HeaderBar() {
@@ -23,10 +24,10 @@ export default function HeaderBar() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
+        <DownloadCVButton label={t("downloadCv")} />
         <ThemeSwitcher label={t("theme")} />
         <LanguageSwitcher label={t("language")} />
       </div>
     </header>
   );
 }
-
