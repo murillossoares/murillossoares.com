@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0b0f14;
-  --panel: #0f172a;
-  --panel-2: #111827;
-  --border: rgba(148, 163, 184, 0.18);
-  --text: #e5e7eb;
-  --muted: rgba(229, 231, 235, 0.75);
-  --accent: #0b57d0;
+  --bg: #0e1116;
+  --panel: #1e1e1e;
+  --panel-2: #161a1f;
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #d4d4d4;
+  --muted: rgba(212, 212, 212, 0.7);
+  --accent: #007acc;
   --accent-2: #22c55e;
-  --glow-accent: rgba(11, 87, 208, 0.14);
+  --glow-accent: rgba(0, 122, 204, 0.16);
   --glow-accent-2: rgba(34, 197, 94, 0.14);
 }
 
@@ -106,20 +106,6 @@ body {
 
   .badge-pulse {
     animation: badgePulse 3.2s ease-in-out infinite;
-  }
-
-  .select-themed {
-    border-radius: 0.5rem;
-    border: 1px solid var(--border);
-    padding: 0.25rem 0.35rem;
-    background-color: var(--panel-2);
-    color: var(--text);
-  }
-
-  .select-themed option,
-  .option-themed {
-    background-color: var(--panel-2);
-    color: var(--text);
   }
 
   .glitch-text {
