@@ -20,17 +20,17 @@ export default function ThemeSwitcher({ label }: { label?: string }) {
   }
 
   return (
-    <div className="group flex items-center gap-2 bg-[color:var(--panel)] border border-[var(--border)] px-3 py-2 rounded hover:border-[color:var(--accent)] transition-colors">
+    <div className="group flex items-center gap-2 bg-panel border border-border px-3 py-2 rounded hover:border-accent transition-colors">
       {label ? (
-        <span className="hidden md:inline text-[10px] font-mono text-[color:var(--muted)]">{label}</span>
+        <span className="hidden md:inline text-[10px] font-mono text-muted">{label}</span>
       ) : null}
       <select
-        className="select-themed cursor-pointer font-mono text-xs outline-none focus:ring-1 focus:ring-[color:var(--accent)]"
+        className="cursor-pointer font-mono text-xs outline-none bg-panel-2 text-text border border-border rounded px-2 py-1 focus:ring-1 focus:ring-accent"
         value={theme ?? "vscode-dark"}
         onChange={(e) => setTheme(e.target.value)}
       >
         {themes.map((t) => (
-          <option key={t.id} value={t.id} className="option-themed">
+          <option key={t.id} value={t.id} className="bg-panel-2 text-text">
             {t.label}
           </option>
         ))}

@@ -13,22 +13,32 @@ const config: Config = {
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       colors: {
+        background: "var(--bg)",
+        panel: "var(--panel)",
+        "panel-2": "var(--panel-2)",
+        border: "var(--border)",
+        text: "var(--text)",
+        muted: "var(--muted)",
+        accent: "var(--accent)",
+        "accent-2": "var(--accent-2)",
+        "glow-accent": "var(--glow-accent)",
+        "glow-accent-2": "var(--glow-accent-2)",
         cyber: {
-          yellow: '#fcee0a',
-          blue: '#00f0ff',
-          pink: '#ff00ff',
-          black: '#0a0a0a'
-        }
+          yellow: "#fcee0a",
+          blue: "#00f0ff",
+          pink: "#ff00ff",
+          black: "#0a0a0a",
+        },
       },
       animation: {
-        'scanline': 'scanline 8s linear infinite',
+        scanline: "scanline 8s linear infinite",
       },
       keyframes: {
         scanline: {
-          '0%': { backgroundPosition: '0% 0%' },
-          '100%': { backgroundPosition: '0% 100%' },
+          "0%": { backgroundPosition: "0% 0%" },
+          "100%": { backgroundPosition: "0% 100%" },
         }
-      }
+      },
     },
   },
   plugins: [],
