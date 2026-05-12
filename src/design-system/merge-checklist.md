@@ -1,0 +1,14 @@
+# Merge Checklist
+- [ ] Tokens validated
+- [ ] Contrast >= 4.5:1 (normal), >= 3:1 (large)
+- [ ] Keyboard navigable
+- [ ] prefers-reduced-motion respected
+- [ ] i18n keys in all locales
+- [ ] States tested (empty, loading, error)
+- [ ] Mobile responsive
+- [ ] No hardcoded colors
+- [ ] Semantic HTML
+- [ ] ARIA attributes
+- [ ] Screen reader tested
+- [ ] Build passes
+- [ ] No console errors
