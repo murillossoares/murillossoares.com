@@ -1,7 +1,7 @@
 {
   "App": {
     "title": "Murillo Soares",
-    "subtitle": "Java 7 → 21 • Spring Boot 3 • Microservices • React • Angular"
+    "subtitle": "Java 7 -> 21 * Spring Boot 3 * Microservices * React * Angular"
   },
   "Header": {
     "tabs": {
@@ -15,47 +15,21 @@
   },
   "Boot": {
     "skip": "Skip boot",
-    "hint": "Esc to skip"
+    "hint": "Esc to skip",
+    "lines": {
+      "kernelStarted": "[ OK ] Started kernel.",
+      "mountedCareer": "[ OK ] Mounted /dev/career.",
+      "networkingStack": "[ OK ] Started Networking Stack.",
+      "mountedExperience": "[ OK ] Mounted /var/lib/experience.",
+      "cvService": "[ OK ] Started CV Service.",
+      "networkTarget": "[ OK ] Reached target Network.",
+      "portfolioStarted": "[ OK ] Started Murillo Soares Portfolio v3.0",
+      "modules": "Loading modules: Java, Spring, React, Angular...",
+      "uptime": "Uptime: 9+ years professional experience",
+      "ready": "System ready."
+    }
   },
   "Dashboard": {
-    "bannerMeta": {
-      "service": "cv-service",
-      "env": "prod",
-      "status": "healthy"
-    },
-    "metrics": {
-      "uptimeLabel": "Uptime",
-      "uptimeValue": "9+ years",
-      "availabilityLabel": "Availability",
-      "availabilityValue": "99.9% SLO",
-      "latencyLabel": "p95 latency",
-      "latencyValue": "low",
-      "deployRateLabel": "Deploy rate",
-      "deployRateValue": "high"
-    },
-    "uptimeHint": "Time in production (career)",
-    "availabilityHint": "Quality / reliability",
-    "latencyHint": "Delivery: fast and consistent",
-    "deployHint": "Continuous iteration",
-    "networkTitle": "Network Interfaces",
-    "networkSubtitle": "active_connections",
-    "dependenciesTitle": "Active Dependencies",
-    "dependenciesGroups": {
-      "backend": "Backend Node",
-      "frontend": "Frontend Client",
-      "platform": "Platform"
-    },
-    "eventHistoryTitle": "Runtime Logs (Experience)",
-    "eventHistoryRight": "event_history.stream",
-    "eventHistoryEmpty": "No history loaded.",
-    "serviceMapTitle": "Service Map",
-    "serviceMapNodes": "nodes: backend → api → ui",
-    "serviceMapFlow": "trace: backend → ui",
-    "serviceMapCaption": "Robust backend, clean integrations and polished UI.",
-    "backendNodeTitle": "Backend Node",
-    "backendNodeRight": "backend@8080",
-    "backendNodeSubtitle": "java/spring runtime",
-    "backendNodeCaption": "Microservices-first stack, integrations and performance.",
     "systemOnline": "System Online",
     "headline": "Senior Full Stack Engineer",
     "kpis": {
@@ -69,7 +43,14 @@
       "archValue": "Solid",
       "archSub": "Mono -> Micro"
     },
+    "eventHistoryTitle": "Runtime Logs (Experience)",
     "eventHistoryHint": "Select a log to inspect",
+    "eventHistoryEmpty": "No history loaded.",
+    "dependenciesTitle": "Active Dependencies",
+    "dependenciesGroups": {
+      "backend": "Backend Node",
+      "frontend": "Frontend Client"
+    },
     "dependenciesEmpty": "No dependencies loaded.",
     "architectureViewLabel": "Architecture View",
     "serviceMapNodeLabels": {
@@ -85,7 +66,7 @@
       "role": "Senior Full Stack",
       "company": "Conkord | IEFP",
       "type": "WARN",
-      "desc": "GOV PORTAL: Evolutionary maintenance of Java 8 ecosystem (Servlet/JSP) and integration of digital services (Axis/MuleSoft).",
+      "desc": "GOV PORTAL: Evolutionary maintenance of Java 8 ecosystem (Servlet/JSP) and integration of digital services.",
       "stack": [
         "Java 8",
         "Spring Web",
@@ -131,9 +112,9 @@
       "id": "fnx",
       "year": "2020",
       "role": "Development Analyst",
-      "company": "FNX Participações",
+      "company": "FNX Participacoes",
       "type": "SUCCESS",
-      "desc": "MULTI-PLATFORM: Hybrid Ecosystem (Mobile/PWA) and deep ERP customization (Financial/Mining).",
+      "desc": "MULTI-PLATFORM: Hybrid Ecosystem (Mobile/PWA) and deep ERP customization.",
       "stack": [
         "Flutter",
         "React",
@@ -147,9 +128,9 @@
       "id": "nbs",
       "year": "2020",
       "role": "System Analyst",
-      "company": "NBS Informática",
+      "company": "NBS Informatica",
       "type": "SUCCESS",
-      "desc": "MICROSERVICES: Distributed architecture with Netflix OSS (Eureka/Zuul) for the automotive sector.",
+      "desc": "MICROSERVICES: Distributed architecture with Netflix OSS for the automotive sector.",
       "stack": [
         "Spring Cloud",
         "Netflix Eureka",
@@ -162,7 +143,7 @@
       "id": "sankhya",
       "year": "2019",
       "role": "System Analyst",
-      "company": "Sankhya Gestão",
+      "company": "Sankhya Gestao",
       "type": "WARN",
       "desc": "ERP CORE: Native Java extensions, complex PL/SQL integrations and corporate reports.",
       "stack": [
@@ -180,7 +161,7 @@
       "role": "Full Stack Developer",
       "company": "Accurate Software",
       "type": "INFO",
-      "desc": "MISSION CRITICAL: Maintenance of legacy & cloud-native apps (AWS Lambda/Serverless) for banking/telco clients.",
+      "desc": "MISSION CRITICAL: Maintenance of legacy & cloud-native apps (AWS Lambda/Serverless) for banking/telco.",
       "stack": [
         "Spring Boot",
         "React",
@@ -197,7 +178,7 @@
       "role": "Back End Developer",
       "company": "PlayMatch",
       "type": "SUCCESS",
-      "desc": "ESPORTS PLATFORM: Gamification engine for educational projects. Containerized environment with Docker.",
+      "desc": "ESPORTS PLATFORM: Gamification engine for educational projects. Containerized environment.",
       "stack": [
         "Java",
         "Spring Boot",
@@ -213,7 +194,7 @@
       "role": "Front End Developer",
       "company": "Atuarial Consultoria",
       "type": "INFO",
-      "desc": "FINTECH REPORTS: Investment reporting dashboard. State management with Redux and SQL Server integration.",
+      "desc": "FINTECH REPORTS: Investment reporting dashboard. State management with Redux.",
       "stack": [
         "React",
         "Redux",
@@ -229,7 +210,7 @@
       "role": "Dev Intern",
       "company": "Datalab Mobile",
       "type": "WARN",
-      "desc": "ERP MOBILITY: Integrations with SAP Business One/HANA. Hybrid development with C#, PHP and Java.",
+      "desc": "ERP MOBILITY: Integrations with SAP Business One/HANA. Hybrid development.",
       "stack": [
         "SAP HANA",
         "C#",
@@ -256,6 +237,47 @@
       "archType": "monolith"
     }
   ],
+  "Scoreboard": {
+    "title": "Performance Scoreboard",
+    "subtitle": "Real-time career metrics visualization",
+    "metrics": {
+      "uptime": {
+        "label": "Uptime",
+        "value": "9+ years",
+        "description": "Professional experience in production"
+      },
+      "stackDepth": {
+        "label": "Stack Depth",
+        "value": "Full",
+        "description": "Backend + Frontend expertise"
+      },
+      "architecture": {
+        "label": "Architecture",
+        "value": "Solid",
+        "description": "Monolith to Microservices journey"
+      },
+      "projects": {
+        "label": "Projects",
+        "value": "11",
+        "description": "Production systems delivered"
+      }
+    },
+    "scene": {
+      "loading": "Loading 3D scene...",
+      "fallback": "Interactive mode unavailable -- showing static metrics",
+      "noWebgl": "Your browser does not support WebGL. Using fallback view."
+    },
+    "controls": {
+      "rotate": "Drag to rotate",
+      "zoom": "Scroll to zoom",
+      "reset": "Reset view"
+    },
+    "accessibility": {
+      "ariaLabel": "3D scoreboard showing career metrics",
+      "staticTableLabel": "Career metrics in tabular form"
+    },
+    "metricsSectionLabel": "Metrics Overview"
+  },
   "Persona": {
     "buttonIdle": "SAFE_MODE",
     "buttonHover": "INIT PROTOCOL",

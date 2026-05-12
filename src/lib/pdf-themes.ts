@@ -36,4 +36,3 @@ export type PdfThemeName = keyof typeof pdfThemes;
 export function isPdfThemeName(value: unknown): value is PdfThemeName {
   return typeof value === "string" && value in pdfThemes;
 }
-

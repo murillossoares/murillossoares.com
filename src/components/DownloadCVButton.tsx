@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Download, Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useLocale, useMessages, useTranslations } from "next-intl";
-import { Download, Loader2 } from "lucide-react";
 
 import { isPdfThemeName, type PdfThemeName } from "@/lib/pdf-themes";
 import type { CVPdfContent } from "@/components/pdf/CVDocument";
@@ -19,13 +19,12 @@ export default function DownloadCVButton({ label }: { label?: string }) {
   const locale = useLocale();
   const tHeader = useTranslations("Header");
   const messages = useMessages() as MessagesShape;
-
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+
   useEffect(() => setMounted(true), []);
 
   const pdfTheme: PdfThemeName = isPdfThemeName(theme) ? theme : "vscode-dark";
-
   const content = useMemo<CVPdfContent>(() => {
     const title = messages?.App?.title ?? "Murillo Soares";
     const headline = messages?.Dashboard?.headline ?? "Senior Full Stack Engineer";
@@ -70,15 +69,13 @@ export default function DownloadCVButton({ label }: { label?: string }) {
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleDownload}
-      disabled={loading}
-      aria-busy={loading}
-      className="flex items-center gap-2 bg-panel-2 hover:bg-panel border border-border px-4 py-2 rounded text-xs font-mono transition-colors text-text hover:border-accent disabled:opacity-70 disabled:cursor-not-allowed"
-    >
-      {loading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-      <span>{loading ? "BUILDING..." : buttonLabel}</span>
+    <button type="button" onClick={handleDownload} disabled={loading} aria-busy={loading}
+      className="group flex items-center gap-2 rounded border border-[var(--accent)]/40 bg-black/50 px-3 py-2 transition-all hover:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
+      aria-label={buttonLabel}>
+      {loading ? <Loader2 size={14} className="animate-spin text-[var(--accent)]" aria-hidden="true" /> : <Download size={14} className="text-[var(--accent)]" aria-hidden="true" />}
+      <span className="hidden text-[10px] font-mono uppercase text-[var(--muted)] group-hover:text-white md:inline">
+        {loading ? "BUILDING..." : buttonLabel}
+      </span>
     </button>
   );
 }
