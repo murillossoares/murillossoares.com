@@ -10,7 +10,8 @@
       "contact": "HistorialEventos.log"
     },
     "theme": "Tema",
-    "language": "Idioma"
+    "language": "Idioma",
+    "downloadCv": "Descargar CV"
   },
   "Boot": {
     "skip": "Omitir boot",
@@ -277,26 +278,14 @@
     },
     "metricsSectionLabel": "Resumen de Metricas"
   },
-  "Cyberpunk": {
-    "button": {
-      "inactive": "SAFE_MODE",
-      "active": "UNSAFE_MODE",
-      "activateLabel": "Activar modo cyberpunk",
-      "deactivateLabel": "Desactivar modo cyberpunk"
-    },
-    "closeLabel": "Cerrar",
-    "title": "NEURAL LINK ESTABLECIDO",
-    "stats": {
-      "label": "CORE_STATS",
-      "focus": "Foco: Arquitectura Backend",
-      "stamina": "Resistencia: 9+ anos",
-      "intellect": "Intelecto: Full Stack"
-    },
-    "modules": {
-      "label": "MODULOS_INSTALADOS",
-      "item1": "Java/Spring Boot",
-      "item2": "React/Angular",
-      "item3": "Microservices"
-    }
+  "Persona": {
+    "buttonIdle": "MODO_SEGURO",
+    "buttonHover": "INICIAR PROTOCOLO",
+    "interestsTitle": "Intereses",
+    "statsTitle": "Stats",
+    "coreStatsTitle": "CORE_STATS",
+    "modulesTitle": "INSTALLED_MODULES",
+    "close": "Cerrar",
+    "footer": "NetWatch Systems v2.77 // Acceso no autorizado detectado // Rastreo completado"
   }
 }

@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Terminal, Server, Code, Database, Github, Linkedin, Send, BarChart3 } from "lucide-react";
 import { useMessages, useTranslations } from "next-intl";
 import Link from "next/link";
+import DownloadCVButton from "./DownloadCVButton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 import type { CareerMetric, ArchType } from "@/models/metrics";
@@ -38,6 +39,7 @@ export default function Dashboard({ locale }: { locale: string }) {
           <Link href={`/${locale}/scoreboard`} className="group flex items-center gap-2 bg-black/50 border border-[var(--border)] px-3 py-2 rounded hover:border-white/30 transition-all focus:ring-2 focus:ring-[var(--accent)]" aria-label="Scoreboard">
             <BarChart3 size={14} className="text-[var(--accent)]" /><span className="hidden md:inline text-[10px] font-mono text-[var(--muted)] group-hover:text-white">SCOREBOARD</span>
           </Link>
+          <DownloadCVButton label="GET_CV.pdf" />
         </nav>
       </header>
       <main className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">

@@ -10,7 +10,8 @@
       "contact": "EventHistory.log"
     },
     "theme": "Theme",
-    "language": "Language"
+    "language": "Language",
+    "downloadCv": "Download CV"
   },
   "Boot": {
     "skip": "Skip boot",
@@ -277,26 +278,14 @@
     },
     "metricsSectionLabel": "Metrics Overview"
   },
-  "Cyberpunk": {
-    "button": {
-      "inactive": "SAFE_MODE",
-      "active": "UNSAFE_MODE",
-      "activateLabel": "Activate cyberpunk mode",
-      "deactivateLabel": "Deactivate cyberpunk mode"
-    },
-    "closeLabel": "Close",
-    "title": "NEURAL LINK ESTABLISHED",
-    "stats": {
-      "label": "CORE_STATS",
-      "focus": "Focus: Backend Architecture",
-      "stamina": "Stamina: 9+ years",
-      "intellect": "Intellect: Full Stack"
-    },
-    "modules": {
-      "label": "INSTALLED_MODULES",
-      "item1": "Java/Spring Boot",
-      "item2": "React/Angular",
-      "item3": "Microservices"
-    }
+  "Persona": {
+    "buttonIdle": "SAFE_MODE",
+    "buttonHover": "INIT PROTOCOL",
+    "interestsTitle": "Interests",
+    "statsTitle": "Stats",
+    "coreStatsTitle": "CORE_STATS",
+    "modulesTitle": "INSTALLED_MODULES",
+    "close": "Close",
+    "footer": "NetWatch Systems v2.77 // Unauthorized Access Detected // Trace Complete"
   }
 }
