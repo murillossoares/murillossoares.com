@@ -1,6 +1,3 @@
 import { redirect } from "next/navigation";
-
-export default function Page() {
-  redirect("/pt-br");
-}
-
+import { defaultLocale } from "@/i18n/routing";
+export default function RootPage() { redirect(`/${defaultLocale}`); }
