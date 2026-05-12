@@ -1,6 +1,6 @@
 {
   "name": "murillossoares-portfolio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.1",
+    "@react-three/drei": "^9.120.4",
+    "@react-three/fiber": "^8.17.12",
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.395.0",
     "next": "14.2.35",
@@ -19,12 +21,14 @@
     "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18",
+    "three": "^0.172.0",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/three": "^0.172.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",

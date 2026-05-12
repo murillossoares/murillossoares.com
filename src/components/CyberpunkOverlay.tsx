@@ -1,333 +1,441 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { Box, Cpu, Dice5, Sparkles, Terminal, X, Zap } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useEffect, useMemo } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import {
+  X,
+  Box,
+  Cpu,
+  Dice5,
+  Sparkles,
+  Terminal,
+  Zap,
+  Blocks,
+  Tv,
+  Gamepad2,
+  Rocket,
+  Dices,
+} from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useMemo, useRef } from "react";
 
 import personaData from "@/data/persona.json";
 import { useUiStore } from "@/store/ui";
 
-type Persona = typeof personaData;
-type IconName = "Box" | "Dice5" | "Cpu" | "Sparkles" | "Terminal" | "Zap";
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
 
-const iconMap: Record<IconName, LucideIcon> = {
-  Box,
-  Dice5,
-  Cpu,
-  Sparkles,
-  Terminal,
-  Zap,
+type PersonaStat = {
+  id: string;
+  short: string;
+  label: { pt: string; en: string; es: string };
+  value: number;
+  color: string;
 };
 
-function localeToMessageKey(locale: string): "pt" | "en" | "es" {
+type PersonaModule = {
+  id: string;
+  icon: string;
+  title: string;
+  desc: { pt: string; en: string; es: string };
+  tags: string[];
+};
+
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+function localeKey(locale: string): "pt" | "en" | "es" {
   if (locale === "en") return "en";
   if (locale === "es") return "es";
   return "pt";
 }
 
+const iconMap: Record<string, React.ElementType> = {
+  Box,
+  Cpu,
+  Dice5,
+  Sparkles,
+  Terminal,
+  Zap,
+  Blocks,
+  Tv,
+  Gamepad2,
+  Rocket,
+  Dices,
+};
+
+const interestIconMap: Record<string, React.ElementType> = {
+  blockchain: Blocks,
+  anime: Tv,
+  rpg: Dices,
+  dnd: Dices,
+  cyberpunk2077: Gamepad2,
+  scifi: Rocket,
+};
+
+/* ------------------------------------------------------------------ */
+/*  RadarChart                                                         */
+/* ------------------------------------------------------------------ */
+
 function RadarChart({
   stats,
   labelKey,
 }: {
-  stats: Persona["stats"];
+  stats: PersonaStat[];
   labelKey: "pt" | "en" | "es";
 }) {
-  const size = 260;
+  const size = 200;
   const center = size / 2;
-  const radius = 92;
-  const angles = stats.map((_, i) => -Math.PI / 2 + (i * 2 * Math.PI) / stats.length);
+  const radius = 80;
+  const angleStep = (Math.PI * 2) / stats.length;
 
-  const polygonPoints = (scale: number) =>
-    angles
-      .map((a) => {
-        const x = center + Math.cos(a) * radius * scale;
-        const y = center + Math.sin(a) * radius * scale;
-        return `${x.toFixed(2)},${y.toFixed(2)}`;
-      })
-      .join(" ");
+  const points = stats.map((_, i) => {
+    const angle = i * angleStep - Math.PI / 2;
+    return {
+      x: center + radius * Math.cos(angle),
+      y: center + radius * Math.sin(angle),
+    };
+  });
 
-  const dataPoints = angles
-    .map((a, i) => {
-      const value = Math.max(0, Math.min(100, stats[i].value));
-      const x = center + Math.cos(a) * radius * (value / 100);
-      const y = center + Math.sin(a) * radius * (value / 100);
-      return { x, y, short: stats[i].short, label: stats[i].label[labelKey], color: stats[i].color };
-    });
+  const dataPoints = stats.map((s, i) => {
+    const angle = i * angleStep - Math.PI / 2;
+    const r = radius * (s.value / 100);
+    return {
+      x: center + r * Math.cos(angle),
+      y: center + r * Math.sin(angle),
+    };
+  });
+
+  const dataPoly = dataPoints.map((p) => `${p.x},${p.y}`).join(" ");
 
   return (
-    <svg
-      viewBox={`0 0 ${size} ${size}`}
-      className="h-[220px] w-[220px] max-w-full sm:h-[260px] sm:w-[260px]"
-    >
-      <g>
-        {[0.25, 0.5, 0.75, 1].map((s) => (
-          <polygon
-            key={s}
-            points={polygonPoints(s)}
-            fill="none"
-            stroke="rgba(0,240,255,0.18)"
-            strokeWidth="1"
-          />
-        ))}
-
-        {angles.map((a, i) => (
-          <line
-            key={stats[i].id}
-            x1={center}
-            y1={center}
-            x2={center + Math.cos(a) * radius}
-            y2={center + Math.sin(a) * radius}
-            stroke="rgba(255,255,255,0.10)"
-            strokeWidth="1"
-          />
-        ))}
-
+    <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[240px] mx-auto">
+      {/* Grid rings */}
+      {[0.25, 0.5, 0.75, 1].map((scale) => (
         <polygon
-          points={dataPoints.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ")}
-          fill="rgba(252,238,10,0.12)"
-          stroke="rgba(252,238,10,0.9)"
-          strokeWidth="2"
+          key={scale}
+          points={points
+            .map((p) => {
+              const dx = p.x - center;
+              const dy = p.y - center;
+              return `${center + dx * scale},${center + dy * scale}`;
+            })
+            .join(" ")}
+          fill="none"
+          stroke="rgba(0,240,255,0.15)"
+          strokeWidth={1}
         />
+      ))}
 
-        {dataPoints.map((p) => (
-          <circle key={p.short} cx={p.x} cy={p.y} r="3.4" fill={p.color} opacity="0.95" />
-        ))}
+      {/* Axis lines */}
+      {points.map((p, i) => (
+        <line
+          key={i}
+          x1={center}
+          y1={center}
+          x2={p.x}
+          y2={p.y}
+          stroke="rgba(0,240,255,0.15)"
+          strokeWidth={1}
+        />
+      ))}
 
-        {dataPoints.map((p, i) => {
-          const a = angles[i];
-          const x = center + Math.cos(a) * (radius + 26);
-          const y = center + Math.sin(a) * (radius + 26);
-          return (
-            <text
-              key={p.short}
-              x={x}
-              y={y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="rgba(255,255,255,0.70)"
-              fontSize="10"
-            >
-              {p.short}
-            </text>
-          );
-        })}
-      </g>
+      {/* Data polygon */}
+      <polygon
+        points={dataPoly}
+        fill="rgba(252,238,10,0.15)"
+        stroke="#fcee0a"
+        strokeWidth={2}
+      />
+
+      {/* Data points */}
+      {dataPoints.map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={3} fill={stats[i].color} />
+      ))}
+
+      {/* Labels */}
+      {stats.map((s, i) => {
+        const angle = i * angleStep - Math.PI / 2;
+        const lx = center + (radius + 18) * Math.cos(angle);
+        const ly = center + (radius + 18) * Math.sin(angle);
+        return (
+          <text
+            key={i}
+            x={lx}
+            y={ly}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="#d4d4d4"
+            fontSize={10}
+            fontFamily="var(--font-mono), monospace"
+          >
+            {s.short}
+          </text>
+        );
+      })}
     </svg>
   );
 }
 
-export default function CyberpunkOverlay({ locale }: { locale: string }) {
+/* ------------------------------------------------------------------ */
+/*  Main Overlay                                                       */
+/* ------------------------------------------------------------------ */
+
+export default function CyberpunkOverlay() {
+  const locale = useLocale();
   const t = useTranslations("Persona");
-  const open = useUiStore((s) => s.cyberpunkOpen);
-  const close = useUiStore((s) => s.closeCyberpunk);
+  const { cyberpunkOpen, closeCyberpunk } = useUiStore();
+  const reduced = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
 
-  const k = localeToMessageKey(locale);
-  const data = personaData as Persona;
+  const k = localeKey(locale);
 
-  const overlayVariants = useMemo(
-    () => ({
-      hidden: { opacity: 0, clipPath: "inset(50% 0 50% 0)", filter: "saturate(130%) contrast(120%)" },
-      visible: {
-        opacity: 1,
-        clipPath: "inset(0 0 0 0)",
-        filter: "saturate(120%) contrast(112%)",
-        transition: { duration: 0.4, ease: "circOut" as const },
-      },
-      exit: {
-        opacity: 0,
-        clipPath: "inset(0 50% 0 50%)",
-        transition: { duration: 0.3, ease: "easeInOut" as const },
-      },
-    }),
-    []
-  );
+  const stats = useMemo(() => personaData.stats as PersonaStat[], []);
+  const modules = useMemo(() => personaData.modules as PersonaModule[], []);
+  const interests = useMemo(() => personaData.interests, []);
 
   useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
+    if (!cyberpunkOpen) return;
+    const h = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeCyberpunk();
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [close, open]);
+    window.addEventListener("keydown", h);
+    document.body.style.overflow = "hidden";
+    if (ref.current) ref.current.focus();
+    return () => {
+      window.removeEventListener("keydown", h);
+      document.body.style.overflow = "";
+    };
+  }, [cyberpunkOpen, closeCyberpunk]);
+
+  const overlayVariants = {
+    hidden: { clipPath: "inset(50% 0 50% 0)", opacity: 0 },
+    visible: { clipPath: "inset(0 0 0 0)", opacity: 1 },
+    exit: { clipPath: "inset(0 50% 0 50%)", opacity: 0 },
+  };
 
   return (
     <AnimatePresence>
-      {open ? (
+      {cyberpunkOpen && (
         <motion.div
-          className="fixed inset-0 z-50 overflow-x-hidden overflow-y-auto overscroll-contain bg-black/95 text-cyber-yellow backdrop-blur-sm [-webkit-overflow-scrolling:touch] pt-[calc(1rem+env(safe-area-inset-top))] pr-[calc(1rem+env(safe-area-inset-right))] pb-[calc(1rem+env(safe-area-inset-bottom))] pl-[calc(1rem+env(safe-area-inset-left))]"
+          ref={ref}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="persona-title"
           initial="hidden"
           animate="visible"
           exit="exit"
-          variants={overlayVariants}
-          onClick={close}
+          variants={reduced ? {} : overlayVariants}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/95 p-4 focus:outline-none"
+          onClick={closeCyberpunk}
         >
+          {/* Grid overlay */}
+          {!reduced && (
+            <div
+              className="pointer-events-none fixed inset-0"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(0,240,255,0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,255,0.14) 1px, transparent 1px)",
+                backgroundSize: "48px 48px",
+              }}
+              aria-hidden="true"
+            />
+          )}
+
+          {/* Scanline */}
+          {!reduced && (
+            <div
+              className="pointer-events-none fixed inset-0 animate-scanline"
+              style={{
+                background:
+                  "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,240,255,0.05) 2px, rgba(0,240,255,0.05) 4px)",
+                backgroundSize: "100% 4px",
+              }}
+              aria-hidden="true"
+            />
+          )}
+
+          {/* Radial gradient vignette */}
+          <div
+            className="pointer-events-none fixed inset-0"
+            style={{
+              background:
+                "radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.6) 100%)",
+            }}
+            aria-hidden="true"
+          />
+
+          {/* Glitch flash */}
+          {!reduced && (
+            <motion.div
+              className="pointer-events-none fixed inset-0 bg-cyber-yellow/20"
+              initial={{ opacity: 0, x: 0 }}
+              animate={{ opacity: [0, 0.8, 0], x: [0, -8, 10, 0] }}
+              transition={{ duration: 0.35, times: [0, 0.3, 1] }}
+              aria-hidden="true"
+            />
+          )}
+
+          {/* Card */}
           <motion.div
-            className="pointer-events-none fixed inset-0 mix-blend-screen"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.8, 0], x: [0, -8, 10, 0] }}
+            initial={reduced ? {} : { scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={reduced ? {} : { scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
+            className="relative z-10 w-full max-w-3xl border border-cyber-yellow/50 bg-cyber-black/90 backdrop-blur"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,240,255,0.18),transparent,rgba(255,0,255,0.18))]" />
-            <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(252,238,10,0.18),transparent_35%,rgba(0,240,255,0.14),transparent_70%)]" />
-          </motion.div>
+            {/* Decorative corners */}
+            <div className="absolute -left-1 -top-1 h-3 w-3 border-l-2 border-t-2 border-cyber-yellow" />
+            <div className="absolute -right-1 -top-1 h-3 w-3 border-r-2 border-t-2 border-cyber-yellow" />
+            <div className="absolute -bottom-1 -left-1 h-3 w-3 border-b-2 border-l-2 border-cyber-yellow" />
+            <div className="absolute -bottom-1 -right-1 h-3 w-3 border-b-2 border-r-2 border-cyber-yellow" />
 
-          <div className="pointer-events-none fixed inset-0 opacity-20">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,240,255,0.16)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,240,255,0.14)_1px,transparent_1px)] bg-[size:48px_48px]" />
-            <div className="absolute inset-0 animate-scanline bg-[linear-gradient(to_bottom,transparent,rgba(252,238,10,0.10),transparent)] bg-[size:100%_160px]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,0,255,0.22),transparent_40%),radial-gradient(circle_at_85%_12%,rgba(0,240,255,0.22),transparent_42%)]" />
-          </div>
-
-          <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-4">
-            <div className="sticky top-0 z-[60] flex justify-end">
+            {/* Sticky header */}
+            <div className="sticky top-0 z-20 flex items-center justify-between border-b border-cyber-yellow/30 bg-cyber-black/95 px-4 py-3 backdrop-blur">
+              <div className="flex items-center gap-2">
+                <Zap size={14} className="text-cyber-yellow" />
+                <span className="font-mono text-xs tracking-widest text-cyber-yellow">
+                  PERSONA.EXE
+                </span>
+              </div>
               <button
                 type="button"
-                onClick={close}
-                className="inline-flex items-center gap-2 border border-cyber-yellow bg-black/60 px-3 py-2 font-mono text-xs text-cyber-yellow backdrop-blur hover:bg-cyber-yellow hover:text-black"
+                onClick={closeCyberpunk}
+                className="flex items-center gap-2 border border-cyber-yellow/50 px-3 py-1.5 font-mono text-xs text-cyber-yellow transition-colors hover:bg-cyber-yellow hover:text-black focus:ring-2 focus:ring-cyber-yellow"
                 aria-label={t("close")}
               >
-                <X size={18} /> {t("close")}
+                <X size={14} />
+                {t("close")}
               </button>
             </div>
 
-            <motion.div
-              className="relative w-full border border-cyber-yellow bg-black/80 p-6 shadow-[0_0_50px_rgba(252,238,10,0.18)] md:p-10"
-              onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-            >
-              <div className="relative flex flex-col gap-6 border-b border-cyber-yellow/30 pb-5 md:flex-row md:items-start md:justify-between">
-                <div className="min-w-0 pr-4">
-                  <h2
-                    className="glitch-text text-3xl font-bold uppercase tracking-tight sm:text-4xl md:text-6xl"
-                    data-text={data.profile.alias}
-                  >
-                    {data.profile.alias}
-                  </h2>
-                  <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-cyber-blue">
-                    <span className="rounded border border-cyber-blue/30 bg-black/40 px-2 py-1">
-                      [{data.profile.class[k]}]
-                    </span>
-                    <span className="rounded border border-cyber-blue/30 bg-black/40 px-2 py-1">
-                      :: {data.profile.origin[k]}
-                    </span>
+            {/* Content */}
+            <div className="space-y-8 p-6 md:p-8">
+              {/* Profile */}
+              <section>
+                <h2
+                  id="persona-title"
+                  className="glitch-text mb-2 font-mono text-2xl font-bold text-cyber-yellow md:text-3xl"
+                  data-text={personaData.profile.alias}
+                >
+                  {personaData.profile.alias}
+                </h2>
+                <div className="flex flex-wrap gap-3 font-mono text-xs text-cyber-blue">
+                  <span className="border border-cyber-blue/30 px-2 py-1">
+                    {personaData.profile.class[k]}
+                  </span>
+                  <span className="border border-cyber-blue/30 px-2 py-1">
+                    {personaData.profile.origin[k]}
+                  </span>
+                </div>
+              </section>
 
-                    <div className="flex flex-wrap items-center gap-2 text-white/60">
-                      {data.interests.map((i) => {
-                        const icon =
-                          i.key === "blockchain"
-                            ? "Cpu"
-                            : i.key === "dnd" || i.key === "rpg"
-                              ? "Dice5"
-                            : i.key === "cyberpunk2077"
-                              ? "Zap"
-                              : i.key === "scifi"
-                                ? "Box"
-                                : "Sparkles";
-                        const Icon = iconMap[icon as IconName] ?? Terminal;
-                        return (
-                          <span
-                            key={i.key}
-                            className="inline-flex items-center gap-2 rounded border border-white/10 bg-white/5 px-2 py-1"
-                          >
-                            <Icon size={14} className="text-cyber-yellow" />
-                            <span className="font-mono text-[10px]">{i.label[k]}</span>
+              {/* Interests */}
+              <section>
+                <h3 className="mb-3 font-mono text-xs uppercase tracking-widest text-cyber-pink">
+                  Interests
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {interests.map((item) => {
+                    const Icon = interestIconMap[item.key] || Terminal;
+                    return (
+                      <span
+                        key={item.key}
+                        className="flex items-center gap-1.5 border border-cyber-blue/30 bg-cyber-blue/5 px-2 py-1 font-mono text-xs text-cyber-blue"
+                      >
+                        <Icon size={12} />
+                        {item.label[k]}
+                      </span>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* Core Stats */}
+              <section>
+                <h3 className="mb-4 font-mono text-xs uppercase tracking-widest text-cyber-pink">
+                  {t("coreStatsTitle")}
+                </h3>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <RadarChart stats={stats} labelKey={k} />
+                  <div className="space-y-3">
+                    {stats.map((s) => (
+                      <div key={s.id}>
+                        <div className="mb-1 flex justify-between font-mono text-xs">
+                          <span className="text-cyber-blue">
+                            {s.label[k]}
                           </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative mt-8 grid grid-cols-1 gap-10 md:grid-cols-2">
-                <div>
-                  <h3 className="mb-5 border-l-4 border-cyber-blue pl-3 text-xl font-bold uppercase tracking-widest text-cyber-blue">
-                    {t("coreStatsTitle")}
-                  </h3>
-
-                  <div className="flex flex-col items-center gap-5">
-                    <RadarChart stats={data.stats} labelKey={k} />
-
-                    <div className="w-full space-y-3">
-                      {data.stats.map((s, idx) => (
-                        <div key={s.id} className="group">
-                          <div className="flex items-center justify-between gap-4 font-mono text-[11px] text-white/80">
-                            <span className="truncate">{s.label[k]}</span>
-                            <span>{s.value}/100</span>
-                          </div>
-                          <div className="mt-1 h-3 overflow-hidden border border-white/10 bg-black/50">
-                            <motion.div
-                              className="h-full"
-                              style={{ backgroundColor: s.color }}
-                              initial={{ width: 0 }}
-                              animate={{ width: `${s.value}%` }}
-                              transition={{ delay: 0.25 + idx * 0.08, duration: 0.9, ease: "easeOut" }}
-                            />
-                          </div>
+                          <span style={{ color: s.color }}>{s.value}%</span>
                         </div>
-                      ))}
-                    </div>
+                        <div className="h-2 w-full bg-white/10">
+                          <motion.div
+                            className="h-full"
+                            style={{ backgroundColor: s.color }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${s.value}%` }}
+                            transition={{
+                              duration: 1,
+                              delay: 0.3,
+                              ease: "easeOut",
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
+              </section>
 
-                <div>
-                  <h3 className="mb-5 border-l-4 border-cyber-pink pl-3 text-xl font-bold uppercase tracking-widest text-cyber-pink">
-                    {t("modulesTitle")}
-                  </h3>
-
-                  <div className="grid gap-4">
-                    {data.modules.map((mod, i) => {
-                      const Icon = iconMap[mod.icon as IconName] ?? Terminal;
-                      return (
-                        <motion.div
-                          key={mod.id}
-                          initial={{ x: 60, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: 0.35 + i * 0.1, duration: 0.35, ease: "easeOut" }}
-                          className="cursor-crosshair border border-white/10 bg-black/50 p-4 hover:border-cyber-yellow hover:shadow-[0_0_18px_rgba(252,238,10,0.25)]"
-                        >
-                          <div className="flex items-start gap-4">
-                            <div className="border border-white/10 bg-black/40 p-2 text-cyber-yellow">
-                              <Icon size={22} />
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex flex-wrap items-center justify-between gap-2">
-                                <h4 className="font-mono text-sm font-bold tracking-widest text-white">
-                                  {mod.title}
-                                </h4>
-                                {mod.tags?.length ? (
-                                  <div className="flex flex-wrap gap-1">
-                                    {mod.tags.map((tag) => (
-                                      <span
-                                        key={tag}
-                                        className="rounded border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] text-white/70"
-                                      >
-                                        {tag}
-                                      </span>
-                                    ))}
-                                  </div>
-                                ) : null}
-                              </div>
-                              <p className="mt-2 text-sm text-white/60">{mod.desc[k] ?? mod.desc.en}</p>
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
+              {/* Installed Modules */}
+              <section>
+                <h3 className="mb-4 font-mono text-xs uppercase tracking-widest text-cyber-pink">
+                  {t("modulesTitle")}
+                </h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {modules.map((m) => {
+                    const Icon = iconMap[m.icon] || Terminal;
+                    return (
+                      <div
+                        key={m.id}
+                        className="border border-cyber-blue/20 bg-cyber-blue/5 p-4"
+                      >
+                        <div className="mb-2 flex items-center gap-2">
+                          <Icon size={16} className="text-cyber-yellow" />
+                          <span className="font-mono text-xs font-bold text-cyber-yellow">
+                            {m.title}
+                          </span>
+                        </div>
+                        <p className="mb-3 font-mono text-xs leading-relaxed text-cyber-blue/80">
+                          {m.desc[k]}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {m.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="border border-cyber-pink/30 px-1.5 py-0.5 font-mono text-[10px] text-cyber-pink"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
+              </section>
 
-              <div className="relative mt-10 border-t border-white/10 pt-4 text-center font-mono text-[10px] uppercase tracking-widest text-white/35">
+              {/* Footer */}
+              <footer className="border-t border-cyber-yellow/20 pt-4 text-center font-mono text-[10px] text-cyber-yellow/50">
                 {t("footer")}
-              </div>
-            </motion.div>
-          </div>
+              </footer>
+            </div>
+          </motion.div>
         </motion.div>
-      ) : null}
+      )}
     </AnimatePresence>
   );
 }
