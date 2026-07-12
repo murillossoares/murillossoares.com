@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -31,6 +31,7 @@ export default function TerminalBoot({
   const t = useTranslations("Boot");
   const requestSkip = useUiStore((s) => s.requestSkip);
   const skipRequested = useUiStore((s) => s.skipRequested);
+  const prefersReducedMotion = useReducedMotion();
 
   const logs = useMemo(() => logsData as BootLog[], []);
   const messageKey = localeToMessageKey(locale);
@@ -44,30 +45,14 @@ export default function TerminalBoot({
   }, [onComplete]);
 
   useEffect(() => {
-    const prefersReducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = undefined;
     }
 
-    if (prefersReducedMotion) {
-      setLines(logs);
-      timeoutRef.current = window.setTimeout(() => onCompleteRef.current(), 250);
-      return () => {
-        if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-      };
-    }
-
-    if (skipRequested) {
-      setLines(logs);
-      timeoutRef.current = window.setTimeout(() => onCompleteRef.current(), 250);
-      return () => {
-        if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-      };
+    if (prefersReducedMotion || skipRequested) {
+      onCompleteRef.current();
+      return;
     }
 
     setLines([]);
@@ -102,7 +87,7 @@ export default function TerminalBoot({
       cancelled = true;
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     };
-  }, [logs, onComplete, skipRequested]);
+  }, [logs, prefersReducedMotion, skipRequested]);
 
   useEffect(() => {
     if (!scrollRef.current) return;
@@ -121,15 +106,18 @@ export default function TerminalBoot({
     <motion.div
       className="fixed inset-0 z-50 flex flex-col bg-black font-mono text-green-400"
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0, filter: "blur(10px)", scale: 1.04 }}
-      transition={{ duration: 0.55, ease: "easeOut" }}
+      exit={{ opacity: 0, scale: 1.015 }}
+      transition={{
+        duration: prefersReducedMotion || skipRequested ? 0 : 0.24,
+        ease: [0.23, 1, 0.32, 1],
+      }}
     >
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div className="text-xs text-white/70">:: Spring Boot :: (v3.x)</div>
         <button
           type="button"
           onClick={requestSkip}
-          className="rounded-md border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80 hover:bg-white/10"
+          className="rounded-md border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80 transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
         >
           {t("skip")} <span className="text-white/50">({t("hint")})</span>
         </button>

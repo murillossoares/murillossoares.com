@@ -32,16 +32,16 @@ function EndpointRow({ endpoint }: { endpoint: InterfaceEndpoint }) {
       href={endpoint.url}
       target={endpoint.url.startsWith("http") ? "_blank" : undefined}
       rel={endpoint.url.startsWith("http") ? "noopener noreferrer" : undefined}
-      className="group/endpoint flex items-start justify-between gap-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2 transition hover:border-[color:var(--accent)]/40 hover:bg-white/5"
+      className="group/endpoint flex items-start justify-between gap-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2 transition-colors hover:border-[color:var(--accent)]/40 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]"
     >
       <div className="min-w-0">
         <div className="flex items-center gap-3">
-          <Icon className="h-4 w-4 shrink-0 text-[color:var(--accent)] opacity-70 transition group-hover/endpoint:opacity-100" />
+          <Icon className="h-4 w-4 shrink-0 text-[color:var(--accent)] opacity-70 transition-opacity group-hover/endpoint:opacity-100 group-focus-visible/endpoint:opacity-100" />
           <div className="min-w-0">
-          <div className="truncate font-mono text-xs text-white/75 transition group-hover/endpoint:text-white">
+          <div className="truncate font-mono text-xs text-white/75 transition-colors group-hover/endpoint:text-white group-focus-visible/endpoint:text-white">
               {endpoint.label}
             </div>
-            <div className="mt-1 flex items-center gap-2 opacity-0 transition group-hover/endpoint:opacity-100">
+            <div className="mt-1 flex items-center gap-2 opacity-0 transition-opacity group-hover/endpoint:opacity-100 group-focus-visible/endpoint:opacity-100">
               <span className="font-mono text-[10px] text-[color:var(--accent-2)]">{endpoint.ip}</span>
               <span className="h-1.5 w-1.5 rounded-full bg-white/10" />
               <span className="font-mono text-[10px] text-white/40">hop=0 ttl=64</span>
@@ -50,7 +50,7 @@ function EndpointRow({ endpoint }: { endpoint: InterfaceEndpoint }) {
         </div>
       </div>
 
-      <span className="shrink-0 rounded-md border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] text-white/55 transition group-hover/endpoint:border-[color:var(--accent-2)]/40 group-hover/endpoint:text-[color:var(--accent-2)]">
+      <span className="shrink-0 rounded-md border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] text-white/55 transition-colors group-hover/endpoint:border-[color:var(--accent-2)]/40 group-hover/endpoint:text-[color:var(--accent-2)] group-focus-visible/endpoint:border-[color:var(--accent-2)]/40 group-focus-visible/endpoint:text-[color:var(--accent-2)]">
         {endpoint.status}
       </span>
     </a>

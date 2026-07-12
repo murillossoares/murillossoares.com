@@ -104,10 +104,6 @@ body {
     background: #6a6a6a;
   }
 
-  .badge-pulse {
-    animation: badgePulse 3.2s ease-in-out infinite;
-  }
-
   .glitch-text {
     position: relative;
     text-shadow: 0 0 24px rgba(252, 238, 10, 0.18);
@@ -141,16 +137,6 @@ body {
   }
 }
 
-@keyframes badgePulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
-  }
-  50% {
-    box-shadow: 0 0 18px rgba(255, 255, 255, 0.10);
-  }
-}
-
 @keyframes glitchTop {
   0% { transform: translate(0, 0) }
   20% { transform: translate(-1px, -1px) }
@@ -173,7 +159,6 @@ body {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
 }
