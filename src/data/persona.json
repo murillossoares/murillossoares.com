@@ -68,72 +68,10 @@
     {
       "key": "scifi",
       "label": {
-        "pt": "Fic\u00e7\u00e3o Cient\u00edfica",
+        "pt": "Ficcao Cientifica",
         "en": "Science Fiction",
-        "es": "Ciencia Ficci\u00f3n"
+        "es": "Ciencia Ficcion"
       }
-    }
-  ],
-  "modules": [
-    {
-      "id": "scifi_library",
-      "icon": "Box",
-      "title": "SCIFI_LIBRARY",
-      "desc": {
-        "pt": "Filmes e livros que exploram o futuro da tecnologia e da humanidade. (Interstellar (2014) ‧ Ficção científica/Aventura)",
-        "en": "Movies and books that explore the future of technology and humanity. (Interstellar (2014) ‧ Science Fiction/Adventure)",
-        "es": "Películas y libros que exploran el futuro de la tecnología y la humanidad. (Interstellar (2014) ‧ Ciencia Ficción/Aventura)"
-      },
-      "tags": [
-        "Interstellar",
-        "Space",
-        "AI",
-        "Future"
-      ]
-    },
-    {
-      "id": "blockchain_node",
-      "icon": "Cpu",
-      "title": "BLOCKCHAIN_NODE",
-      "desc": {
-        "pt": "Curiosidade por dApps e como sistemas distribuídos se comportam sob carga.",
-        "en": "Curiosity for dApps and how distributed systems behave under load.",
-        "es": "Curiosidad por dApps y cómo se comportan los sistemas distribuidos bajo carga."
-      },
-      "tags": [
-        "Solidity",
-        "Rust",
-        "BTC"
-      ]
-    },
-    {
-      "id": "rpg_system",
-      "icon": "Dice5",
-      "title": "RPG_SYSTEM",
-      "desc": {
-        "pt": "Estatísticas, builds e decisões — bom para liderança, storytelling e trabalho em equipe.",
-        "en": "Stats, builds and decisions — great for leadership, storytelling and teamwork.",
-        "es": "Estadísticas, builds y decisiones — genial para liderazgo, storytelling y trabajo en equipo."
-      },
-      "tags": [
-        "D&D",
-        "Cyberpunk 2077",
-        "TTRPG"
-      ]
-    },
-    {
-      "id": "anime_cache",
-      "icon": "Sparkles",
-      "title": "ANIME_CACHE",
-      "desc": {
-        "pt": "Referências e estética (quando cabem) para deixar interfaces mais memoráveis.",
-        "en": "References and aesthetics (when it fits) to make interfaces more memorable.",
-        "es": "Referencias y estética (cuando encaja) para hacer interfaces más memorables."
-      },
-      "tags": [
-        "Anime",
-        "Aesthetics"
-      ]
     }
   ],
   "stats": [
@@ -143,7 +81,7 @@
       "label": {
         "pt": "Sabedoria (Arquitetura)",
         "en": "Wisdom (Architecture)",
-        "es": "Sabidur\u00eda (Arquitectura)"
+        "es": "Sabiduria (Arquitectura)"
       },
       "value": 88,
       "color": "#00f0ff"
@@ -152,7 +90,7 @@
       "id": "intelligence",
       "short": "INT",
       "label": {
-        "pt": "Intelig\u00eancia (Java/Backend)",
+        "pt": "Inteligencia (Java/Backend)",
         "en": "Intelligence (Java/Backend)",
         "es": "Inteligencia (Java/Backend)"
       },
@@ -180,6 +118,52 @@
       },
       "value": 84,
       "color": "#ff00ff"
+    }
+  ],
+  "modules": [
+    {
+      "id": "scifi_library",
+      "icon": "Box",
+      "title": "SCIFI_LIBRARY",
+      "desc": {
+        "pt": "Filmes e livros que exploram o futuro da tecnologia e da humanidade. (Interstellar (2014) - Ficcao cientifica/Aventura)",
+        "en": "Movies and books that explore the future of technology and humanity. (Interstellar (2014) - Science Fiction/Adventure)",
+        "es": "Peliculas y libros que exploran el futuro de la tecnologia y la humanidad."
+      },
+      "tags": ["Interstellar", "Space", "AI", "Future"]
+    },
+    {
+      "id": "blockchain_node",
+      "icon": "Cpu",
+      "title": "BLOCKCHAIN_NODE",
+      "desc": {
+        "pt": "Curiosidade por dApps e como sistemas distribuidos se comportam sob carga.",
+        "en": "Curiosity for dApps and how distributed systems behave under load.",
+        "es": "Curiosidad por dApps y como se comportan los sistemas distribuidos bajo carga."
+      },
+      "tags": ["Solidity", "Rust", "BTC"]
+    },
+    {
+      "id": "rpg_system",
+      "icon": "Dice5",
+      "title": "RPG_SYSTEM",
+      "desc": {
+        "pt": "Estatisticas, builds e decisoes - bom para lideranca, storytelling e trabalho em equipe.",
+        "en": "Stats, builds and decisions - great for leadership, storytelling and teamwork.",
+        "es": "Estadisticas, builds y decisiones - genial para liderazgo, storytelling y trabajo en equipo."
+      },
+      "tags": ["D&D", "Cyberpunk 2077", "TTRPG"]
+    },
+    {
+      "id": "anime_cache",
+      "icon": "Sparkles",
+      "title": "ANIME_CACHE",
+      "desc": {
+        "pt": "Referencias e estetica (quando cabem) para deixar interfaces mais memoraveis.",
+        "en": "References and aesthetics (when it fits) to make interfaces more memorable.",
+        "es": "Referencias y estetica (cuando encaja) para hacer interfaces mas memorables."
+      },
+      "tags": ["Anime", "Aesthetics"]
     }
   ]
 }

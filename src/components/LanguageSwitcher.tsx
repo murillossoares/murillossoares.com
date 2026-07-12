@@ -1,61 +1,15 @@
 "use client";
-
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useLocale } from "next-intl";
-
+import { usePathname } from "next/navigation";
 import { locales } from "@/i18n/routing";
-
-const labels: Record<string, string> = {
-  "pt-br": "PT-BR",
-  en: "EN",
-  es: "ES",
-};
-
-export default function LanguageSwitcher({ label }: { label?: string }) {
-  const locale = useLocale();
+export default function LanguageSwitcher({ currentLocale }: { currentLocale: string }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const buildHref = (nextLocale: string) => {
-    const parts = (pathname ?? "/").split("/").filter(Boolean);
-
-    if (parts.length === 0) {
-      return `/${nextLocale}`;
-    }
-
-    if (locales.includes(parts[0] as never)) {
-      parts[0] = nextLocale;
-    } else {
-      parts.unshift(nextLocale);
-    }
-
-    const base = `/${parts.join("/")}`;
-    const query = searchParams?.toString() ?? "";
-    return query ? `${base}?${query}` : base;
-  };
-
+  const getPath = (locale: string) => { const s = pathname.split("/"); s[1] = locale; return s.join("/"); };
   return (
-    <div className="group flex items-center gap-2 rounded border border-white/10 bg-black/50 px-3 py-2 transition-colors hover:border-white/30">
-      {label ? (
-        <span className="hidden md:inline text-[10px] font-mono text-[color:var(--muted)]">{label}</span>
-      ) : null}
-      <div className="flex items-center gap-1">
-        {locales.map((l) => (
-          <Link
-            key={l}
-            href={buildHref(l)}
-            aria-current={locale === l ? "page" : undefined}
-            className={`rounded px-1.5 py-0.5 font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
-              locale === l
-                ? "bg-white/10 text-[color:var(--text)]"
-                : "hover:bg-white/5 text-gray-400"
-            }`}
-          >
-            {labels[l] ?? l.toUpperCase()}
-          </Link>
-        ))}
-      </div>
-    </div>
+    <nav aria-label="Language" className="group flex items-center gap-2 bg-panel border border-border px-3 py-2 rounded hover:border-accent transition-colors">
+      {locales.map((l) => (
+        <a key={l} href={getPath(l)} aria-current={currentLocale === l ? "page" : undefined}
+          className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded transition-colors focus:ring-2 focus:ring-[var(--accent)] ${currentLocale === l ? "bg-accent text-white" : "text-muted hover:text-white"}`}>{l}</a>
+      ))}
+    </nav>
   );
 }
