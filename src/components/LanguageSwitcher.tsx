@@ -36,7 +36,7 @@ export default function LanguageSwitcher({ label }: { label?: string }) {
   };
 
   return (
-    <div className="group flex items-center gap-2 bg-black/50 border border-white/10 px-3 py-2 rounded hover:border-white/30 transition-all">
+    <div className="group flex items-center gap-2 rounded border border-white/10 bg-black/50 px-3 py-2 transition-colors hover:border-white/30">
       {label ? (
         <span className="hidden md:inline text-[10px] font-mono text-[color:var(--muted)]">{label}</span>
       ) : null}
@@ -45,7 +45,8 @@ export default function LanguageSwitcher({ label }: { label?: string }) {
           <Link
             key={l}
             href={buildHref(l)}
-            className={`rounded px-1.5 py-0.5 font-mono text-xs ${
+            aria-current={locale === l ? "page" : undefined}
+            className={`rounded px-1.5 py-0.5 font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
               locale === l
                 ? "bg-white/10 text-[color:var(--text)]"
                 : "hover:bg-white/5 text-gray-400"

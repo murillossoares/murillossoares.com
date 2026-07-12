@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 const themes = [
@@ -11,6 +12,7 @@ const themes = [
 
 export default function ThemeSwitcher({ label }: { label?: string }) {
   const { theme, setTheme } = useTheme();
+  const t = useTranslations("Header");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -25,6 +27,7 @@ export default function ThemeSwitcher({ label }: { label?: string }) {
         <span className="hidden md:inline text-[10px] font-mono text-muted">{label}</span>
       ) : null}
       <select
+        aria-label={label ?? t("theme")}
         className="cursor-pointer font-mono text-xs outline-none bg-panel-2 text-text border border-border rounded px-2 py-1 focus:ring-1 focus:ring-accent"
         value={theme ?? "vscode-dark"}
         onChange={(e) => setTheme(e.target.value)}

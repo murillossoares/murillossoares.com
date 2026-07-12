@@ -22,6 +22,7 @@ export default function DownloadCVButton({ label }: { label?: string }) {
 
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const pdfTheme: PdfThemeName = isPdfThemeName(theme) ? theme : "vscode-dark";
@@ -49,6 +50,7 @@ export default function DownloadCVButton({ label }: { label?: string }) {
 
   const handleDownload = async () => {
     if (loading) return;
+    setFailed(false);
     setLoading(true);
     try {
       const [{ pdf }, { CVDocument }] = await Promise.all([import("@react-pdf/renderer"), import("@/components/pdf/CVDocument")]);
@@ -64,6 +66,9 @@ export default function DownloadCVButton({ label }: { label?: string }) {
       anchor.remove();
 
       setTimeout(() => URL.revokeObjectURL(url), 500);
+    } catch (error) {
+      console.error("Failed to generate CV PDF", error);
+      setFailed(true);
     } finally {
       setLoading(false);
     }
@@ -78,7 +83,9 @@ export default function DownloadCVButton({ label }: { label?: string }) {
       className="flex items-center gap-2 bg-panel-2 hover:bg-panel border border-border px-4 py-2 rounded text-xs font-mono transition-colors text-text hover:border-accent disabled:opacity-70 disabled:cursor-not-allowed"
     >
       {loading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-      <span>{loading ? "BUILDING..." : buttonLabel}</span>
+      <span role={failed ? "alert" : undefined} aria-live="polite">
+        {loading ? "BUILDING..." : failed ? tHeader("downloadError") : buttonLabel}
+      </span>
     </button>
   );
 }

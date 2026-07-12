@@ -18,3 +18,7 @@ coverage
 .idea
 .vscode
 .cache
+
+# Test artifacts
+test-results/
+playwright-report/
