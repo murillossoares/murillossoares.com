@@ -1,6 +1,7 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
+import { MotionConfig } from "framer-motion";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -11,8 +12,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
       themes={["vscode-dark", "intellij-darcula", "sublime-monokai"]}
     >
-      {children}
+      <MotionConfig reducedMotion="user">{children}</MotionConfig>
     </ThemeProvider>
   );
 }
-

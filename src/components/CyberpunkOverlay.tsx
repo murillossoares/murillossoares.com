@@ -1,10 +1,10 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Box, Cpu, Dice5, Sparkles, Terminal, X, Zap } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import personaData from "@/data/persona.json";
 import { useUiStore } from "@/store/ui";
@@ -122,23 +122,18 @@ export default function CyberpunkOverlay({ locale }: { locale: string }) {
   const t = useTranslations("Persona");
   const open = useUiStore((s) => s.cyberpunkOpen);
   const close = useUiStore((s) => s.closeCyberpunk);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const k = localeToMessageKey(locale);
   const data = personaData as Persona;
 
   const overlayVariants = useMemo(
     () => ({
-      hidden: { opacity: 0, clipPath: "inset(50% 0 50% 0)", filter: "saturate(130%) contrast(120%)" },
+      hidden: { opacity: 0, scale: 0.985 },
       visible: {
         opacity: 1,
-        clipPath: "inset(0 0 0 0)",
-        filter: "saturate(120%) contrast(112%)",
-        transition: { duration: 0.4, ease: "circOut" as const },
-      },
-      exit: {
-        opacity: 0,
-        clipPath: "inset(0 50% 0 50%)",
-        transition: { duration: 0.3, ease: "easeInOut" as const },
+        scale: 1,
+        transition: { duration: 0.24, ease: [0.23, 1, 0.32, 1] as const },
       },
     }),
     []
@@ -146,29 +141,61 @@ export default function CyberpunkOverlay({ locale }: { locale: string }) {
 
   useEffect(() => {
     if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [close, open]);
+    const dialog = dialogRef.current;
+    if (!dialog) return;
 
-  return (
-    <AnimatePresence>
-      {open ? (
-        <motion.div
-          className="fixed inset-0 z-50 overflow-x-hidden overflow-y-auto overscroll-contain bg-black/95 text-cyber-yellow backdrop-blur-sm [-webkit-overflow-scrolling:touch] pt-[calc(1rem+env(safe-area-inset-top))] pr-[calc(1rem+env(safe-area-inset-right))] pb-[calc(1rem+env(safe-area-inset-bottom))] pl-[calc(1rem+env(safe-area-inset-left))]"
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    dialog.showModal();
+
+    return () => {
+      if (dialog.open) dialog.close();
+      previouslyFocused?.focus();
+    };
+  }, [open]);
+
+  return open ? (
+        <motion.dialog
+          ref={dialogRef}
+          aria-label={data.profile.alias}
+          className="fixed inset-0 z-50 m-0 h-full max-h-none w-full max-w-none overflow-x-hidden overflow-y-auto overscroll-contain border-0 bg-black/95 text-cyber-yellow backdrop-blur-sm [-webkit-overflow-scrolling:touch] pt-[calc(1rem+env(safe-area-inset-top))] pr-[calc(1rem+env(safe-area-inset-right))] pb-[calc(1rem+env(safe-area-inset-bottom))] pl-[calc(1rem+env(safe-area-inset-left))]"
           initial="hidden"
           animate="visible"
-          exit="exit"
           variants={overlayVariants}
-          onClick={close}
+          onCancel={(event) => {
+            event.preventDefault();
+            close();
+          }}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) close();
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== "Tab") return;
+            const focusable = Array.from(
+              event.currentTarget.querySelectorAll<HTMLElement>(
+                'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+              ),
+            );
+            if (focusable.length === 0) return;
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+              event.preventDefault();
+              last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+              event.preventDefault();
+              first.focus();
+            }
+          }}
         >
           <motion.div
             className="pointer-events-none fixed inset-0 mix-blend-screen"
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.8, 0], x: [0, -8, 10, 0] }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
+            animate={{
+              opacity: [0, 0.8, 0],
+              transform: ["translateX(0)", "translateX(-8px)", "translateX(10px)", "translateX(0)"],
+            }}
+            transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1] }}
           >
             <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,240,255,0.18),transparent,rgba(255,0,255,0.18))]" />
             <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(252,238,10,0.18),transparent_35%,rgba(0,240,255,0.14),transparent_70%)]" />
@@ -176,7 +203,6 @@ export default function CyberpunkOverlay({ locale }: { locale: string }) {
 
           <div className="pointer-events-none fixed inset-0 opacity-20">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,240,255,0.16)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,240,255,0.14)_1px,transparent_1px)] bg-[size:48px_48px]" />
-            <div className="absolute inset-0 animate-scanline bg-[linear-gradient(to_bottom,transparent,rgba(252,238,10,0.10),transparent)] bg-[size:100%_160px]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,0,255,0.22),transparent_40%),radial-gradient(circle_at_85%_12%,rgba(0,240,255,0.22),transparent_42%)]" />
           </div>
 
@@ -185,7 +211,8 @@ export default function CyberpunkOverlay({ locale }: { locale: string }) {
               <button
                 type="button"
                 onClick={close}
-                className="inline-flex items-center gap-2 border border-cyber-yellow bg-black/60 px-3 py-2 font-mono text-xs text-cyber-yellow backdrop-blur hover:bg-cyber-yellow hover:text-black"
+                autoFocus
+                className="inline-flex items-center gap-2 border border-cyber-yellow bg-black/60 px-3 py-2 font-mono text-xs text-cyber-yellow backdrop-blur transition-colors hover:bg-cyber-yellow hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyber-blue"
                 aria-label={t("close")}
               >
                 <X size={18} /> {t("close")}
@@ -195,12 +222,11 @@ export default function CyberpunkOverlay({ locale }: { locale: string }) {
             <motion.div
               className="relative w-full border border-cyber-yellow bg-black/80 p-6 shadow-[0_0_50px_rgba(252,238,10,0.18)] md:p-10"
               onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
             >
               <div className="relative flex flex-col gap-6 border-b border-cyber-yellow/30 pb-5 md:flex-row md:items-start md:justify-between">
                 <div className="min-w-0 pr-4">
                   <h2
+                    id="persona-title"
                     className="glitch-text text-3xl font-bold uppercase tracking-tight sm:text-4xl md:text-6xl"
                     data-text={data.profile.alias}
                   >
@@ -261,10 +287,14 @@ export default function CyberpunkOverlay({ locale }: { locale: string }) {
                           <div className="mt-1 h-3 overflow-hidden border border-white/10 bg-black/50">
                             <motion.div
                               className="h-full"
-                              style={{ backgroundColor: s.color }}
-                              initial={{ width: 0 }}
-                              animate={{ width: `${s.value}%` }}
-                              transition={{ delay: 0.25 + idx * 0.08, duration: 0.9, ease: "easeOut" }}
+                              style={{ backgroundColor: s.color, transformOrigin: "left" }}
+                              initial={{ scaleX: 0.01, opacity: 0 }}
+                              animate={{ scaleX: Math.max(0.01, Math.min(1, s.value / 100)), opacity: 1 }}
+                              transition={{
+                                delay: 0.16 + idx * 0.04,
+                                duration: 0.24,
+                                ease: [0.23, 1, 0.32, 1],
+                              }}
                             />
                           </div>
                         </div>
@@ -284,9 +314,9 @@ export default function CyberpunkOverlay({ locale }: { locale: string }) {
                       return (
                         <motion.div
                           key={mod.id}
-                          initial={{ x: 60, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: 0.35 + i * 0.1, duration: 0.35, ease: "easeOut" }}
+                          initial={{ transform: "translateX(16px)", opacity: 0 }}
+                          animate={{ transform: "translateX(0)", opacity: 1 }}
+                          transition={{ delay: 0.2 + i * 0.06, duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
                           className="cursor-crosshair border border-white/10 bg-black/50 p-4 hover:border-cyber-yellow hover:shadow-[0_0_18px_rgba(252,238,10,0.25)]"
                         >
                           <div className="flex items-start gap-4">
@@ -326,8 +356,6 @@ export default function CyberpunkOverlay({ locale }: { locale: string }) {
               </div>
             </motion.div>
           </div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
-  );
+        </motion.dialog>
+  ) : null;
 }

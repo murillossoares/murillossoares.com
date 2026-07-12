@@ -11,7 +11,8 @@
     },
     "theme": "Tema",
     "language": "Idioma",
-    "downloadCv": "Descargar CV"
+    "downloadCv": "Descargar CV",
+    "downloadError": "No se pudo generar el CV. Inténtalo de nuevo."
   },
   "Boot": {
     "skip": "Saltar boot",

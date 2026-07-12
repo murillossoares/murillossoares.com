@@ -30,15 +30,6 @@ const config: Config = {
           black: "#0a0a0a",
         },
       },
-      animation: {
-        scanline: "scanline 8s linear infinite",
-      },
-      keyframes: {
-        scanline: {
-          "0%": { backgroundPosition: "0% 0%" },
-          "100%": { backgroundPosition: "0% 100%" },
-        }
-      },
     },
   },
   plugins: [],
