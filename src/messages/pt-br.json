@@ -1,13 +1,13 @@
 {
   "App": {
     "title": "Murillo Soares",
-    "subtitle": "Java 7 → 21 • Spring Boot 3 • Microservices • React • Angular"
+    "subtitle": "Java 7 -> 21 * Spring Boot 3 * Microservices * React * Angular"
   },
   "Header": {
     "tabs": {
-      "cv": "Overview.dashboard",
-      "skills": "Dependencies.lock",
-      "contact": "EventHistory.log"
+      "cv": "VisaoGeral.dashboard",
+      "skills": "Dependencias.lock",
+      "contact": "HistoricoEventos.log"
     },
     "theme": "Tema",
     "language": "Idioma",
@@ -16,77 +16,58 @@
   },
   "Boot": {
     "skip": "Pular boot",
-    "hint": "Esc para pular"
+    "hint": "Esc para pular",
+    "lines": {
+      "kernelStarted": "[ OK ] Kernel iniciado.",
+      "mountedCareer": "[ OK ] /dev/carreira montado.",
+      "networkingStack": "[ OK ] Stack de rede iniciado.",
+      "mountedExperience": "[ OK ] /var/lib/experiencia montado.",
+      "cvService": "[ OK ] Servico de CV iniciado.",
+      "networkTarget": "[ OK ] Alvo de rede alcancado.",
+      "portfolioStarted": "[ OK ] Murillo Soares Portfolio v3.0 iniciado",
+      "modules": "Carregando modulos: Java, Spring, React, Angular...",
+      "uptime": "Uptime: 9+ anos de experiencia profissional",
+      "ready": "Sistema pronto."
+    }
   },
   "Dashboard": {
-    "bannerMeta": {
-      "service": "cv-service",
-      "env": "prod",
-      "status": "healthy"
-    },
-    "metrics": {
-      "uptimeLabel": "Uptime",
-      "uptimeValue": "9+ anos",
-      "availabilityLabel": "Availability",
-      "availabilityValue": "99.9% SLO",
-      "latencyLabel": "p95 latency",
-      "latencyValue": "low",
-      "deployRateLabel": "Deploy rate",
-      "deployRateValue": "high"
-    },
-    "uptimeHint": "Tempo de produção (carreira)",
-    "availabilityHint": "Qualidade / confiabilidade",
-    "latencyHint": "Entrega: rápido e consistente",
-    "deployHint": "Iteração contínua",
-    "networkTitle": "Network Interfaces",
-    "networkSubtitle": "conexoes_ativas",
-    "dependenciesTitle": "Depend\u00eancias Ativas",
-    "dependenciesGroups": {
-      "backend": "N\u00f3 Backend",
-      "frontend": "Cliente Frontend",
-      "platform": "Plataforma"
-    },
-    "eventHistoryTitle": "Logs de Execução (Experiência)",
-    "eventHistoryRight": "event_history.stream",
-    "eventHistoryEmpty": "Nenhum evento carregado.",
-    "serviceMapTitle": "Service Map",
-    "serviceMapNodes": "nodes: backend → api → ui",
-    "serviceMapFlow": "trace: backend → ui",
-    "serviceMapCaption": "Backend robusto, integrações limpas e UI polida.",
-    "backendNodeTitle": "Backend Node",
-    "backendNodeRight": "backend@8080",
-    "backendNodeSubtitle": "java/spring runtime",
-    "systemOnline": "Sistema online",
-    "headline": "Engenheiro Full Stack S\u00eanior",
+    "systemOnline": "Sistema Online",
+    "headline": "Engenheiro Full Stack Senior",
     "kpis": {
-      "uptimeLabel": "TEMPO ATIVO",
+      "uptimeLabel": "UPTIME",
       "uptimeValue": "9+ anos",
-      "uptimeSub": "Experi\u00eancia profissional",
-      "stackLabel": "PROFUNDIDADE DE STACK",
+      "uptimeSub": "Exp. profissional",
+      "stackLabel": "PROFUNDIDADE STACK",
       "stackValue": "Completo",
       "stackSub": "Backend + Frontend",
-      "archLabel": "ARQ",
-      "archValue": "S\u00f3lida",
+      "archLabel": "ARCH",
+      "archValue": "Solida",
       "archSub": "Mono -> Micro"
     },
+    "eventHistoryTitle": "Logs de Execucao (Experiencia)",
     "eventHistoryHint": "Selecione um log para inspecionar",
-    "dependenciesEmpty": "Nenhuma depend\u00eancia carregada.",
-    "architectureViewLabel": "Vis\u00e3o de Arquitetura",
+    "eventHistoryEmpty": "Nenhum historico carregado.",
+    "dependenciesTitle": "Dependencias Ativas",
+    "dependenciesGroups": {
+      "backend": "No Backend",
+      "frontend": "Cliente Frontend"
+    },
+    "dependenciesEmpty": "Nenhuma dependencia carregada.",
+    "architectureViewLabel": "Visao de Arquitetura",
     "serviceMapNodeLabels": {
       "server": "Servidor",
       "gateway": "Gateway",
       "client": "Cliente"
-    },
-    "backendNodeCaption": "Stack focada em microservices, integrações e performance."
+    }
   },
   "careerHistory": [
     {
       "id": "iefp",
       "year": "2025",
-      "role": "Desenvolvedor Full Stack S\u00eanior",
+      "role": "Full Stack Senior",
       "company": "Conkord | IEFP",
       "type": "WARN",
-      "desc": "GOV PORTAL: Manutenção evolutiva de ecossistema Java 8 (Servlet/JSP) e integração de serviços digitais (Axis/MuleSoft).",
+      "desc": "PORTAL GOV: Manutencao evolutiva do ecossistema Java 8 (Servlet/JSP) e integracao de servicos digitais.",
       "stack": [
         "Java 8",
         "Spring Web",
@@ -102,7 +83,7 @@
       "role": "Desenvolvedor Full Stack",
       "company": "YTech | CGI",
       "type": "INFO",
-      "desc": "SMART GRIDS: Infraestrutura de medição avançada (AMI) e gestão de alta volumetria de dados de energia.",
+      "desc": "SMART GRIDS: Infraestrutura de medicao avancada (AMI) e gestao de alto volume de dados de energia.",
       "stack": [
         "Java 17",
         "Spring Boot",
@@ -115,10 +96,10 @@
     {
       "id": "inovaprime",
       "year": "2022",
-      "role": "Consultor T\u00e9cnico",
+      "role": "Consultor Tecnico",
       "company": "Inovaprime",
       "type": "INFO",
-      "desc": "AUTOMATION: Soluções de Governança IT, dashboards dinâmicos e fluxo de mensagens (Message Queue).",
+      "desc": "AUTOMACAO: Solucoes de governanca de TI, dashboards dinamicos e fluxo de filas de mensagens.",
       "stack": [
         "Java",
         "Groovy",
@@ -132,9 +113,9 @@
       "id": "fnx",
       "year": "2020",
       "role": "Analista de Desenvolvimento",
-      "company": "FNX Participações",
+      "company": "FNX Participacoes",
       "type": "SUCCESS",
-      "desc": "MULTI-PLATFORM: Ecossistema Híbrido (Mobile/PWA) e customização profunda de ERP (Financeiro/Mining).",
+      "desc": "MULTIPLATAFORMA: Ecossistema hibrido (Mobile/PWA) e customizacao profunda de ERP.",
       "stack": [
         "Flutter",
         "React",
@@ -148,9 +129,9 @@
       "id": "nbs",
       "year": "2020",
       "role": "Analista de Sistemas",
-      "company": "NBS Informática",
+      "company": "NBS Informatica",
       "type": "SUCCESS",
-      "desc": "MICROSERVICES: Arquitetura distribuída com Netflix OSS (Eureka/Zuul) para o setor automóvel.",
+      "desc": "MICROSERVICES: Arquitetura distribuida com Netflix OSS para o setor automotivo.",
       "stack": [
         "Spring Cloud",
         "Netflix Eureka",
@@ -163,9 +144,9 @@
       "id": "sankhya",
       "year": "2019",
       "role": "Analista de Sistemas",
-      "company": "Sankhya Gestão",
+      "company": "Sankhya Gestao",
       "type": "WARN",
-      "desc": "ERP CORE: Extensões Java nativas, integrações PL/SQL complexas e relatórios corporativos.",
+      "desc": "ERP CORE: Extensoes nativas Java, integracoes PL/SQL complexas e relatorios corporativos.",
       "stack": [
         "Java",
         "PL/SQL",
@@ -181,7 +162,7 @@
       "role": "Desenvolvedor Full Stack",
       "company": "Accurate Software",
       "type": "INFO",
-      "desc": "MISSÃO CRÍTICA: Manutenção de aplicações legadas e cloud-native (AWS Lambda/Serverless) para grandes clientes do setor bancário e telecomunicações.",
+      "desc": "MISSAO CRITICA: Manutencao de apps legados e cloud-native (AWS Lambda/Serverless) para banking/telco.",
       "stack": [
         "Spring Boot",
         "React",
@@ -195,10 +176,10 @@
     {
       "id": "playmatch",
       "year": "2021",
-      "role": "Desenvolvedor Back End",
+      "role": "Desenvolvedor Backend",
       "company": "PlayMatch",
       "type": "SUCCESS",
-      "desc": "PLATAFORMA ESPORTS: Motor de gamificação para projetos educacionais. Ambiente containerizado com Docker e migrações de banco de dados.",
+      "desc": "PLATAFORMA ESPORTS: Motor de gamificacao para projetos educacionais. Ambiente conteinerizado.",
       "stack": [
         "Java",
         "Spring Boot",
@@ -211,10 +192,10 @@
     {
       "id": "atuarial",
       "year": "2019",
-      "role": "Desenvolvedor Front End",
+      "role": "Desenvolvedor Frontend",
       "company": "Atuarial Consultoria",
       "type": "INFO",
-      "desc": "RELATÓRIOS FINTECH: Dashboard de investimentos e relatórios atuariais. Gerenciamento de estado com Redux e integração com SQL Server.",
+      "desc": "RELATORIOS FINTECH: Dashboard de relatorios de investimento. Gestao de estado com Redux.",
       "stack": [
         "React",
         "Redux",
@@ -227,10 +208,10 @@
     {
       "id": "datalab",
       "year": "2018",
-      "role": "Estagiário em Dev",
+      "role": "Estagiario de Desenvolvimento",
       "company": "Datalab Mobile",
       "type": "WARN",
-      "desc": "MOBILIDADE ERP: Integrações com SAP Business One/HANA. Desenvolvimento híbrido com C#, PHP e Java para automação comercial.",
+      "desc": "MOBILIDADE ERP: Integracoes com SAP Business One/HANA. Desenvolvimento hibrido.",
       "stack": [
         "SAP HANA",
         "C#",
@@ -243,10 +224,10 @@
     {
       "id": "ufmt",
       "year": "2017",
-      "role": "Estagiário de TI",
+      "role": "Estagiario de TI",
       "company": "UFMT",
       "type": "INFO",
-      "desc": "INFRA ACADÊMICA: Manutenção de CMS (Joomla) e suporte à infraestrutura de TI e redes do campus universitário.",
+      "desc": "INFRA ACADEMICA: Manutencao de CMS (Joomla) e suporte a infraestrutura de TI do campus.",
       "stack": [
         "Joomla",
         "PHP",
@@ -257,6 +238,47 @@
       "archType": "monolith"
     }
   ],
+  "Scoreboard": {
+    "title": "Quadro de Desempenho",
+    "subtitle": "Visualizacao em tempo real das metricas de carreira",
+    "metrics": {
+      "uptime": {
+        "label": "Tempo de Atividade",
+        "value": "9+ anos",
+        "description": "Experiencia profissional em producao"
+      },
+      "stackDepth": {
+        "label": "Profundidade do Stack",
+        "value": "Completo",
+        "description": "Experiencia Backend + Frontend"
+      },
+      "architecture": {
+        "label": "Arquitetura",
+        "value": "Solida",
+        "description": "Da monolito a microservicos"
+      },
+      "projects": {
+        "label": "Projetos",
+        "value": "11",
+        "description": "Sistemas em producao entregues"
+      }
+    },
+    "scene": {
+      "loading": "Carregando cena 3D...",
+      "fallback": "Modo interativo indisponivel -- mostrando metricas estaticas",
+      "noWebgl": "Seu navegador nao suporta WebGL. Usando visualizacao alternativa."
+    },
+    "controls": {
+      "rotate": "Arraste para rotacionar",
+      "zoom": "Role para zoom",
+      "reset": "Redefinir"
+    },
+    "accessibility": {
+      "ariaLabel": "Scoreboard 3D mostrando metricas de carreira",
+      "staticTableLabel": "Metricas de carreira em formato tabular"
+    },
+    "metricsSectionLabel": "Visao Geral das Metricas"
+  },
   "Persona": {
     "buttonIdle": "MODO_SEGURO",
     "buttonHover": "INICIAR PROTOCOLO",
@@ -265,6 +287,6 @@
     "coreStatsTitle": "CORE_STATS",
     "modulesTitle": "INSTALLED_MODULES",
     "close": "Fechar",
-    "footer": "NetWatch Systems v2.77 // Acesso n\u00e3o autorizado detectado // Rastreamento conclu\u00eddo"
+    "footer": "NetWatch Systems v2.77 // Acesso nao autorizado detectado // Rastreamento concluido"
   }
 }
