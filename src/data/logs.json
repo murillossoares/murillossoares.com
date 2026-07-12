@@ -15,9 +15,9 @@
     "timestamp": "00:00:02",
     "level": "INFO",
     "message": {
-      "pt": "Montando volume de memória: IFMT (Engenharia de Computação) verificado.",
+      "pt": "Montando volume de memoria: IFMT (Engenharia de Computacao) verificado.",
       "en": "Mounting memory volume: IFMT (Computer Engineering) verified.",
-      "es": "Montando volumen de memoria: IFMT (Ingeniería Informática) verificado."
+      "es": "Montando volumen de memoria: IFMT (Ingenieria Informatica) verificado."
     },
     "delay": 450
   },
@@ -59,11 +59,10 @@
     "timestamp": "00:00:06",
     "level": "SUCCESS",
     "message": {
-      "pt": "SISTEMA PRONTO. Iniciando Interface Gráfica (GUI) na porta 8080...",
+      "pt": "SISTEMA PRONTO. Iniciando Interface Grafica (GUI) na porta 8080...",
       "en": "SYSTEM READY. Starting Graphic User Interface (GUI) on port 8080...",
-      "es": "SISTEMA LISTO. Iniciando Interfaz Gráfica (GUI) en el puerto 8080..."
+      "es": "SISTEMA LISTO. Iniciando Interfaz Grafica (GUI) en el puerto 8080..."
     },
     "delay": 680
   }
 ]
-

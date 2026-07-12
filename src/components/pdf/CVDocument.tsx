@@ -1,4 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+
 import { pdfThemes, type PdfThemeName } from "@/lib/pdf-themes";
 
 type CareerItem = {
