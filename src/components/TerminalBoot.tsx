@@ -36,7 +36,7 @@ export default function TerminalBoot({ locale, onComplete }: { locale: string; o
   const k = localeKey(locale);
   const [lines, setLines] = useState<BootLog[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const onCompleteRef = useRef(onComplete);
 
   useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);

@@ -33,6 +33,17 @@ test.describe("portfolio smoke", () => {
     expect(pageErrors).toEqual([]);
   });
 
+  test("scoreboard hydrates without client-side exceptions", async ({ page }) => {
+    const pageErrors: Error[] = [];
+    page.on("pageerror", (error) => pageErrors.push(error));
+
+    await page.goto("/pt-br/scoreboard");
+    await expect(page.getByRole("heading", { name: "Quadro de Desempenho" })).toBeVisible();
+    await page.waitForTimeout(1_000);
+
+    expect(pageErrors).toEqual([]);
+  });
+
   test("keyboard skip is immediate", async ({ page }) => {
     await page.goto("/pt-br");
     await expect(page.getByRole("button", { name: /Pular boot/i })).toBeVisible();

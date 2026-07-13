@@ -15,6 +15,7 @@ import {
   Rocket,
   Dices,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef } from "react";
 
@@ -51,7 +52,7 @@ function localeKey(locale: string): "pt" | "en" | "es" {
   return "pt";
 }
 
-const iconMap: Record<string, React.ElementType> = {
+const iconMap: Record<string, LucideIcon> = {
   Box,
   Cpu,
   Dice5,
@@ -65,7 +66,7 @@ const iconMap: Record<string, React.ElementType> = {
   Dices,
 };
 
-const interestIconMap: Record<string, React.ElementType> = {
+const interestIconMap: Record<string, LucideIcon> = {
   blockchain: Blocks,
   anime: Tv,
   rpg: Dices,
@@ -355,7 +356,7 @@ export default function CyberpunkOverlay() {
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {interests.map((item) => {
-                    const Icon = interestIconMap[item.key] || Terminal;
+                    const Icon: LucideIcon = interestIconMap[item.key] || Terminal;
                     return (
                       <span
                         key={item.key}

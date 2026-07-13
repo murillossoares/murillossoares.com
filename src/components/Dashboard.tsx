@@ -2,6 +2,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Terminal, Server, Code, Database, Github, Linkedin, Send, BarChart3 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useMessages, useTranslations } from "next-intl";
 import Link from "next/link";
 import DownloadCVButton from "./DownloadCVButton";
@@ -91,7 +92,7 @@ export default function Dashboard({ locale }: { locale: string }) {
   );
 }
 
-function SB({ icon: I, label, href, color, status = "CONN" }: { icon: React.ElementType; label: string; href: string; color: string; status?: string }) {
+function SB({ icon: I, label, href, color, status = "CONN" }: { icon: LucideIcon; label: string; href: string; color: string; status?: string }) {
   return <a href={href} target="_blank" rel="noreferrer" className="group flex items-center gap-2 bg-black/50 border border-[var(--border)] px-3 py-2 rounded hover:border-white/30 transition-all focus:ring-2 focus:ring-[var(--accent)]" aria-label={`${label} ${status}`}><I size={14} className={color} aria-hidden="true" /><span className="hidden md:inline text-[10px] font-mono text-[var(--muted)] group-hover:text-white">{label}::{status}</span></a>;
 }
 function Kpi({ label, value, sub, c }: { label: string; value: string; sub: string; c: string }) {
@@ -116,7 +117,7 @@ function SvcMap({ archType, reduced }: { archType: ArchType; reduced: boolean | 
     </div>
   );
 }
-function Node({ icon: I, color, label, size = 20 }: { icon: React.ElementType; color: string; label: string; size?: number }) {
+function Node({ icon: I, color, label, size = 20 }: { icon: LucideIcon; color: string; label: string; size?: number }) {
   return <div className="flex flex-col items-center gap-2"><div className={`w-12 h-12 rounded bg-${color}-500/10 border border-${color}-500/50 flex items-center justify-center text-${color}-500`}><I size={size} aria-hidden="true" /></div><span className="text-[10px] font-mono text-gray-500">{label}</span></div>;
 }
 function Line({ color, archType, reduced, delay }: { color: string; archType: ArchType; reduced: boolean | null; delay: number }) {
