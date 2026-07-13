@@ -1,7 +1,7 @@
 "use client";
 import { memo, useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, RoundedBox, Environment, Html } from "@react-three/drei";
+import { OrbitControls, RoundedBox, Html } from "@react-three/drei";
 import * as THREE from "three";
 import type { ScoreboardData, ScoreboardMetric } from "@/models/metrics";
 
@@ -56,7 +56,6 @@ function Scene({ accentColor, bgColor, data }: { accentColor: string; bgColor: s
       <ambientLight intensity={0.3} />
       <directionalLight position={[5, 8, 5]} intensity={0.8} castShadow />
       <pointLight position={[0, 4, 2]} intensity={0.6} color={a} />
-      <Environment preset="city" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
         <planeGeometry args={[20, 20]} />
         <meshStandardMaterial color={bgColor} roughness={0.8} />
