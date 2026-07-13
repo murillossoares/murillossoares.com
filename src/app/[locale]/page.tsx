@@ -2,10 +2,11 @@ import Dashboard from "@/components/Dashboard";
 import BootExperience from "@/components/BootExperience";
 import CyberpunkOverlay from "@/components/CyberpunkOverlay";
 import MysteryButton from "@/components/MysteryButton";
-export default function HomePage({ params }: { params: { locale: string } }) {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
     <BootExperience>
-      <Dashboard locale={params.locale} />
+      <Dashboard locale={locale} />
       <CyberpunkOverlay />
       <MysteryButton />
     </BootExperience>
