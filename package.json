@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.1",
-    "@react-three/drei": "^9.120.4",
+    "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^8.17.12",
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.395.0",
