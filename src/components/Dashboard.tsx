@@ -34,7 +34,7 @@ export default function Dashboard({ locale }: { locale: string }) {
         <nav aria-label="Controls" className="flex flex-wrap gap-3">
           <SB icon={Linkedin} label="LINKEDIN" href="https://linkedin.com/in/murillossoares" color="text-blue-400" />
           <SB icon={Github} label="GITHUB" href="https://github.com/mhsscel" color="text-purple-400" />
-          <SB icon={Send} label="TELEGRAM" href="http://t.me/murillossoares" color="text-sky-400" status="ENCRYPTED" />
+          <SB icon={Send} label="TELEGRAM" href="https://t.me/murillossoares" color="text-sky-400" status="ENCRYPTED" />
           <ThemeSwitcher /><LanguageSwitcher currentLocale={locale} />
           <Link href={`/${locale}/scoreboard`} className="group flex items-center gap-2 bg-black/50 border border-[var(--border)] px-3 py-2 rounded hover:border-white/30 transition-all focus:ring-2 focus:ring-[var(--accent)]" aria-label="Scoreboard">
             <BarChart3 size={14} className="text-[var(--accent)]" /><span className="hidden md:inline text-[10px] font-mono text-[var(--muted)] group-hover:text-white">SCOREBOARD</span>

@@ -1,4 +1,5 @@
 import ScoreboardClient from "./ScoreboardClient";
-export default function ScoreboardPage({ params }: { params: { locale: string } }) {
-  return <ScoreboardClient locale={params.locale} />;
+export default async function ScoreboardPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  return <ScoreboardClient locale={locale} />;
 }
