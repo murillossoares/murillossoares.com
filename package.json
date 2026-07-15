@@ -1,6 +1,6 @@
 {
   "name": "murillossoares-portfolio",
-  "version": "0.2.1",
+  "version": "5.1.0",
   "private": true,
   "scripts": {
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",

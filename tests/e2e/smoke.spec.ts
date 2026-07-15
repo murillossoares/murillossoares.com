@@ -33,15 +33,32 @@ test.describe("portfolio smoke", () => {
     expect(pageErrors).toEqual([]);
   });
 
-  test("scoreboard hydrates without client-side exceptions", async ({ page }) => {
+  test("scoreboard presents factual metrics without layout shift", async ({ page }) => {
     const pageErrors: Error[] = [];
     page.on("pageerror", (error) => pageErrors.push(error));
 
     await page.goto("/pt-br/scoreboard");
-    await expect(page.getByRole("heading", { name: "Quadro de Desempenho" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Painel da Carreira" })).toBeVisible();
+    await expect(page.getByLabel("Resumo da carreira").getByText("Experiências profissionais")).toBeVisible();
+    await expect(page.locator("dd")).toHaveCount(4);
+    await expect(page.getByText("90%", { exact: true })).toHaveCount(0);
+
+    const scene = page.getByTestId("scoreboard-scene");
+    const initialHeight = (await scene.boundingBox())?.height;
     await page.waitForTimeout(1_000);
+    expect((await scene.boundingBox())?.height).toBe(initialHeight);
 
     expect(pageErrors).toEqual([]);
+  });
+
+  test("scoreboard reduced-motion mode keeps the factual static view", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/pt-br/scoreboard");
+
+    await expect(page.getByTestId("scoreboard-scene")).toBeVisible();
+    await expect(page.locator("canvas")).toHaveCount(0);
+    await expect(page.getByText(/arraste|zoom|redefinir/i)).toHaveCount(0);
+    await expect(page.locator("dd")).toHaveCount(4);
   });
 
   test("keyboard skip is immediate", async ({ page }) => {

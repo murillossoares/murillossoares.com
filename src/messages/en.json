@@ -239,45 +239,33 @@
     }
   ],
   "Scoreboard": {
-    "title": "Performance Scoreboard",
-    "subtitle": "Real-time career metrics visualization",
+    "title": "Career Scoreboard",
+    "subtitle": "A factual snapshot of professional experience",
+    "back": "Back to portfolio",
+    "skipToContent": "Skip to main content",
+    "summaryTitle": "Career summary",
+    "summaryDescription": "Metrics calculated from the professional history in this portfolio.",
+    "downloadCv": "Download CV",
+    "ctaTitle": "Want the details?",
+    "ctaDescription": "Open the full résumé with roles, companies, and technologies.",
     "metrics": {
-      "uptime": {
-        "label": "Uptime",
-        "value": "9+ years",
-        "description": "Professional experience in production"
+      "experience": {
+        "label": "Years of experience",
+        "description": "Period covered by the professional history"
       },
-      "stackDepth": {
-        "label": "Stack Depth",
-        "value": "Full",
-        "description": "Backend + Frontend expertise"
+      "engagements": {
+        "label": "Professional engagements",
+        "description": "Roles and projects represented in the timeline"
       },
-      "architecture": {
-        "label": "Architecture",
-        "value": "Solid",
-        "description": "Monolith to Microservices journey"
+      "technologies": {
+        "label": "Technologies",
+        "description": "Distinct technologies listed across engagements"
       },
-      "projects": {
-        "label": "Projects",
-        "value": "11",
-        "description": "Production systems delivered"
+      "architectures": {
+        "label": "Architecture models",
+        "description": "Monolith, SOA, hybrid, and microservices"
       }
-    },
-    "scene": {
-      "loading": "Loading 3D scene...",
-      "fallback": "Interactive mode unavailable -- showing static metrics",
-      "noWebgl": "Your browser does not support WebGL. Using fallback view."
-    },
-    "controls": {
-      "rotate": "Drag to rotate",
-      "zoom": "Scroll to zoom",
-      "reset": "Reset view"
-    },
-    "accessibility": {
-      "ariaLabel": "3D scoreboard showing career metrics",
-      "staticTableLabel": "Career metrics in tabular form"
-    },
-    "metricsSectionLabel": "Metrics Overview"
+    }
   },
   "Persona": {
     "buttonIdle": "SAFE_MODE",

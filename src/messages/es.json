@@ -239,45 +239,33 @@
     }
   ],
   "Scoreboard": {
-    "title": "Panel de Rendimiento",
-    "subtitle": "Visualizacion de metricas de carrera en tiempo real",
+    "title": "Panel de Carrera",
+    "subtitle": "Un resumen factual de la experiencia profesional",
+    "back": "Volver al portafolio",
+    "skipToContent": "Ir al contenido principal",
+    "summaryTitle": "Resumen de carrera",
+    "summaryDescription": "Métricas calculadas a partir del historial profesional de este portafolio.",
+    "downloadCv": "Descargar CV",
+    "ctaTitle": "¿Quieres ver los detalles?",
+    "ctaDescription": "Abre el CV completo con funciones, empresas y tecnologías.",
     "metrics": {
-      "uptime": {
-        "label": "Tiempo de Actividad",
-        "value": "9+ anos",
-        "description": "Experiencia profesional en produccion"
+      "experience": {
+        "label": "Años de experiencia",
+        "description": "Período cubierto por el historial profesional"
       },
-      "stackDepth": {
-        "label": "Profundidad del Stack",
-        "value": "Completo",
-        "description": "Experiencia Backend + Frontend"
+      "engagements": {
+        "label": "Experiencias profesionales",
+        "description": "Funciones y proyectos representados en el historial"
       },
-      "architecture": {
-        "label": "Arquitectura",
-        "value": "Solida",
-        "description": "De monolito a microservicios"
+      "technologies": {
+        "label": "Tecnologías",
+        "description": "Tecnologías distintas listadas en las experiencias"
       },
-      "projects": {
-        "label": "Proyectos",
-        "value": "11",
-        "description": "Sistemas en produccion entregados"
+      "architectures": {
+        "label": "Modelos de arquitectura",
+        "description": "Monolito, SOA, híbrido y microservicios"
       }
-    },
-    "scene": {
-      "loading": "Cargando escena 3D...",
-      "fallback": "Modo interactivo no disponible -- mostrando metricas estaticas",
-      "noWebgl": "Su navegador no soporta WebGL. Usando vista alternativa."
-    },
-    "controls": {
-      "rotate": "Arrastra para rotar",
-      "zoom": "Desplaza para zoom",
-      "reset": "Restablecer"
-    },
-    "accessibility": {
-      "ariaLabel": "Scoreboard 3D mostrando metricas de carrera",
-      "staticTableLabel": "Metricas de carrera en formato tabular"
-    },
-    "metricsSectionLabel": "Resumen de Metricas"
+    }
   },
   "Persona": {
     "buttonIdle": "MODO_SEGURO",

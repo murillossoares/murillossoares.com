@@ -239,45 +239,33 @@
     }
   ],
   "Scoreboard": {
-    "title": "Quadro de Desempenho",
-    "subtitle": "Visualizacao em tempo real das metricas de carreira",
+    "title": "Painel da Carreira",
+    "subtitle": "Um retrato factual da experiência profissional",
+    "back": "Voltar ao portfólio",
+    "skipToContent": "Ir para o conteúdo principal",
+    "summaryTitle": "Resumo da carreira",
+    "summaryDescription": "Métricas calculadas a partir do histórico profissional deste portfólio.",
+    "downloadCv": "Baixar CV",
+    "ctaTitle": "Quer ver os detalhes?",
+    "ctaDescription": "Abra o CV completo com funções, empresas e tecnologias.",
     "metrics": {
-      "uptime": {
-        "label": "Tempo de Atividade",
-        "value": "9+ anos",
-        "description": "Experiencia profissional em producao"
+      "experience": {
+        "label": "Anos de experiência",
+        "description": "Período coberto pelo histórico profissional"
       },
-      "stackDepth": {
-        "label": "Profundidade do Stack",
-        "value": "Completo",
-        "description": "Experiencia Backend + Frontend"
+      "engagements": {
+        "label": "Experiências profissionais",
+        "description": "Funções e projetos apresentados no histórico"
       },
-      "architecture": {
-        "label": "Arquitetura",
-        "value": "Solida",
-        "description": "Da monolito a microservicos"
+      "technologies": {
+        "label": "Tecnologias",
+        "description": "Tecnologias distintas listadas nas experiências"
       },
-      "projects": {
-        "label": "Projetos",
-        "value": "11",
-        "description": "Sistemas em producao entregues"
+      "architectures": {
+        "label": "Modelos de arquitetura",
+        "description": "Monólito, SOA, híbrido e microsserviços"
       }
-    },
-    "scene": {
-      "loading": "Carregando cena 3D...",
-      "fallback": "Modo interativo indisponivel -- mostrando metricas estaticas",
-      "noWebgl": "Seu navegador nao suporta WebGL. Usando visualizacao alternativa."
-    },
-    "controls": {
-      "rotate": "Arraste para rotacionar",
-      "zoom": "Role para zoom",
-      "reset": "Redefinir"
-    },
-    "accessibility": {
-      "ariaLabel": "Scoreboard 3D mostrando metricas de carreira",
-      "staticTableLabel": "Metricas de carreira em formato tabular"
-    },
-    "metricsSectionLabel": "Visao Geral das Metricas"
+    }
   },
   "Persona": {
     "buttonIdle": "MODO_SEGURO",

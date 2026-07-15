@@ -14,7 +14,7 @@ type MessagesShape = {
   careerHistory?: CVPdfContent["careerHistory"];
 };
 
-export default function DownloadCVButton({ label }: { label?: string }) {
+export default function DownloadCVButton({ label, showLabel = false }: { label?: string; showLabel?: boolean }) {
   const { theme } = useTheme();
   const locale = useLocale();
   const tHeader = useTranslations("Header");
@@ -78,7 +78,7 @@ export default function DownloadCVButton({ label }: { label?: string }) {
       className="group flex items-center gap-2 rounded border border-[var(--accent)]/40 bg-black/50 px-3 py-2 transition-all hover:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
       aria-label={buttonLabel}>
       {loading ? <Loader2 size={14} className="animate-spin text-[var(--accent)]" aria-hidden="true" /> : <Download size={14} className="text-[var(--accent)]" aria-hidden="true" />}
-      <span role={failed ? "alert" : undefined} aria-live="polite" className="hidden text-[10px] font-mono uppercase text-[var(--muted)] group-hover:text-white md:inline">
+      <span role={failed ? "alert" : undefined} aria-live="polite" className={`${showLabel ? "inline" : "hidden md:inline"} text-xs font-mono uppercase text-[var(--muted)] group-hover:text-white`}>
         {loading ? "BUILDING..." : failed ? tHeader("downloadError") : buttonLabel}
       </span>
     </button>
