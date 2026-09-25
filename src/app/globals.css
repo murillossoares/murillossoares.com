@@ -6,6 +6,9 @@
   --border: rgba(255,255,255,0.09); --text: #d4d4d4;
   --muted: rgba(212,212,212,0.7); --accent: #007acc; --accent-2: #22c55e; --on-accent: #ffffff;
   --glow-accent: rgba(0,122,204,0.16); --glow-accent-2: rgba(34,197,94,0.14);
+  --strong: #ffffff; --surface: rgba(0,0,0,0.4); --surface-strong: rgba(0,0,0,0.5); --hover: rgba(255,255,255,0.05);
+  --hover-strong: rgba(255,255,255,0.1); --line-strong: rgba(255,255,255,0.3); --scene-ink: #ffffff; --scene-dim: #64748b;
+  color-scheme: dark;
 }
 :root[data-theme="vscode-dark"] {
   --bg: #0e1116; --panel: #1e1e1e; --panel-2: #161a1f;
@@ -24,6 +27,17 @@
   --border: rgba(255,255,255,0.1); --text: #f8f8f2; --muted: rgba(248,248,242,0.7);
   --accent: #a6e22e; --accent-2: #ff4f8b; --on-accent: #141414;
   --glow-accent: rgba(166,226,46,0.16); --glow-accent-2: rgba(249,38,114,0.16);
+}
+/* Bluloco Light (after the VS Code theme by uloco): light editor surface, blue accent, green strings. Colours are
+   darkened where needed so text keeps at least 4.5:1 on the background. */
+:root[data-theme="bluloco-light"] {
+  --bg: #f9f9f9; --panel: #ffffff; --panel-2: #f0f0f1;
+  --border: rgba(56,58,66,0.16); --text: #383a42; --muted: #62656e;
+  --accent: #275fe4; --accent-2: #1f7d3f; --on-accent: #ffffff;
+  --glow-accent: rgba(39,95,228,0.10); --glow-accent-2: rgba(35,151,74,0.10);
+  --strong: #1f2129; --surface: rgba(255,255,255,0.82); --surface-strong: #ffffff; --hover: rgba(56,58,66,0.05);
+  --hover-strong: rgba(56,58,66,0.09); --line-strong: rgba(56,58,66,0.38); --scene-ink: #383a42; --scene-dim: #a0a1a7;
+  color-scheme: light;
 }
 html, body { height: 100%; }
 body { background: var(--bg); color: var(--text); }

@@ -8,7 +8,7 @@ import * as THREE from "three";
 import { ARCH_STYLE } from "@/lib/arch-style";
 import { yearToX, type GalaxyLayout, type GalaxyNode } from "@/lib/galaxy";
 
-function Starfield({ count = 500 }: { count?: number }) {
+function Starfield({ count = 500, dim }: { count?: number; dim: string }) {
   const ref = useRef<THREE.Points>(null);
   const positions = useMemo(() => {
     // Seeded pseudo-random so the field is stable across renders.
@@ -26,7 +26,7 @@ function Starfield({ count = 500 }: { count?: number }) {
   return (
     <points ref={ref}>
       <bufferGeometry><bufferAttribute attach="attributes-position" args={[positions, 3]} /></bufferGeometry>
-      <pointsMaterial size={0.035} color="#9ca3af" transparent opacity={0.55} sizeAttenuation />
+      <pointsMaterial size={0.035} color={dim} transparent opacity={0.55} sizeAttenuation />
     </points>
   );
 }
@@ -73,7 +73,7 @@ function CareerNode({ node, active, onSelect }: { node: GalaxyNode; active: bool
       ) : null}
       {active || hovered ? (
         <Html position={[0, node.radius * 2.6 + 0.15, 0]} center distanceFactor={9} zIndexRange={[20, 0]}>
-          <span className="pointer-events-none whitespace-nowrap rounded border border-white/15 bg-black/80 px-2 py-0.5 font-mono text-[11px] text-white">
+          <span className="pointer-events-none whitespace-nowrap rounded border border-[var(--border)] bg-surface-strong px-2 py-0.5 font-mono text-[11px] text-strong shadow-sm">
             {node.label} · {node.year}
           </span>
         </Html>
@@ -82,7 +82,7 @@ function CareerNode({ node, active, onSelect }: { node: GalaxyNode; active: bool
   );
 }
 
-function Scene({ layout, activeId, onSelect }: { layout: GalaxyLayout; activeId: string | null; onSelect: (id: string) => void }) {
+function Scene({ layout, activeId, onSelect, ink, dim }: { layout: GalaxyLayout; activeId: string | null; onSelect: (id: string) => void; ink: string; dim: string }) {
   const group = useRef<THREE.Group>(null);
   const byId = useMemo(() => new Map(layout.nodes.map((n) => [n.id, n])), [layout]);
 
@@ -98,22 +98,22 @@ function Scene({ layout, activeId, onSelect }: { layout: GalaxyLayout; activeId:
     <>
       <ambientLight intensity={0.35} />
       <pointLight position={[0, 4, 6]} intensity={30} color="#ffffff" />
-      <Starfield />
+      <Starfield dim={dim} />
       <group ref={group}>
         {/* time axis */}
-        <Line points={[[-5.6, -1.9, 0], [5.6, -1.9, 0]]} color="#ffffff" transparent opacity={0.15} lineWidth={1} />
+        <Line points={[[-5.6, -1.9, 0], [5.6, -1.9, 0]]} color={ink} transparent opacity={0.15} lineWidth={1} />
         {layout.years.map((year) => (
           <group key={year} position={[yearToX(year, layout), -1.9, 0]}>
-            <Line points={[[0, 0, 0], [0, 0.12, 0]]} color="#ffffff" transparent opacity={0.3} lineWidth={1} />
+            <Line points={[[0, 0, 0], [0, 0.12, 0]]} color={ink} transparent opacity={0.3} lineWidth={1} />
             <Html position={[0, -0.28, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
-              <span className="pointer-events-none font-mono text-[10px] text-white/45">{year}</span>
+              <span className="pointer-events-none font-mono text-[10px] text-[var(--muted)]">{year}</span>
             </Html>
           </group>
         ))}
         {layout.edges.map((edge) => {
           const a = byId.get(edge.from)!, b = byId.get(edge.to)!;
           const on = activeId === edge.from || activeId === edge.to;
-          return <Line key={`${edge.from}-${edge.to}`} points={[a.position, b.position]} color={on ? "#ffffff" : "#64748b"} transparent opacity={on ? 0.55 : 0.12 + Math.min(edge.shared.length, 4) * 0.03} lineWidth={on ? 1.6 : 1} />;
+          return <Line key={`${edge.from}-${edge.to}`} points={[a.position, b.position]} color={on ? ink : dim} transparent opacity={on ? 0.55 : 0.12 + Math.min(edge.shared.length, 4) * 0.03} lineWidth={on ? 1.6 : 1} />;
         })}
         {layout.nodes.map((node) => <CareerNode key={node.id} node={node} active={node.id === activeId} onSelect={onSelect} />)}
       </group>
@@ -121,8 +121,10 @@ function Scene({ layout, activeId, onSelect }: { layout: GalaxyLayout; activeId:
   );
 }
 
-const CareerGalaxy3D = memo(function CareerGalaxy3D({ layout, activeId, onSelect, running, onReady }: {
+const CareerGalaxy3D = memo(function CareerGalaxy3D({ layout, activeId, onSelect, running, onReady, ink = "#ffffff", dim = "#64748b" }: {
   layout: GalaxyLayout; activeId: string | null; onSelect: (id: string) => void; running: boolean; onReady?: () => void;
+  /** Line and label colours from the theme (--scene-ink / --scene-dim), so the scene reads on light themes too. */
+  ink?: string; dim?: string;
 }) {
   return (
     <Canvas
@@ -133,7 +135,7 @@ const CareerGalaxy3D = memo(function CareerGalaxy3D({ layout, activeId, onSelect
       onCreated={() => onReady?.()}
       aria-hidden="true"
     >
-      <Scene layout={layout} activeId={activeId} onSelect={onSelect} />
+      <Scene layout={layout} activeId={activeId} onSelect={onSelect} ink={ink} dim={dim} />
     </Canvas>
   );
 });

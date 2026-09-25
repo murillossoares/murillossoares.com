@@ -29,6 +29,16 @@ export const pdfThemes = {
     accent: "#a6e22e",
     accent2: "#ff4f8b",
   },
+  "bluloco-light": {
+    bg: "#ffffff",
+    panel: "#f9f9f9",
+    panel2: "#f0f0f1",
+    border: "#d4d5d9",
+    text: "#383a42",
+    muted: "#62656e",
+    accent: "#275fe4",
+    accent2: "#1f7d3f",
+  },
 } as const;
 
 export type PdfThemeName = keyof typeof pdfThemes;

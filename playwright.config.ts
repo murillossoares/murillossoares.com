@@ -17,13 +17,19 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]] : "list",
   use: {
     baseURL,
+    // The site follows the system colour scheme; specs run on a dark system unless they say otherwise.
+    colorScheme: "dark",
     trace: "retain-on-failure",
     // Lets sandboxes with a preinstalled browser run the suite (e.g. PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium).
     launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {},
+    // Post-deploy runs: PLAYWRIGHT_BASE_URL=https://murillossoares.netlify.app npm run test:e2e
+    // (PLAYWRIGHT_PROXY / PLAYWRIGHT_IGNORE_HTTPS_ERRORS=1 for networks behind an intercepting proxy).
+    ...(process.env.PLAYWRIGHT_PROXY ? { proxy: { server: process.env.PLAYWRIGHT_PROXY } } : {}),
+    ignoreHTTPSErrors: process.env.PLAYWRIGHT_IGNORE_HTTPS_ERRORS === "1",
   },
   // Tests run against the production static export (run "npm run build" first), the same files Netlify serves.
   // PLAYWRIGHT_DEV=1 uses the Next.js dev server instead, for quick local iteration.
-  webServer: {
+  webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     command: process.env.PLAYWRIGHT_DEV
       ? `npm exec next dev -- --hostname ${host} -p ${port}`
       : `node scripts/serve-static.mjs --dir out --host ${host} --port ${port}`,

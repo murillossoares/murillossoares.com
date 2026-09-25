@@ -34,10 +34,10 @@ function YearColumn({ row, max, x, color, delay }: { row: YearRow; max: number; 
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.25} roughness={0.38} metalness={0.45} transparent opacity={row.count ? 1 : 0.3} />
       </RoundedBox>
       <Html position={[0, height + 0.3, 0]} center transform={false}>
-        <strong className="pointer-events-none block text-center font-mono text-xs tabular-nums text-white">{row.count}</strong>
+        <strong className="pointer-events-none block text-center font-mono text-xs tabular-nums text-strong">{row.count}</strong>
       </Html>
       <Html position={[0, -0.3, 0.4]} center transform={false}>
-        <span className="pointer-events-none block text-center font-mono text-[10px] text-white/60">{String(row.year).slice(2)}&apos;</span>
+        <span className="pointer-events-none block text-center font-mono text-[10px] text-[var(--muted)]">{String(row.year).slice(2)}&apos;</span>
       </Html>
     </group>
   );
@@ -60,18 +60,19 @@ function IntroCamera() {
   return null;
 }
 
-function Scene({ rows, accentColor, secondaryColor, bgColor }: { rows: YearRow[]; accentColor: string; secondaryColor: string; bgColor: string }) {
+function Scene({ rows, accentColor, secondaryColor, bgColor, light }: { rows: YearRow[]; accentColor: string; secondaryColor: string; bgColor: string; light: boolean }) {
   const max = useMemo(() => Math.max(1, ...rows.map((r) => r.count)), [rows]);
 
   return (
     <>
       <color attach="background" args={[bgColor]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[4, 7, 5]} intensity={0.9} />
+      {/* A light background needs more fill light, or the lit floor turns grey and the columns go dark. */}
+      <ambientLight intensity={light ? 1.25 : 0.55} />
+      <directionalLight position={[4, 7, 5]} intensity={light ? 1.1 : 0.9} />
       <pointLight position={[0, 3, 2]} intensity={0.45} color={accentColor} />
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[18, 12]} />
-        <meshStandardMaterial color={bgColor} roughness={0.9} />
+        {light ? <meshBasicMaterial color={bgColor} toneMapped={false} /> : <meshStandardMaterial color={bgColor} roughness={0.9} />}
       </mesh>
       {rows.map((row, index) => (
         <YearColumn
@@ -93,12 +94,15 @@ const Scoreboard3D = memo(function Scoreboard3D({
   accentColor = "#007acc",
   secondaryColor = "#22c55e",
   bgColor = "#0e1116",
+  light = false,
   onReady,
 }: {
   rows: YearRow[];
   accentColor?: string;
   secondaryColor?: string;
   bgColor?: string;
+  /** Light theme: brighter lighting and an unshaded floor. */
+  light?: boolean;
   onReady?: () => void;
 }) {
   return (
@@ -110,7 +114,7 @@ const Scoreboard3D = memo(function Scoreboard3D({
         gl={{ antialias: true, powerPreference: "low-power" }}
         onCreated={onReady}
       >
-        <Scene rows={rows} accentColor={accentColor} secondaryColor={secondaryColor} bgColor={bgColor} />
+        <Scene rows={rows} accentColor={accentColor} secondaryColor={secondaryColor} bgColor={bgColor} light={light} />
       </Canvas>
     </div>
   );

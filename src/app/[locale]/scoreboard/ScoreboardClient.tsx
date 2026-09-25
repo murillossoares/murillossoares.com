@@ -26,19 +26,19 @@ export default function ScoreboardClient({ locale, asOf }: { locale: string; asO
         <header className="mb-8 max-w-2xl">
           <Link
             href={`/${locale}`}
-            className="mb-6 inline-flex items-center gap-2 rounded text-sm text-[var(--muted)] transition-colors duration-150 hover:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)]"
+            className="mb-6 inline-flex items-center gap-2 rounded text-sm text-[var(--muted)] transition-colors duration-150 hover:text-strong focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)]"
           >
             <ArrowLeft size={16} aria-hidden="true" />
             {t("back")}
           </Link>
-          <h1 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">{t("title")}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-strong md:text-5xl">{t("title")}</h1>
           <p className="mt-3 max-w-xl text-base leading-relaxed text-[var(--muted)]">{t("subtitle")}</p>
         </header>
 
         <main id="main-content">
           <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(18rem,1fr)]">
             <section aria-labelledby="chart-title" className="order-2 lg:order-1">
-              <h2 id="chart-title" className="text-lg font-semibold text-white">{t("chartTitle")}</h2>
+              <h2 id="chart-title" className="text-lg font-semibold text-strong">{t("chartTitle")}</h2>
               <p className="mb-3 mt-1 text-sm text-[var(--muted)]">{t("chartDescription")}</p>
               <ScoreboardScene rows={perYear} caption={t("chartTitle")} yearLabel={t("chartYear")} countLabel={t("chartCount")} />
             </section>
@@ -47,7 +47,7 @@ export default function ScoreboardClient({ locale, asOf }: { locale: string; asO
               aria-labelledby="career-summary-title"
               className="order-1 rounded-lg border border-[var(--border)] bg-[var(--panel)] p-5 lg:order-2 md:p-6"
             >
-              <h2 id="career-summary-title" className="text-lg font-semibold text-white">
+              <h2 id="career-summary-title" className="text-lg font-semibold text-strong">
                 {t("summaryTitle")}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{t("summaryDescription")}</p>
@@ -58,7 +58,7 @@ export default function ScoreboardClient({ locale, asOf }: { locale: string; asO
                       <span className="block font-mono text-xs uppercase tracking-wider text-[var(--muted)]">{metric.label}</span>
                       <span className="mt-1 block text-sm leading-snug text-[var(--muted)]">{metric.description}</span>
                     </dt>
-                    <dd className="self-center font-mono text-3xl font-semibold tabular-nums text-white">{metric.value}</dd>
+                    <dd className="self-center font-mono text-3xl font-semibold tabular-nums text-strong">{metric.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -67,7 +67,7 @@ export default function ScoreboardClient({ locale, asOf }: { locale: string; asO
 
           <section className="mt-8 flex flex-col gap-4 border-t border-[var(--border)] pt-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="font-semibold text-white">{t("ctaTitle")}</h2>
+              <h2 className="font-semibold text-strong">{t("ctaTitle")}</h2>
               <p className="mt-1 text-sm text-[var(--muted)]">{t("ctaDescription")}</p>
             </div>
             <div className="self-start">
