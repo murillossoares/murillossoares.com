@@ -30,23 +30,47 @@
         "institution": "Instituto Federal de Educação, Ciência e Tecnologia de Mato Grosso",
         "shortName": "IFMT",
         "url": "https://ifmt.edu.br",
+        "degree": {
+          "pt-br": "Bacharelado",
+          "en": "Bachelor's degree",
+          "es": "Licenciatura"
+        },
         "area": {
           "pt-br": "Engenharia de Computação",
           "en": "Computer Engineering",
           "es": "Ingeniería Informática"
-        }
+        },
+        "start": "2013",
+        "end": "2020"
+      },
+      {
+        "institution": "Instituto Federal de Educação, Ciência e Tecnologia de Mato Grosso",
+        "shortName": "IFMT",
+        "url": "https://ifmt.edu.br",
+        "degree": {
+          "pt-br": "Tecnólogo",
+          "en": "Technology degree",
+          "es": "Tecnicatura"
+        },
+        "area": {
+          "pt-br": "Sistemas para Internet",
+          "en": "Internet Systems",
+          "es": "Sistemas para Internet"
+        },
+        "start": "2021-01",
+        "end": "2021-10"
       }
     ]
   },
   "sync": {
-    "source": "manual",
-    "syncedAt": null
+    "source": "linkedin-profile-pdf",
+    "syncedAt": "2026-09-25T00:00:00.000Z"
   },
   "positions": [
     {
       "id": "iefp",
       "company": "Conkord | IEFP",
-      "start": "2025",
+      "start": "2025-03",
       "end": null,
       "current": true,
       "kind": "employment",
@@ -76,8 +100,8 @@
     {
       "id": "ytech",
       "company": "YTech | CGI",
-      "start": "2023",
-      "end": null,
+      "start": "2023-07",
+      "end": "2025-04",
       "current": false,
       "kind": "employment",
       "archType": "microservices",
@@ -106,8 +130,8 @@
     {
       "id": "inovaprime",
       "company": "Inovaprime",
-      "start": "2022",
-      "end": null,
+      "start": "2022-08",
+      "end": "2023-09",
       "current": false,
       "kind": "employment",
       "archType": "hybrid",
@@ -136,8 +160,8 @@
     {
       "id": "fnx",
       "company": "FNX Participações",
-      "start": "2020",
-      "end": null,
+      "start": "2020-11",
+      "end": "2023-06",
       "current": false,
       "kind": "employment",
       "archType": "soa",
@@ -166,8 +190,8 @@
     {
       "id": "nbs",
       "company": "NBS Informática",
-      "start": "2020",
-      "end": null,
+      "start": "2020-11",
+      "end": "2020-11",
       "current": false,
       "kind": "employment",
       "archType": "microservices",
@@ -195,8 +219,8 @@
     {
       "id": "sankhya",
       "company": "Sankhya Gestão",
-      "start": "2019",
-      "end": null,
+      "start": "2019-07",
+      "end": "2020-10",
       "current": false,
       "kind": "employment",
       "archType": "monolith",
@@ -225,8 +249,8 @@
     {
       "id": "accurate",
       "company": "Accurate Software",
-      "start": "2022",
-      "end": null,
+      "start": "2022-02",
+      "end": "2022-10",
       "current": false,
       "kind": "employment",
       "archType": "microservices",
@@ -256,8 +280,8 @@
     {
       "id": "playmatch",
       "company": "PlayMatch",
-      "start": "2021",
-      "end": null,
+      "start": "2021-08",
+      "end": "2021-09",
       "current": false,
       "kind": "employment",
       "archType": "microservices",
@@ -286,8 +310,8 @@
     {
       "id": "atuarial",
       "company": "Atuarial Consultoria",
-      "start": "2019",
-      "end": null,
+      "start": "2019-07",
+      "end": "2019-08",
       "current": false,
       "kind": "employment",
       "archType": "monolith",
@@ -315,8 +339,8 @@
     {
       "id": "datalab",
       "company": "Datalab Mobile",
-      "start": "2018",
-      "end": null,
+      "start": "2018-04",
+      "end": "2019-07",
       "current": false,
       "kind": "internship",
       "archType": "monolith",
@@ -345,8 +369,8 @@
     {
       "id": "ufmt",
       "company": "UFMT",
-      "start": "2017",
-      "end": null,
+      "start": "2017-04",
+      "end": "2018-04",
       "current": false,
       "kind": "internship",
       "archType": "monolith",
