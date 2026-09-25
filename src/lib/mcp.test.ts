@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { careerFile } from "@/services/careerData";
 import { handleMcpHttp } from "./mcp";
 
 const post = (body: unknown) => handleMcpHttp(new Request("https://example.test/mcp", { method: "POST", body: JSON.stringify(body), headers: { "Content-Type": "application/json" } }));
@@ -28,7 +29,8 @@ describe("MCP endpoint", () => {
     const { result } = await rpc("tools/call", { name: "get_profile", arguments: { locale: "pt-br" } });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({ name: "Murillo Soares", headline: "Engenheiro Full Stack Sênior" });
-    expect(JSON.parse(result.content[0].text).facts.companies).toBe(11);
+    expect(JSON.parse(result.content[0].text).facts.companies).toBe(new Set(careerFile.positions.map((p) => p.company.toLowerCase())).size);
+    expect(result.structuredContent.summary).toMatch(/anos de experiência/);
   });
 
   it("finds positions by technology ignoring versions", async () => {
@@ -54,6 +56,12 @@ describe("MCP endpoint", () => {
     const [read, ping] = await res.json();
     expect(JSON.parse(read.result.contents[0].text).basics.name).toBe("Murillo Soares");
     expect(ping.result).toEqual({});
+  });
+
+  it("answers null or non-object messages with -32600 instead of crashing", async () => {
+    expect((await (await post(null)).json()).error.code).toBe(-32600);
+    const [a, b] = await (await post([null, 42])).json();
+    expect([a.error.code, b.error.code]).toEqual([-32600, -32600]);
   });
 
   it("rejects GET because the server is stateless", async () => {

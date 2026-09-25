@@ -21,5 +21,5 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function ScoreboardPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ScoreboardClient locale={locale} />;
+  return <ScoreboardClient locale={locale} asOf={new Date().toISOString()} />;
 }

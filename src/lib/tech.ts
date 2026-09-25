@@ -69,7 +69,7 @@ export function distinctTechnologies(stacks: string[][]): string[] {
   return [...seen.values()];
 }
 
-/** Tokens the LinkedIn sync can look for when inferring a stack from free-text descriptions. */
-export function catalogueTerms(): string[] {
-  return [...CATALOGUE.keys()];
+/** Display names the LinkedIn sync looks for when inferring a stack from free-text descriptions. */
+export function catalogueNames(): string[] {
+  return [...CATALOGUE.values()].map((entry) => entry.name);
 }

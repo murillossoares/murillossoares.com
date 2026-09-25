@@ -99,8 +99,10 @@ test.describe("career data is shown truthfully", () => {
     await page.goto("/pt-br");
     await skipBoot(page);
     const kpis = page.getByRole("region", { name: "KPIs" });
-    await expect(kpis).toContainText("DESDE 2017");
-    await expect(kpis).toContainText("em 11 empresas");
+    const since = Math.min(...career.positions.map((p) => Number(p.start.slice(0, 4))));
+    const companies = new Set(career.positions.map((p) => p.company.toLowerCase())).size;
+    await expect(kpis).toContainText(`DESDE ${since}`);
+    await expect(kpis).toContainText(`em ${companies} empresas`);
     await expect(kpis).not.toContainText(/Completo|Sólida|Solida/);
   });
 

@@ -16,10 +16,16 @@ function isoDate(value: string | null): string | undefined {
   return value.length >= 7 ? value.slice(0, 7) : value.slice(0, 4);
 }
 
+const SUMMARY: Record<string, (v: { name: string; headline: string; city: string; years: number; since: number; companies: number; technologies: number }) => string> = {
+  en: (v) => `${v.name} is a ${v.headline.toLowerCase()} based in ${v.city}, with ${v.years} years of experience (since ${v.since}) across ${v.companies} companies, working with ${v.technologies} distinct technologies — mainly Java, Spring Boot, microservices, SOA, React and Angular.`,
+  "pt-br": (v) => `${v.name} é ${v.headline.toLowerCase()} em ${v.city}, com ${v.years} anos de experiência (desde ${v.since}) em ${v.companies} empresas e ${v.technologies} tecnologias distintas — principalmente Java, Spring Boot, microsserviços, SOA, React e Angular.`,
+  es: (v) => `${v.name} es ${v.headline.toLowerCase()} en ${v.city}, con ${v.years} años de experiencia (desde ${v.since}) en ${v.companies} empresas y ${v.technologies} tecnologías distintas — principalmente Java, Spring Boot, microservicios, SOA, React y Angular.`,
+};
+
 export function summary(locale = "en", file: CareerFile = careerFile, now = new Date()): string {
   const facts = careerFacts(getCareerHistory(locale, file), now);
-  const { name, location } = file.person;
-  return `${name} is a ${getHeadline("en", file).toLowerCase()} based in ${location.city}, with ${facts.years} years of experience (since ${facts.since}) across ${facts.companies} companies, working with ${facts.technologies} distinct technologies — mainly Java, Spring Boot, microservices, SOA, React and Angular.`;
+  const render = SUMMARY[locale] ?? SUMMARY.en;
+  return render({ name: file.person.name, headline: getHeadline(locale, file), city: file.person.location.city, ...facts });
 }
 
 export function skills(file: CareerFile = careerFile): { category: string; items: string[] }[] {

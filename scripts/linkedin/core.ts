@@ -1,8 +1,8 @@
 // Pure LinkedIn → career.json logic. No network, no filesystem: everything here is unit-tested.
 // Runs under Node's built-in type stripping, hence the explicit ".ts" import and erasable-only TypeScript.
-import { catalogueTerms, resolveTech } from "../../src/lib/tech.ts";
-
-const LOCALES = ["pt-br", "en", "es"];
+import { precision, yearOf } from "../../src/lib/dates.ts";
+import { LOCALES } from "../../src/lib/site.ts";
+import { catalogueNames } from "../../src/lib/tech.ts";
 
 /** The only LinkedIn fields that ever reach the (public) repository. */
 export interface LinkedInPosition {
@@ -130,8 +130,6 @@ export function companyTokens(name: string): string[] {
     .filter((t) => t.length >= 3 && !STOPWORDS.has(t));
 }
 
-const yearOf = (d: string | null | undefined) => Number(String(d ?? "").slice(0, 4)) || 0;
-
 function matches(site: CareerPositionJson, li: LinkedInPosition): boolean {
   const a = new Set(companyTokens(site.company));
   const shared = companyTokens(li.company).some((t) => a.has(t));
@@ -144,18 +142,19 @@ function slug(s: string): string {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 32);
 }
 
+/**
+ * Single-word names ("React", "REST", "Git", "Spring") are matched case-sensitively so ordinary prose such as
+ * "the rest of the team" or "react quickly" does not invent technologies; multi-word names match in any case.
+ */
 export function inferStack(text: string): string[] {
   const found: string[] = [];
-  const hay = ` ${text.toLowerCase()} `;
-  for (const term of catalogueTerms()) {
-    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    if (new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9#]|$)`).test(hay)) {
-      const label = resolveTech(term)[0]?.canonical ?? term;
-      if (!found.some((f) => f.toLowerCase() === label.toLowerCase())) found.push(label);
-    }
+  for (const name of catalogueNames()) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const flags = /\s/.test(name) ? "i" : "";
+    if (new RegExp(`(^|[^A-Za-z0-9])${escaped}(?![A-Za-z0-9#+])`, flags).test(text) && !found.includes(name)) found.push(name);
   }
-  // Prefer the most specific term ("Spring Boot" over "Spring").
-  return found.filter((f) => !found.some((o) => o !== f && o.toLowerCase().startsWith(`${f.toLowerCase()} `)));
+  // Prefer the most specific term ("Spring Boot" over "Spring", "AWS Lambda" over "AWS").
+  return found.filter((f) => !found.some((o) => o !== f && o.startsWith(`${f} `)));
 }
 
 function firstSentence(text: string, max = 220): string {
@@ -197,8 +196,11 @@ export function mergeCareer(career: CareerJson, incoming: LinkedInPosition[], op
         position[key] = value;
       }
     };
-    if (li.start) set("start", li.start);
-    set("end", li.end);
+    // Never trade a more precise curated date ("2019-03") for a vaguer LinkedIn one ("2019") of the same year.
+    const keepPrecise = (current: string | null, incoming: string | null) =>
+      current && incoming && yearOf(current) === yearOf(incoming) && precision(current) > precision(incoming) ? current : incoming;
+    if (li.start) set("start", keepPrecise(position.start, li.start) ?? position.start);
+    set("end", keepPrecise(position.end, li.end));
     set("current", !li.end);
     if (li.location) set("location", li.location);
     set("linkedin", { company: li.company, title: li.title });

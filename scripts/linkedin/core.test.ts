@@ -1,9 +1,24 @@
 import { describe, expect, it } from "vitest";
 
-import career from "../../src/data/career.json";
-import { inferStack, mergeCareer, normalizePositions, parseCsv, parseLinkedInDate, type CareerJson, type LinkedInPosition } from "./core.ts";
+import { inferStack, mergeCareer, normalizePositions, parseCsv, parseLinkedInDate, type CareerJson, type CareerPositionJson, type LinkedInPosition } from "./core.ts";
 
-const site = career as unknown as CareerJson;
+// A fixed fixture, not src/data/career.json: the sync workflow runs these tests right after rewriting that file.
+const position = (id: string, company: string, start: string, extra: Partial<CareerPositionJson> = {}): CareerPositionJson => ({
+  id, company, start, end: null, current: false, kind: "employment", archType: "soa", stack: ["Java 8"],
+  i18n: { "pt-br": { role: `Dev ${id}`, summary: "Texto curado." }, en: { role: `Dev ${id}`, summary: "Curated text." }, es: { role: `Dev ${id}`, summary: "Texto curado." } },
+  ...extra,
+});
+const site: CareerJson = {
+  person: { name: "Test" },
+  sync: { source: "manual", syncedAt: null },
+  positions: [
+    position("iefp", "Conkord | IEFP", "2025", { current: true }),
+    position("ytech", "YTech | CGI", "2023"),
+    position("accurate", "Accurate Software", "2022"),
+    position("nbs", "NBS Informática", "2020"),
+    position("ufmt", "UFMT", "2017", { kind: "internship" }),
+  ],
+};
 const now = new Date("2026-09-01T00:00:00Z");
 const li = (company: string, start: string, end: string | null, title = "Engineer", description = ""): LinkedInPosition =>
   ({ company, title, description, location: "", start, end });
@@ -34,6 +49,11 @@ describe("LinkedIn parsing", () => {
   it("infers a stack from free text using the catalogue", () => {
     expect(inferStack("Built Spring Boot services on Kubernetes with PostgreSQL and React")).toEqual(expect.arrayContaining(["Spring Boot", "Kubernetes", "PostgreSQL", "React"]));
     expect(inferStack("Built Spring Boot services")).not.toContain("Spring");
+  });
+
+  it("does not turn ordinary words into technologies", () => {
+    expect(inferStack("Worked with the rest of the team to react quickly, in spring.")).toEqual([]);
+    expect(inferStack("Exposed REST APIs consumed by a React app")).toEqual(expect.arrayContaining(["REST", "React"]));
   });
 });
 
@@ -69,6 +89,13 @@ describe("mergeCareer — never breaks the site", () => {
     expect(after.stack).toEqual(before.stack);
     expect(after.archType).toBe(before.archType);
     expect(out.sync).toEqual({ source: "linkedin-api", syncedAt: now.toISOString() });
+  });
+
+  it("never downgrades a precise curated date to a vaguer LinkedIn one", () => {
+    const precise: CareerJson = { ...site, positions: site.positions.map((p) => (p.id === "nbs" ? { ...p, start: "2020-01", end: "2020-07" } : p)) };
+    const incoming = mirror().map((p) => (p.company.startsWith("NBS") ? { ...p, start: "2020", end: "2020" } : p));
+    const { career: out } = mergeCareer(precise, incoming, { source: "linkedin-api", now });
+    expect(out.positions.find((p) => p.id === "nbs")).toMatchObject({ start: "2020-01", end: "2020-07" });
   });
 
   it("adds new LinkedIn positions flagged for review and keeps ones missing from LinkedIn", () => {

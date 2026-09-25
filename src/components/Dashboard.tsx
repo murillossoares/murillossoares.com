@@ -15,12 +15,12 @@ import { groupStack } from "@/lib/tech";
 import { ARCH_STYLE } from "@/lib/arch-style";
 import { useUiStore } from "@/store/ui";
 
-export default function Dashboard({ locale }: { locale: string }) {
+export default function Dashboard({ locale, asOf }: { locale: string; asOf: string }) {
   const tDash = useTranslations("Dashboard");
   const tApp = useTranslations("App");
   const reduced = useReducedMotion();
   const careerHistory = useMemo(() => getCareerHistory(locale), [locale]);
-  const facts = useMemo(() => careerFacts(careerHistory), [careerHistory]);
+  const facts = useMemo(() => careerFacts(careerHistory, new Date(asOf)), [careerHistory, asOf]);
   const activeJobId = useUiStore((s) => s.activeJobId);
   const setActiveJob = useUiStore((s) => s.setActiveJob);
   const activeJob = careerHistory.find((j) => j.id === activeJobId) ?? careerHistory[0] ?? null;

@@ -11,11 +11,11 @@ import SkipLink from "@/components/SkipLink";
 import { calculateScoreboardMetrics, technologiesPerYear } from "@/models/metrics";
 import { getCareerHistory } from "@/services/careerData";
 
-export default function ScoreboardClient({ locale }: { locale: string }) {
+export default function ScoreboardClient({ locale, asOf }: { locale: string; asOf: string }) {
   const t = useTranslations("Scoreboard");
   const events = useMemo(() => getCareerHistory(locale), [locale]);
-  const data = useMemo(() => calculateScoreboardMetrics(events, (key, values) => t(key, values)), [events, t]);
-  const perYear = useMemo(() => technologiesPerYear(events), [events]);
+  const data = useMemo(() => calculateScoreboardMetrics(events, (key, values) => t(key, values), new Date(asOf)), [events, t, asOf]);
+  const perYear = useMemo(() => technologiesPerYear(events, new Date(asOf)), [events, asOf]);
 
   return (
     <div className="min-h-screen bg-[var(--bg)] px-4 py-6 text-[var(--text)] md:px-8 md:py-10">

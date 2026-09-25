@@ -49,7 +49,7 @@ async function request(url: string, token: string, version: string): Promise<Res
     } catch (error) {
       lastError = new Unavailable(`network error: ${(error as Error).name}`);
     }
-    await new Promise((r) => setTimeout(r, 2000 * 2 ** attempt));
+    if (attempt < 2) await new Promise((r) => setTimeout(r, 2000 * 2 ** attempt));
   }
   throw lastError;
 }
@@ -82,7 +82,9 @@ async function fromApi(): Promise<Record<string, unknown>[]> {
       if (res.status === 403) throw new Unavailable(`${await describe(res)}. The app lacks the Member Data Portability product/scope, or the profile is deactivated.`);
       if (res.status === 404) return [];
       if (!res.ok) throw new Unavailable(await describe(res));
-      const body = (await res.json()) as {
+      const body = (await res.json().catch(() => {
+        throw new Unavailable(`LinkedIn answered HTTP ${res.status} with a body that is not JSON`);
+      })) as {
         elements?: { snapshotDomain?: string; snapshotData?: Record<string, unknown>[] }[];
         paging?: { links?: { rel?: string; href?: string }[] };
       };
@@ -132,8 +134,11 @@ async function main() {
     report = result.report;
     if (report.status === "updated" && !flag("dry-run")) writeFileSync(CAREER_PATH, `${JSON.stringify(result.career, null, 2)}\n`);
   } catch (error) {
-    if (!(error instanceof Unavailable) || flag("strict")) throw error;
-    report = { status: "skipped", reason: `LinkedIn unavailable: ${error.message.replace(/\.$/, "")}. The site keeps the last synced data.`, updated: [], added: [], notOnLinkedIn: [], titleDiffs: [] };
+    // Local export imports fail loudly (bad path is a user error). Anything that goes wrong while talking to the
+    // API — expected or not — must not fail the scheduled job: the site keeps the last committed data.
+    if (flag("strict") || (source === "export" && !(error instanceof Unavailable))) throw error;
+    const detail = error instanceof Unavailable ? error.message : `unexpected ${(error as Error).name}`;
+    report = { status: "skipped", reason: `LinkedIn unavailable: ${detail.replace(/\.$/, "")}. The site keeps the last synced data.`, updated: [], added: [], notOnLinkedIn: [], titleDiffs: [] };
   }
 
   const markdown = renderReport(report);

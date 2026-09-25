@@ -138,11 +138,12 @@ function dispatch(req: RpcRequest): unknown {
   }
 }
 
-function handleOne(req: RpcRequest): RpcResponse | null {
-  const isNotification = req.id === undefined;
-  if (req?.jsonrpc !== "2.0" || typeof req.method !== "string") {
-    return { jsonrpc: "2.0", id: req?.id ?? null, error: { code: -32600, message: "Invalid Request" } };
+function handleOne(req: RpcRequest | null): RpcResponse | null {
+  if (!req || typeof req !== "object" || req.jsonrpc !== "2.0" || typeof req.method !== "string") {
+    const id = req && typeof req === "object" ? req.id ?? null : null;
+    return { jsonrpc: "2.0", id, error: { code: -32600, message: "Invalid Request" } };
   }
+  const isNotification = req.id === undefined;
   try {
     const result = dispatch(req);
     return isNotification ? null : { jsonrpc: "2.0", id: req.id ?? null, result };
@@ -173,7 +174,7 @@ export async function handleMcpHttp(request: Request): Promise<Response> {
   }
 
   const batch = Array.isArray(body);
-  const messages = (batch ? body : [body]) as RpcRequest[];
+  const messages = (batch ? body : [body]) as (RpcRequest | null)[];
   if (messages.length === 0 || messages.length > 20) {
     return new Response(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Invalid Request" } }), { status: 400, headers });
   }

@@ -1,4 +1,7 @@
+import { yearOf } from "../lib/dates";
 import { distinctTechnologies } from "../lib/tech";
+
+export { yearOf };
 
 export type ArchType = "microservices" | "monolith" | "soa" | "hybrid";
 export type PositionKind = "employment" | "internship" | "freelance";
@@ -37,11 +40,6 @@ export function inferArchType(desc: string, stack: string[]): ArchType {
   return "hybrid";
 }
 
-export function yearOf(date: string | null | undefined): number {
-  const year = Number(String(date ?? "").slice(0, 4));
-  return Number.isFinite(year) && year > 0 ? year : 0;
-}
-
 /** Newest first; current positions win ties, then later start month, then id for stability. */
 export function sortCareerEvents(events: CareerMetric[]): CareerMetric[] {
   return [...events].sort((a, b) => {
@@ -51,10 +49,22 @@ export function sortCareerEvents(events: CareerMetric[]): CareerMetric[] {
   });
 }
 
+/**
+ * Last calendar year a position was active. Current → `now`; known end → its year; unknown end → the year before the
+ * next position starts (never before its own start). The scoreboard states this assumption next to the chart.
+ */
+export function effectiveEndYear(event: CareerMetric, events: CareerMetric[], now: Date): number {
+  const start = yearOf(event.start);
+  if (event.current) return now.getFullYear();
+  if (event.end) return Math.max(start, yearOf(event.end));
+  const laterStarts = events.map((e) => yearOf(e.start)).filter((y) => y > start);
+  return laterStarts.length ? Math.max(start, Math.min(...laterStarts) - 1) : start;
+}
+
 export function careerSpan(events: CareerMetric[], now = new Date()): { from: number; to: number; years: number } {
   const starts = events.map((e) => yearOf(e.start)).filter(Boolean);
   if (starts.length === 0) return { from: 0, to: 0, years: 0 };
-  const ends = events.map((e) => (e.current ? now.getFullYear() : yearOf(e.end) || yearOf(e.start))).filter(Boolean);
+  const ends = events.map((e) => effectiveEndYear(e, events, now)).filter(Boolean);
   const from = Math.min(...starts);
   const to = Math.max(...ends);
   return { from, to, years: to - from };
@@ -102,9 +112,7 @@ export function technologiesPerYear(events: CareerMetric[], now = new Date()): {
   const rows: { year: number; count: number }[] = [];
   for (let year = span.from; year <= span.to; year++) {
     const active = events.filter((e) => {
-      const start = yearOf(e.start);
-      const end = e.current ? now.getFullYear() : yearOf(e.end) || start;
-      return start <= year && year <= end;
+      return yearOf(e.start) <= year && year <= effectiveEndYear(e, events, now);
     });
     rows.push({ year, count: distinctTechnologies(active.map((e) => e.stack)).length });
   }

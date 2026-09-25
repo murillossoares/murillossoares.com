@@ -109,7 +109,7 @@
       }
     },
     "chartTitle": "Tecnologias distintas por ano",
-    "chartDescription": "Altura de cada coluna = número de tecnologias em uso naquele ano."
+    "chartDescription": "Altura de cada coluna = número de tecnologias em uso naquele ano. Experiências sem data de término contam até o início da seguinte."
   },
   "Persona": {
     "buttonIdle": "MODO_SEGURO",
