@@ -162,7 +162,7 @@ function TimelineItem({ job, active, onSelect, reduced, period, status, archLabe
 
 function StatusBadge({ current, label }: { current: boolean; label: string }) {
   return current
-    ? <span className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded border bg-green-500/10 text-green-400 light:text-green-700 border-green-500/30"><span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" aria-hidden="true" />{label}</span>
+    ? <span className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded border bg-green-500/10 text-green-400 light:text-green-800 border-green-500/30"><span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" aria-hidden="true" />{label}</span>
     : <span className="text-[10px] font-mono px-2 py-0.5 rounded border bg-hover text-[var(--muted)] border-[var(--border)]">{label}</span>;
 }
 
