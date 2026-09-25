@@ -15,12 +15,22 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mon
 
 // Runs before first paint: returning visitors (same tab session) and link-preview/search bots skip the boot
 // overlay entirely, so it never delays content. The dashboard itself is always in the HTML.
-const BOOT_FLAG_SCRIPT = `try{var d=document.documentElement;if(sessionStorage.getItem("booted")==="1"||/bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|whatsapp|telegram/i.test(navigator.userAgent))d.setAttribute("data-booted","1")}catch(e){}`;
+// Runs while <head> is parsed, before React hydrates. Besides the boot flag, it drops whitespace text nodes and
+// comments from <head>: Netlify injects "\n<!-- This site is hosted on Netlify ... -->\n" after <meta charset> when
+// serving, and a stray text node there makes React discard the server HTML (hydration error #418).
+const BOOT_FLAG_SCRIPT = `try{var d=document.documentElement;if(sessionStorage.getItem("booted")==="1"||/bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|whatsapp|telegram/i.test(navigator.userAgent))d.setAttribute("data-booted","1")}catch(e){}try{for(var h=document.head,n=h.firstChild,x;n;n=x){x=n.nextSibling;if(n.nodeType===8||(n.nodeType===3&&!n.nodeValue.trim()))h.removeChild(n)}}catch(e){}`;
 
 export function generateStaticParams() { return locales.map((l) => ({ locale: l })); }
 export const dynamicParams = false;
 
-export const viewport: Viewport = { themeColor: "#0e1116", colorScheme: "dark" };
+export const viewport: Viewport = {
+  // Browser chrome follows the system scheme, like the site's default theme.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f9f9f9" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1116" },
+  ],
+  colorScheme: "dark light",
+};
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
