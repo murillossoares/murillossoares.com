@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { inferStack, mergeCareer, normalizePositions, parseCsv, parseLinkedInDate, type CareerJson, type CareerPositionJson, type LinkedInPosition } from "./core.ts";
+import { inferStack, mergeCareer, normalizePositions, normalizePositionsWithIssues, renderReport, parseCsv, parseLinkedInDate, type CareerJson, type CareerPositionJson, type LinkedInPosition } from "./core.ts";
 
 // A fixed fixture, not src/data/career.json: the sync workflow runs these tests right after rewriting that file.
 const position = (id: string, company: string, start: string, extra: Partial<CareerPositionJson> = {}): CareerPositionJson => ({
@@ -38,6 +38,22 @@ describe("LinkedIn parsing", () => {
     expect(parseLinkedInDate("2019-7-01")).toBe("2019-07");
     expect(parseLinkedInDate("2018")).toBe("2018");
     expect(parseLinkedInDate("")).toBeNull();
+  });
+
+  it("reads Spanish and Portuguese month names, with or without 'de'", () => {
+    expect(parseLinkedInDate("dic 2022")).toBe("2022-12");
+    expect(parseLinkedInDate("ene. de 2020")).toBe("2020-01");
+    expect(parseLinkedInDate("dez. de 2021")).toBe("2021-12");
+    expect(parseLinkedInDate("março de 2019")).toBe("2019-03");
+  });
+
+  it("rejects a record whose end date is present but unreadable instead of marking it current", () => {
+    const { positions, rejected } = normalizePositionsWithIssues([
+      { "Company Name": "Old Job", "Started On": "Jan 2020", "Finished On": "??? 2022" },
+      { "Company Name": "Now", "Started On": "Jan 2024", "Finished On": "" },
+    ]);
+    expect(positions.map((p) => p.company)).toEqual(["Now"]);
+    expect(rejected[0]).toMatch(/Old Job/);
   });
 
   it("keeps only whitelisted fields", () => {
@@ -89,6 +105,26 @@ describe("mergeCareer — never breaks the site", () => {
     expect(after.stack).toEqual(before.stack);
     expect(after.archType).toBe(before.archType);
     expect(out.sync).toEqual({ source: "linkedin-api", syncedAt: now.toISOString() });
+  });
+
+  it("does not list changes in the report when a partial response is refused", () => {
+    const { report } = mergeCareer(site, mirror().slice(0, 2), { source: "linkedin-api", now });
+    expect(report.updated).toEqual([]);
+    expect(renderReport(report)).not.toContain("### Updated");
+  });
+
+  it("pairs repeated stints at the same company by closest start, not list order", () => {
+    const stints: CareerJson = { ...site, positions: [...site.positions, position("cgi-2024", "CGI", "2024", { stack: [] })].map((p) => (p.id === "ytech" ? { ...p, company: "CGI" } : p)) };
+    const incoming = [...mirror().filter((p) => !p.company.startsWith("YTech")), li("CGI", "2024-06", null), li("CGI", "2023-02", "2024-05")];
+    const { career: out } = mergeCareer(stints, incoming, { source: "linkedin-api", now });
+    expect(out.positions.find((p) => p.id === "ytech")).toMatchObject({ start: "2023-02", end: "2024-05", current: false });
+    expect(out.positions.find((p) => p.id === "cgi-2024")).toMatchObject({ start: "2024-06", current: true });
+  });
+
+  it("in updates-only mode (site build) reports new positions instead of publishing them", () => {
+    const { career: out, report } = mergeCareer(site, [...mirror(), li("Acme", "2026-01", null)], { source: "linkedin-repo", now, updatesOnly: true });
+    expect(out.positions.some((p) => p.company === "Acme")).toBe(false);
+    expect(report.pendingAdditions).toEqual(["Acme"]);
   });
 
   it("never downgrades a precise curated date to a vaguer LinkedIn one", () => {

@@ -12,7 +12,7 @@ import { createHash } from "node:crypto";
 import { appendFileSync, existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { mergeCareer, normalizePositions, parseCsv, POSITIONS_COLUMNS, renderReport, type CareerJson, type LinkedInPosition, type SyncReport } from "./core.ts";
+import { mergeCareer, normalizePositionsWithIssues, parseCsv, POSITIONS_COLUMNS, renderReport, type CareerJson, type LinkedInPosition, type SyncReport } from "./core.ts";
 
 const CAREER_PATH = new URL("../../src/data/career.json", import.meta.url);
 /** The manually refreshed export committed to the repo. Only this CSV — never the export ZIP. */
@@ -147,7 +147,7 @@ async function main() {
   const label = source === "repo" ? "LinkedIn export in repo" : source === "export" ? "LinkedIn export" : "LinkedIn API";
   let report: SyncReport;
   let write: CareerJson | null = null;
-  const skipped = (reason: string): SyncReport => ({ status: "skipped", reason, updated: [], added: [], notOnLinkedIn: [], titleDiffs: [] });
+  const skipped = (reason: string): SyncReport => ({ status: "skipped", reason, updated: [], added: [], notOnLinkedIn: [], titleDiffs: [], pendingAdditions: [] });
 
   try {
     let raw: Record<string, unknown>[];
@@ -159,13 +159,15 @@ async function main() {
     } else {
       raw = source === "export" ? fromExport(arg("path")) : await fromApi();
     }
-    const positions: LinkedInPosition[] = normalizePositions(raw);
+    const { positions, rejected } = normalizePositionsWithIssues(raw) as { positions: LinkedInPosition[]; rejected: string[] };
+    for (const r of rejected) console.log(`::warning title=${label}: record ignored::${r}`);
     if (source === "repo" && positions.length === 0) throw new Unavailable("data/linkedin/Positions.csv has no positions");
-    const result = mergeCareer(career, positions, { source: `linkedin-${source}`, minMatchRatio: flag("force") ? 0 : 0.5 });
+    const result = mergeCareer(career, positions, { source: `linkedin-${source}`, minMatchRatio: flag("force") ? 0 : 0.5, updatesOnly: flag("updates-only") });
     report = result.report;
     if (report.status === "updated") write = result.career;
     // Record the export as applied even when it changed nothing, so it is not re-applied over newer API data.
-    if (hash && report.status !== "skipped") write = { ...(write ?? career), sync: { ...(write ?? career).sync, exportHash: hash } };
+    // Build-time (--updates-only) runs do not record it: the workflow still has to add new positions via a PR.
+    if (hash && report.status !== "skipped" && !flag("updates-only")) write = { ...(write ?? career), sync: { ...(write ?? career).sync, exportHash: hash } };
   } catch (error) {
     // Local export imports fail loudly (bad path is a user error). The API and the repo file must never fail the
     // scheduled job or the site build: the site keeps the last committed data.

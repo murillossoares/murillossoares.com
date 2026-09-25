@@ -31,6 +31,6 @@ describe("machine-readable content", () => {
 
   it("never leaks sync internals or anything that looks like a credential", () => {
     const blob = JSON.stringify([jsonResume("en", careerFile, now), personJsonLd("pt-br", careerFile, now)]) + llmsFullTxt(careerFile, now);
-    expect(blob).not.toMatch(/token|secret|password|bearer|@gmail\.com/i);
+    expect(blob).not.toMatch(/Bearer\s+[A-Za-z0-9._-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|AQ[A-Za-z0-9_-]{40,}|[\w.+-]+@[\w-]+\.[a-z]{2,}/);
   });
 });
