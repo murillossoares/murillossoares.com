@@ -10,12 +10,13 @@ describe("machine-readable content", () => {
     const ld = personJsonLd("en", careerFile, now);
     expect(ld["@type"]).toBe("ProfilePage");
     expect(ld.mainEntity).toMatchObject({ "@type": "Person", name: "Murillo Soares", sameAs: expect.arrayContaining(["https://www.linkedin.com/in/murillossoares/"]) });
-    const roles = [...ld.mainEntity.worksFor, ...ld.mainEntity.alumniOf];
+    const roles = ld.mainEntity.worksFor;
     expect(roles).toHaveLength(careerFile.positions.length);
-    // Role pattern: the wrapped property repeats inside each OrganizationRole, never a bare worksFor on a Role.
-    expect(ld.mainEntity.worksFor.every((r) => r["@type"] === "OrganizationRole" && "worksFor" in r)).toBe(true);
-    expect(ld.mainEntity.alumniOf.every((r) => r["@type"] === "OrganizationRole" && "alumniOf" in r && !("worksFor" in r))).toBe(true);
-    expect(JSON.stringify(ld)).not.toContain("hasOccupation");
+    // Role pattern: worksFor repeats inside each OrganizationRole; past roles end, the current one does not.
+    expect(roles.every((r) => r["@type"] === "OrganizationRole" && r.worksFor["@type"] === "Organization")).toBe(true);
+    const current = careerFile.positions.filter((p) => p.current).length;
+    expect(roles.filter((r) => r.endDate === undefined).length).toBeGreaterThanOrEqual(current);
+    expect(JSON.stringify(ld)).not.toMatch(/hasOccupation|alumniOf/);
   });
 
   it("follows the llms.txt shape: H1, blockquote summary, link sections", () => {

@@ -37,14 +37,14 @@ export function skills(file: CareerFile = careerFile): { category: string; items
   return groupStack(all).map((g) => ({ category: CATEGORY_NAMES[g.category], items: g.items.map((i) => i.canonical) }));
 }
 
-function organizationRole(e: CareerMetric, property: "worksFor" | "alumniOf") {
+function organizationRole(e: CareerMetric) {
   return {
     "@type": "OrganizationRole",
     roleName: e.role,
     startDate: isoDate(e.start),
     endDate: e.current ? undefined : isoDate(e.end),
     description: e.desc,
-    [property]: { "@type": "Organization", name: e.company },
+    worksFor: { "@type": "Organization", name: e.company },
   };
 }
 
@@ -70,11 +70,10 @@ export function personJsonLd(locale: string, file: CareerFile = careerFile, now 
       address: { "@type": "PostalAddress", addressLocality: person.location.city, addressCountry: person.location.country },
       sameAs: Object.values(person.links),
       knowsAbout: distinctTechnologies(file.positions.map((p) => p.stack)),
-      // schema.org Role pattern: the wrapped property repeats inside the OrganizationRole. Current employers go in
-      // worksFor, past ones in alumniOf (schema.org has no "worked for"). Putting worksFor inside a hasOccupation Role
-      // is invalid and produced one validator warning per position.
-      worksFor: history.filter((e) => e.current).map((e) => organizationRole(e, "worksFor")),
-      alumniOf: history.filter((e) => !e.current).map((e) => organizationRole(e, "alumniOf")),
+      // schema.org Role pattern: the wrapped property (worksFor) repeats inside each OrganizationRole, and the role's
+      // start/end dates say when that employment held, so past jobs carry an endDate. alumniOf would be wrong here: its
+      // role dates mean "alumnus since". A bare worksFor inside a hasOccupation Role is invalid (validator warning).
+      worksFor: history.map(organizationRole),
     },
   };
 }

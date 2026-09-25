@@ -23,7 +23,7 @@ test.describe("crawlers and agents", () => {
 
     const ld = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)![1]);
     expect(ld.mainEntity.name).toBe("Murillo Soares");
-    expect(ld.mainEntity.worksFor.length + ld.mainEntity.alumniOf.length).toBe(career.positions.length);
+    expect(ld.mainEntity.worksFor).toHaveLength(career.positions.length);
   });
 
   test("robots, sitemap, llms.txt and resume.json are served", async ({ request }) => {

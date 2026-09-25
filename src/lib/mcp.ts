@@ -7,7 +7,7 @@ import { jsonResume, llmsFullTxt, skills, summary } from "./agent-content";
 import { LOCALES } from "./site";
 import { resolveTech } from "./tech";
 
-const SUPPORTED_VERSIONS = ["2025-06-18", "2025-03-26", "2024-11-05"];
+const SUPPORTED_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
 const SERVER_INFO = { name: "murillo-soares-portfolio", title: "Murillo Soares — career data", version: "1.0.0" };
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json | undefined };
@@ -171,11 +171,14 @@ const DEFAULT_ALLOWED_HEADERS = "Content-Type, Accept, Authorization, Mcp-Sessio
  */
 function preflightHeaders(request: Request): Record<string, string> {
   const requested = request.headers.get("access-control-request-headers") ?? "";
-  const safe = /^[A-Za-z0-9-]+(\s*,\s*[A-Za-z0-9-]+)*$/.test(requested.trim()) ? requested.trim() : "";
+  // RFC 9110 token characters only, so nothing but a comma-separated list of header names is ever reflected.
+  const token = "[!#$%&'*+.^_`|~0-9A-Za-z-]+";
+  const safe = new RegExp(`^${token}(\\s*,\\s*${token})*$`).test(requested.trim()) ? requested.trim() : "";
   return {
     "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": safe ? `${safe}, Authorization` : DEFAULT_ALLOWED_HEADERS,
     "Access-Control-Max-Age": "7200",
+    Vary: "Access-Control-Request-Headers",
   };
 }
 

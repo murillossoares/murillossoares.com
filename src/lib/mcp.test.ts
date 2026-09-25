@@ -11,7 +11,7 @@ describe("MCP endpoint", () => {
     const res = await rpc("initialize", { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "t", version: "1" } });
     expect(res.result.protocolVersion).toBe("2025-03-26");
     expect(res.result.capabilities.tools).toBeDefined();
-    expect((await rpc("initialize", { protocolVersion: "1999-01-01" })).result.protocolVersion).toBe("2025-06-18");
+    expect((await rpc("initialize", { protocolVersion: "1999-01-01" })).result.protocolVersion).toBe("2025-11-25");
   });
 
   it("acknowledges notifications with 202 and no body", async () => {
@@ -66,13 +66,14 @@ describe("MCP endpoint", () => {
 
   it("answers CORS preflight so browser-based MCP clients can connect", async () => {
     const preflight = (headers: Record<string, string>) => handleMcpHttp(new Request("https://example.test/mcp", { method: "OPTIONS", headers }));
-    const res = await preflight({ Origin: "https://inspector.example", "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type,mcp-protocol-version,mcp-method,x-custom-auth-headers" });
+    const res = await preflight({ Origin: "https://inspector.example", "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type,mcp-protocol-version,mcp-method,x-custom-auth-headers,x_trace.id" });
     expect(res.status).toBe(204);
     expect(res.headers.get("access-control-allow-origin")).toBe("*");
     expect(res.headers.get("access-control-allow-methods")).toContain("POST");
     expect(res.headers.get("access-control-max-age")).toBe("7200");
     const echoed = res.headers.get("access-control-allow-headers")!.toLowerCase();
-    for (const h of ["content-type", "mcp-protocol-version", "mcp-method", "x-custom-auth-headers", "authorization"]) expect(echoed).toContain(h);
+    for (const h of ["content-type", "mcp-protocol-version", "mcp-method", "x-custom-auth-headers", "x_trace.id", "authorization"]) expect(echoed).toContain(h);
+    expect(res.headers.get("vary")).toBe("Access-Control-Request-Headers");
     expect(res.headers.get("access-control-allow-credentials")).toBeNull();
 
     const fallback = (await preflight({ Origin: "https://a.example" })).headers.get("access-control-allow-headers")!.toLowerCase();
@@ -116,6 +117,7 @@ describe("MCP endpoint", () => {
     }));
     expect((await call("2025-06-18")).status).toBe(200);
     expect((await call("2025-03-26")).status).toBe(200);
+    expect((await call("2025-11-25")).status).toBe(200);
     const bad = await call("1999-01-01");
     expect(bad.status).toBe(400);
     const err = (await bad.json()).error;
