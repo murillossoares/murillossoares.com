@@ -1,0 +1,72 @@
+name: Post-deploy e2e
+
+# After a push to master, waits until Netlify serves that commit in production (the pages carry it in
+# <meta name="build-commit">), then runs the whole Playwright suite against the live site.
+# Run it by hand from the Actions tab to test production at any time.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: post-deploy-e2e
+  cancel-in-progress: true
+
+env:
+  SITE_URL: https://murillossoares.netlify.app
+
+jobs:
+  e2e:
+    name: e2e-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          persist-credentials: false
+
+      - name: Wait for the deploy of this commit
+        if: github.event_name == 'push'
+        run: |
+          for i in $(seq 1 60); do
+            live=$(curl -fsS "$SITE_URL/en" | grep -o 'name="build-commit" content="[0-9a-f]*"' | grep -o '[0-9a-f]\{7,\}' || true)
+            if [ "$live" = "$GITHUB_SHA" ]; then echo "Production serves $GITHUB_SHA"; exit 0; fi
+            echo "Live: ${live:-unknown}; waiting for $GITHUB_SHA ($i/60)"
+            sleep 20
+          done
+          echo "::error title=Post-deploy e2e::Production did not serve $GITHUB_SHA within 20 minutes"
+          exit 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests against production (desktop, Android and iPhone profiles)
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ env.SITE_URL }}
+        run: npm run test:e2e
+
+      - name: Upload Playwright artifacts
+        if: ${{ failure() && !cancelled() }}
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: playwright-production
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
