@@ -44,6 +44,11 @@ test.describe("crawlers and agents", () => {
     expect(sitemap).toContain('hreflang="x-default"');
 
     expect(await (await request.get("/llms.txt")).text()).toMatch(/^# Murillo Soares/);
+    // Our own favicon (16/32/48 px); without it Netlify serves its logo at /favicon.ico.
+    const ico = await (await request.get("/favicon.ico")).body();
+    expect([ico.readUInt16LE(2), ico.readUInt16LE(4)]).toEqual([1, 3]);
+    expect((await request.get("/apple-icon.png")).headers()["content-type"]).toContain("image/png");
+
     const resume = await (await request.get("/resume.json")).json();
     expect(resume.work).toHaveLength(career.positions.length);
   });

@@ -71,6 +71,11 @@ test.describe("portfolio smoke", () => {
     const dialog = page.getByRole("dialog", { name: "M_SOARES_V" });
     await expect(dialog).toBeVisible();
     await expect(page.getByRole("button", { name: "Fechar" })).toBeFocused();
+    // The character level follows the years of experience shown in the KPIs.
+    const kpiValue = page.getByRole("region", { name: "KPIs" }).locator("article").first().locator("p").first();
+    const years = (await kpiValue.textContent())?.match(/^(\d+)\+? anos$/)?.[1];
+    expect(years).toBeTruthy();
+    await expect(dialog).toContainText(`Nvl. ${years}`);
 
     await page.keyboard.press("Tab");
     await expect(dialog).toContainText("CORE_STATS");

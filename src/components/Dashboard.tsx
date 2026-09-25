@@ -9,12 +9,15 @@ import DownloadCVButton from "./DownloadCVButton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 import SkipLink from "./SkipLink";
+import Monogram from "./Monogram";
 import CareerGalaxyScene from "./CareerGalaxyScene";
 import { careerFacts, formatYears, type ArchType, type CareerMetric } from "@/models/metrics";
 import { careerFile, educationLabel, getCareerHistory, getHeadline } from "@/services/careerData";
 import { periodParts, type PeriodParts } from "@/lib/period";
 import { groupStack } from "@/lib/tech";
 import { ARCH_STYLE } from "@/lib/arch-style";
+
+const ARCH_TYPES = Object.keys(ARCH_STYLE) as ArchType[];
 import { useUiStore } from "@/store/ui";
 
 export default function Dashboard({ locale, asOf }: { locale: string; asOf: string }) {
@@ -53,8 +56,9 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
       <div className="fixed inset-0 bg-gradient-to-br from-purple-900/10 to-green-900/10 pointer-events-none" aria-hidden="true" />
       <header className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-[var(--border)] pb-6 relative z-10">
         <div className="flex items-center gap-3">
+          <Monogram className="h-9 w-9 shrink-0 text-[var(--text)]" />
           <div className="relative" aria-hidden="true"><div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" /><div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20" /></div>
-          <span className="font-mono text-xs text-green-500 tracking-widest uppercase">{tDash("systemOnline")}</span>
+          <span className="font-mono text-xs text-green-500 tracking-widest uppercase whitespace-nowrap">{tDash("systemOnline")}</span>
         </div>
         <nav aria-label={tHeader("controls")} className="flex flex-wrap gap-3">
           <SB icon={Linkedin} label="LINKEDIN" href={links.linkedin} color="text-blue-400" rel="me noreferrer" />
@@ -77,7 +81,8 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
             {tDash("about", { city: careerFile.person.location.city, years, companies: facts.companies })}
           </p>
         </div>
-        <CareerGalaxyScene events={careerHistory} activeId={activeJob?.id ?? null} onSelect={setActiveJob} label={tDash("galaxyLabel")} hint={tDash("galaxyHint")} />
+        <CareerGalaxyScene events={careerHistory} activeId={activeJob?.id ?? null} onSelect={setActiveJob} label={tDash("galaxyLabel")} hint={tDash("galaxyHint")}
+          archLabels={Object.fromEntries(ARCH_TYPES.map((k) => [k, tDash(`archNames.${k}`)]))} />
       </section>
 
       <section aria-label="KPIs" className="relative z-10 mb-6 grid grid-cols-2 lg:grid-cols-4 gap-4">

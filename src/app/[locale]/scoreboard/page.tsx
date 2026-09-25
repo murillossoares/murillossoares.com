@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title,
     description,
     alternates: { canonical: `/${locale}/scoreboard`, languages: localeAlternates("/scoreboard") },
-    openGraph: { type: "website", url: `/${locale}/scoreboard`, title, description, locale: LOCALE_TAGS[locale]?.og, images: [{ url: "/og.png", width: 1200, height: 630, alt: title }] },
-    twitter: { card: "summary_large_image", title, description, images: ["/og.png"] },
+    openGraph: { type: "website", url: `/${locale}/scoreboard`, title, description, locale: LOCALE_TAGS[locale]?.og, images: [{ url: `/og/${locale}.png`, width: 1200, height: 630, alt: title }] },
+    twitter: { card: "summary_large_image", title, description, images: [`/og/${locale}.png`] },
   };
 }
 

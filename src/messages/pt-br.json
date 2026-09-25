@@ -1,14 +1,8 @@
 {
   "App": {
-    "title": "Murillo Soares",
-    "subtitle": "Java 7 -> 21 * Spring Boot 3 * Microservices * React * Angular"
+    "title": "Murillo Soares"
   },
   "Header": {
-    "tabs": {
-      "cv": "VisãoGeral.dashboard",
-      "skills": "Dependências.lock",
-      "contact": "HistóricoEventos.log"
-    },
     "theme": "Tema",
     "language": "Idioma",
     "downloadCv": "Baixar CV",
@@ -20,19 +14,7 @@
   },
   "Boot": {
     "skip": "Pular boot",
-    "hint": "Esc para pular",
-    "lines": {
-      "kernelStarted": "[ OK ] Kernel iniciado.",
-      "mountedCareer": "[ OK ] /dev/carreira montado.",
-      "networkingStack": "[ OK ] Stack de rede iniciado.",
-      "mountedExperience": "[ OK ] /var/lib/experiência montado.",
-      "cvService": "[ OK ] Serviço de CV iniciado.",
-      "networkTarget": "[ OK ] Alvo de rede alcancado.",
-      "portfolioStarted": "[ OK ] Murillo Soares Portfolio v3.0 iniciado",
-      "modules": "Carregando módulos: Java, Spring, React, Angular...",
-      "uptime": "Uptime: 9+ anos de experiência profissional",
-      "ready": "Sistema pronto."
-    }
+    "hint": "Esc para pular"
   },
   "Dashboard": {
     "systemOnline": "Sistema Online",
@@ -118,10 +100,6 @@
     "chartCount": "Tecnologias"
   },
   "Persona": {
-    "buttonIdle": "MODO_SEGURO",
-    "buttonHover": "INICIAR PROTOCOLO",
-    "interestsTitle": "Interesses",
-    "statsTitle": "Stats",
     "coreStatsTitle": "CORE_STATS",
     "modulesTitle": "INSTALLED_MODULES",
     "close": "Fechar",
