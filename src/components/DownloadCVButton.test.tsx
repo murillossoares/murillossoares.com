@@ -16,7 +16,7 @@ vi.mock("next-intl", () => ({
   useLocale: () => "en",
   useMessages: () => ({
     App: { title: "Murillo Soares" },
-    Dashboard: { eventHistoryTitle: "Experience", present: "present" },
+    Dashboard: { eventHistoryTitle: "Experience" },
   }),
   useTranslations: () => (key: string) =>
     ({ downloadCv: "Download CV", downloadError: "Could not generate the CV. Try again." })[key] ?? key,

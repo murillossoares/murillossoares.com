@@ -12,6 +12,7 @@ import { createHash } from "node:crypto";
 import { appendFileSync, existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { hasMonth } from "../../src/lib/period.ts";
 import { mergeCareer, normalizePositionsWithIssues, parseCsv, POSITIONS_COLUMNS, renderReport, type CareerJson, type LinkedInPosition, type SyncReport } from "./core.ts";
 
 const CAREER_PATH = new URL("../../src/data/career.json", import.meta.url);
@@ -184,6 +185,12 @@ async function main() {
   summary(markdown);
   output("changed", String(Boolean(write) && !flag("dry-run")));
   if (report.status === "skipped") console.log(`::warning title=${label} skipped::${report.reason}`);
+
+  // Month and year matter on a CV (days are intentionally omitted); flag positions that still lack the month.
+  const missing = (write ?? career).positions.filter((p) => !hasMonth(p.start) || (!p.current && !hasMonth(p.end)));
+  if (missing.length) {
+    console.log(`::warning title=Career dates without month::${missing.length} of ${(write ?? career).positions.length} positions have no start/end month: ${missing.map((p) => p.id).join(", ")}. Add them via data/linkedin/Positions.csv or src/data/career.json ("YYYY-MM").`);
+  }
 }
 
 main().catch((error) => {

@@ -63,11 +63,3 @@ export function getCareerHistory(locale: string, file: CareerFile = careerFile):
 export function getHeadline(locale: string, file: CareerFile = careerFile): string {
   return file.person.headline[locale] ?? file.person.headline[FALLBACK_LOCALE] ?? "";
 }
-
-/** "2019 — 2021", "2025 — present", or just "2019" when the end is unknown. */
-export function formatPeriod(event: Pick<CareerMetric, "start" | "end" | "current">, presentLabel: string): string {
-  const fmt = (d: string) => (d.length >= 7 ? `${d.slice(5, 7)}/${d.slice(0, 4)}` : d.slice(0, 4));
-  if (event.current) return `${fmt(event.start)} — ${presentLabel}`;
-  if (event.end && event.end !== event.start) return `${fmt(event.start)} — ${fmt(event.end)}`;
-  return fmt(event.start);
-}

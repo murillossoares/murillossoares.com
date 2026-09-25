@@ -58,7 +58,6 @@
       "gateway": "Gateway",
       "client": "Client"
     },
-    "present": "present",
     "running": "RUNNING",
     "exited": "EXITED",
     "categories": {

@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { use3DMode } from "@/lib/use-3d";
 import { ARCH_STYLE } from "@/lib/arch-style";
-import { buildGalaxy } from "@/lib/galaxy";
+import { buildGalaxy, yearToT } from "@/lib/galaxy";
 import type { CareerMetric } from "@/models/metrics";
 
 const CareerGalaxy3D = dynamic(() => import("./CareerGalaxy3D"), { ssr: false, loading: () => null });
@@ -60,14 +60,12 @@ function GalaxySvg({ layout, activeId }: { layout: ReturnType<typeof buildGalaxy
   const x = (t: number) => pad + t * (W - pad * 2);
   const y = (py: number, pz: number) => H / 2 - 16 + py * 38 + pz * 12;
   const pos = new Map(layout.nodes.map((n) => [n.id, { x: x(n.t), y: y(n.position[1], n.position[2]) }]));
-  const first = layout.years[0] ?? 0;
-  const span = Math.max(1, (layout.years[layout.years.length - 1] ?? 0) - first);
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" preserveAspectRatio="xMidYMid meet">
       {layout.years.map((yr) => (
         <g key={yr}>
-          <line x1={x((yr - first) / span)} x2={x((yr - first) / span)} y1={24} y2={H - 44} stroke="rgba(255,255,255,0.05)" />
-          <text x={x((yr - first) / span)} y={H - 30} textAnchor="middle" fontSize="10" fill="rgba(212,212,212,0.55)" fontFamily="monospace">{yr}</text>
+          <line x1={x(yearToT(yr, layout))} x2={x(yearToT(yr, layout))} y1={24} y2={H - 44} stroke="rgba(255,255,255,0.05)" />
+          <text x={x(yearToT(yr, layout))} y={H - 30} textAnchor="middle" fontSize="10" fill="rgba(212,212,212,0.55)" fontFamily="monospace">{yr}</text>
         </g>
       ))}
       {layout.edges.map((e) => {

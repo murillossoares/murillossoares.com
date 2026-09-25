@@ -58,7 +58,6 @@
       "gateway": "Gateway",
       "client": "Cliente"
     },
-    "present": "atual",
     "running": "EM EXECUÇÃO",
     "exited": "ENCERRADO",
     "categories": {

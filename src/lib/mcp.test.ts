@@ -64,6 +64,60 @@ describe("MCP endpoint", () => {
     expect([a.error.code, b.error.code]).toEqual([-32600, -32600]);
   });
 
+  it("answers CORS preflight so browser-based MCP clients can connect", async () => {
+    const preflight = (headers: Record<string, string>) => handleMcpHttp(new Request("https://example.test/mcp", { method: "OPTIONS", headers }));
+    const res = await preflight({ Origin: "https://inspector.example", "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type,mcp-protocol-version,mcp-method,x-custom-auth-headers" });
+    expect(res.status).toBe(204);
+    expect(res.headers.get("access-control-allow-origin")).toBe("*");
+    expect(res.headers.get("access-control-allow-methods")).toContain("POST");
+    expect(res.headers.get("access-control-max-age")).toBe("7200");
+    const echoed = res.headers.get("access-control-allow-headers")!.toLowerCase();
+    for (const h of ["content-type", "mcp-protocol-version", "mcp-method", "x-custom-auth-headers", "authorization"]) expect(echoed).toContain(h);
+    expect(res.headers.get("access-control-allow-credentials")).toBeNull();
+
+    const fallback = (await preflight({ Origin: "https://a.example" })).headers.get("access-control-allow-headers")!.toLowerCase();
+    for (const h of ["content-type", "accept", "authorization", "mcp-protocol-version", "mcp-session-id", "mcp-method", "mcp-name"]) expect(fallback).toContain(h);
+    // A malformed request-header list is never reflected.
+    const odd = (await preflight({ "Access-Control-Request-Headers": "content-type; set-cookie=a, x y" })).headers.get("access-control-allow-headers")!;
+    expect(odd).not.toMatch(/set-cookie|x y/i);
+    expect(odd.toLowerCase()).toContain("content-type");
+  });
+
+  it("applies an explicit Origin policy: any well-formed origin is fine, a malformed one gets 403", async () => {
+    const withOrigin = (origin: string, method = "POST") => handleMcpHttp(new Request("https://example.test/mcp", {
+      method, headers: { Origin: origin, "Content-Type": "application/json" }, body: method === "POST" ? JSON.stringify({ jsonrpc: "2.0", id: 1, method: "ping" }) : undefined,
+    }));
+    expect((await withOrigin("https://client.example.org")).status).toBe(200);
+    expect((await withOrigin("null")).status).toBe(200);
+    const bad = await withOrigin("not a url");
+    expect(bad.status).toBe(403);
+    expect(bad.headers.get("access-control-allow-origin")).toBe("*");
+    // Preflight always succeeds, even for an odd Origin.
+    expect((await withOrigin("not a url", "OPTIONS")).status).toBe(204);
+  });
+
+  it("sends CORS headers on every response, errors included", async () => {
+    const ok = await post({ jsonrpc: "2.0", id: 1, method: "ping" });
+    const notification = await post({ jsonrpc: "2.0", method: "notifications/initialized" });
+    const parseError = await handleMcpHttp(new Request("https://example.test/mcp", { method: "POST", body: "{" }));
+    const get = await handleMcpHttp(new Request("https://example.test/mcp"));
+    for (const res of [ok, notification, parseError, get]) expect(res.headers.get("access-control-allow-origin")).toBe("*");
+  });
+
+  it("enforces MCP-Protocol-Version on requests after initialize", async () => {
+    const call = (version: string, method = "ping") => handleMcpHttp(new Request("https://example.test/mcp", {
+      method: "POST", headers: { "Content-Type": "application/json", "MCP-Protocol-Version": version }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method }),
+    }));
+    expect((await call("2025-06-18")).status).toBe(200);
+    expect((await call("2025-03-26")).status).toBe(200);
+    const bad = await call("1999-01-01");
+    expect(bad.status).toBe(400);
+    const err = (await bad.json()).error;
+    expect(err.message).toMatch(/Unsupported MCP-Protocol-Version/);
+    expect(err.data.supported).toContain("2025-06-18");
+    expect((await call("1999-01-01", "initialize")).status).toBe(200);
+  });
+
   it("rejects GET because the server is stateless", async () => {
     expect((await handleMcpHttp(new Request("https://example.test/mcp"))).status).toBe(405);
   });

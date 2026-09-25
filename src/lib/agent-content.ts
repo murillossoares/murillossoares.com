@@ -1,8 +1,10 @@
 // Machine-readable views of the career data, shared by the static routes (/llms.txt, /resume.json, JSON-LD)
 // and the MCP function so every consumer — Google, LLM crawlers, agents — reads the same facts.
 // Relative imports only: this module is also bundled by Netlify Functions, which do not know the "@/" alias.
-import { careerFacts, type CareerMetric } from "../models/metrics";
-import { careerFile, formatPeriod, getCareerHistory, getHeadline, type CareerFile } from "../services/careerData";
+import { careerFacts, formatYears, type CareerMetric } from "../models/metrics";
+import { hasMonth } from "./period";
+import { careerFile, getCareerHistory, getHeadline, type CareerFile } from "../services/careerData";
+import { formatPeriod } from "./period";
 import { distinctTechnologies, groupStack } from "./tech";
 import { absoluteUrl, LOCALES, LOCALE_TAGS } from "./site";
 
@@ -11,12 +13,14 @@ const CATEGORY_NAMES: Record<string, string> = {
   languages: "Languages", backend: "Backend", frontend: "Frontend & Mobile", data: "Data", integration: "Integration", infra: "Infra & DevOps", other: "Other",
 };
 
-function isoDate(value: string | null): string | undefined {
+/** ISO 8601 reduced precision only ("2019-03" or "2019"): what schema.org, JSON Resume and <time> accept. Never a day. */
+export function isoDate(value: string | null | undefined): string | undefined {
   if (!value) return undefined;
-  return value.length >= 7 ? value.slice(0, 7) : value.slice(0, 4);
+  if (hasMonth(value)) return value;
+  return /^\d{4}/.test(value) ? value.slice(0, 4) : undefined;
 }
 
-const SUMMARY: Record<string, (v: { name: string; headline: string; city: string; years: number; since: number; companies: number; technologies: number }) => string> = {
+const SUMMARY: Record<string, (v: { name: string; headline: string; city: string; years: string; since: number; companies: number; technologies: number }) => string> = {
   en: (v) => `${v.name} is a ${v.headline.toLowerCase()} based in ${v.city}, with ${v.years} years of experience (since ${v.since}) across ${v.companies} companies, working with ${v.technologies} distinct technologies — mainly Java, Spring Boot, microservices, SOA, React and Angular.`,
   "pt-br": (v) => `${v.name} é ${v.headline.toLowerCase()} em ${v.city}, com ${v.years} anos de experiência (desde ${v.since}) em ${v.companies} empresas e ${v.technologies} tecnologias distintas — principalmente Java, Spring Boot, microsserviços, SOA, React e Angular.`,
   es: (v) => `${v.name} es ${v.headline.toLowerCase()} en ${v.city}, con ${v.years} años de experiencia (desde ${v.since}) en ${v.companies} empresas y ${v.technologies} tecnologías distintas — principalmente Java, Spring Boot, microservicios, SOA, React y Angular.`,
@@ -25,7 +29,7 @@ const SUMMARY: Record<string, (v: { name: string; headline: string; city: string
 export function summary(locale = "en", file: CareerFile = careerFile, now = new Date()): string {
   const facts = careerFacts(getCareerHistory(locale, file), now);
   const render = SUMMARY[locale] ?? SUMMARY.en;
-  return render({ name: file.person.name, headline: getHeadline(locale, file), city: file.person.location.city, ...facts });
+  return render({ name: file.person.name, headline: getHeadline(locale, file), city: file.person.location.city, ...facts, years: formatYears(facts) });
 }
 
 export function skills(file: CareerFile = careerFile): { category: string; items: string[] }[] {
@@ -33,11 +37,21 @@ export function skills(file: CareerFile = careerFile): { category: string; items
   return groupStack(all).map((g) => ({ category: CATEGORY_NAMES[g.category], items: g.items.map((i) => i.canonical) }));
 }
 
+function organizationRole(e: CareerMetric, property: "worksFor" | "alumniOf") {
+  return {
+    "@type": "OrganizationRole",
+    roleName: e.role,
+    startDate: isoDate(e.start),
+    endDate: e.current ? undefined : isoDate(e.end),
+    description: e.desc,
+    [property]: { "@type": "Organization", name: e.company },
+  };
+}
+
 export function personJsonLd(locale: string, file: CareerFile = careerFile, now = new Date()) {
   const history = getCareerHistory(locale, file);
   const person = file.person;
   const pageUrl = absoluteUrl(`/${locale}`);
-  const current = history.find((e) => e.current);
   return {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
@@ -56,23 +70,19 @@ export function personJsonLd(locale: string, file: CareerFile = careerFile, now 
       address: { "@type": "PostalAddress", addressLocality: person.location.city, addressCountry: person.location.country },
       sameAs: Object.values(person.links),
       knowsAbout: distinctTechnologies(file.positions.map((p) => p.stack)),
-      worksFor: current ? { "@type": "Organization", name: current.company } : undefined,
-      hasOccupation: history.map((e) => ({
-        "@type": "Role",
-        roleName: e.role,
-        startDate: isoDate(e.start),
-        endDate: e.current ? undefined : isoDate(e.end),
-        description: e.desc,
-        worksFor: { "@type": "Organization", name: e.company },
-      })),
+      // schema.org Role pattern: the wrapped property repeats inside the OrganizationRole. Current employers go in
+      // worksFor, past ones in alumniOf (schema.org has no "worked for"). Putting worksFor inside a hasOccupation Role
+      // is invalid and produced one validator warning per position.
+      worksFor: history.filter((e) => e.current).map((e) => organizationRole(e, "worksFor")),
+      alumniOf: history.filter((e) => !e.current).map((e) => organizationRole(e, "alumniOf")),
     },
   };
 }
 
-function positionMarkdown(e: CareerMetric, present: string): string {
+function positionMarkdown(e: CareerMetric, locale: string, now: Date): string {
   const stack = groupStack(e.stack).map((g) => `${CATEGORY_NAMES[g.category]}: ${g.items.map((i) => i.label).join(", ")}`).join("; ");
   return [
-    `### ${e.role} — ${e.company} (${formatPeriod(e, present)})`,
+    `### ${e.role} — ${e.company} (${formatPeriod(e, locale, now)})`,
     e.desc,
     `- Architecture: ${ARCH_NAMES[e.archType]}`,
     `- Stack: ${stack}`,
@@ -81,9 +91,7 @@ function positionMarkdown(e: CareerMetric, present: string): string {
 }
 
 export function careerMarkdown(locale = "en", file: CareerFile = careerFile, now = new Date()): string {
-  const present = locale === "en" ? "present" : locale === "es" ? "actual" : "atual";
-  const history = getCareerHistory(locale, file);
-  return history.map((e) => positionMarkdown(e, present)).join("\n\n");
+  return getCareerHistory(locale, file).map((e) => positionMarkdown(e, locale, now)).join("\n\n");
 }
 
 export function llmsTxt(file: CareerFile = careerFile, now = new Date()): string {
@@ -115,7 +123,7 @@ export function llmsFullTxt(file: CareerFile = careerFile, now = new Date()): st
 > ${summary("en", file, now)}
 
 - Location: ${file.person.location.city}, ${file.person.location.country}
-- Experience: ${facts.years} years since ${facts.since} (${facts.internships} internships included), ${facts.positions} positions, ${facts.companies} companies
+- Experience: ${formatYears(facts)} years since ${facts.since} (${facts.internships} internships included), ${facts.positions} positions, ${facts.companies} companies
 - Architecture models worked with: ${facts.architectures}
 - Links: ${Object.values(file.person.links).join(", ")}
 - Data last synced: ${file.sync.syncedAt ?? "manually maintained"}

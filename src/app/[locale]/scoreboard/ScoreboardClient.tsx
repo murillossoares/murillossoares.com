@@ -3,7 +3,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import DownloadCVButton from "@/components/DownloadCVButton";
 import ScoreboardScene from "@/components/ScoreboardScene";
@@ -14,8 +14,10 @@ import { getCareerHistory } from "@/services/careerData";
 export default function ScoreboardClient({ locale, asOf }: { locale: string; asOf: string }) {
   const t = useTranslations("Scoreboard");
   const events = useMemo(() => getCareerHistory(locale), [locale]);
-  const data = useMemo(() => calculateScoreboardMetrics(events, (key, values) => t(key, values), new Date(asOf)), [events, t, asOf]);
-  const perYear = useMemo(() => technologiesPerYear(events, new Date(asOf)), [events, asOf]);
+  const [now, setNow] = useState(asOf);
+  useEffect(() => setNow(new Date().toISOString()), []);
+  const data = useMemo(() => calculateScoreboardMetrics(events, (key, values) => t(key, values), new Date(now)), [events, t, now]);
+  const perYear = useMemo(() => technologiesPerYear(events, new Date(now)), [events, now]);
 
   return (
     <div className="min-h-screen bg-[var(--bg)] px-4 py-6 text-[var(--text)] md:px-8 md:py-10">

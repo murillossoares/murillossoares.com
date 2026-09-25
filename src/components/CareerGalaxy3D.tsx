@@ -103,7 +103,7 @@ function Scene({ layout, activeId, onSelect }: { layout: GalaxyLayout; activeId:
         {/* time axis */}
         <Line points={[[-5.6, -1.9, 0], [5.6, -1.9, 0]]} color="#ffffff" transparent opacity={0.15} lineWidth={1} />
         {layout.years.map((year) => (
-          <group key={year} position={[yearToX(year, layout.years), -1.9, 0]}>
+          <group key={year} position={[yearToX(year, layout), -1.9, 0]}>
             <Line points={[[0, 0, 0], [0, 0.12, 0]]} color="#ffffff" transparent opacity={0.3} lineWidth={1} />
             <Html position={[0, -0.28, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
               <span className="pointer-events-none font-mono text-[10px] text-white/45">{year}</span>

@@ -21,3 +21,15 @@ export function localeAlternates(path = "") {
     "x-default": absoluteUrl(`/${DEFAULT_LOCALE}${path}`),
   };
 }
+
+/**
+ * Google Search Console verification tokens (the `content` of <meta name="google-site-verification">), read at build
+ * time from the GOOGLE_SITE_VERIFICATION environment variable (comma-separated for several owners). They are public
+ * by design, but keeping them in the Netlify environment means changing owners needs no code change.
+ */
+export function googleVerificationTokens(env: Record<string, string | undefined> = process.env): string[] {
+  return (env.GOOGLE_SITE_VERIFICATION ?? "")
+    .split(/[\s,]+/)
+    .map((t) => t.trim())
+    .filter((t) => /^[A-Za-z0-9_-]{10,100}$/.test(t));
+}
