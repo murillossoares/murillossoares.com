@@ -56,6 +56,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     twitter: { card: "summary_large_image", title, description, images: [`/og/${locale}.png`] },
     ...(google.length ? { verification: { google } } : {}),
+    // Netlify exposes the built commit as COMMIT_REF; the post-deploy e2e workflow waits for it before testing.
+    other: { "build-commit": process.env.COMMIT_REF ?? "local" },
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
   };
 }
