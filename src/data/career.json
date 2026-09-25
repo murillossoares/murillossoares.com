@@ -84,15 +84,15 @@
       ],
       "i18n": {
         "pt-br": {
-          "role": "Full Stack Senior",
+          "role": "Engenheiro Full Stack Sênior",
           "summary": "PORTAL GOV: Manutenção evolutiva do ecossistema Java 8 (Servlet/JSP) e integração de serviços digitais."
         },
         "en": {
-          "role": "Senior Full Stack",
+          "role": "Senior Full Stack Engineer",
           "summary": "GOV PORTAL: Evolutionary maintenance of Java 8 ecosystem (Servlet/JSP) and integration of digital services."
         },
         "es": {
-          "role": "Full Stack Senior",
+          "role": "Ingeniero Full Stack Senior",
           "summary": "PORTAL GOV: Mantenimiento evolutivo del ecosistema Java 8 (Servlet/JSP) e integración de servicios digitales."
         }
       }
@@ -118,7 +118,7 @@
           "summary": "SMART GRIDS: Infraestrutura de medição avançada (AMI) e gestão de alto volume de dados de energia."
         },
         "en": {
-          "role": "Full Stack Dev",
+          "role": "Full Stack Developer",
           "summary": "SMART GRIDS: Advanced Metering Infrastructure (AMI) and management of high volume energy data."
         },
         "es": {
@@ -140,7 +140,7 @@
         "Groovy",
         "PostgreSQL",
         "SQL Server",
-        "Rest"
+        "REST"
       ],
       "i18n": {
         "pt-br": {
@@ -207,7 +207,7 @@
           "summary": "MICROSERVICES: Arquitetura distribuída com Netflix OSS para o setor automotivo."
         },
         "en": {
-          "role": "System Analyst",
+          "role": "Systems Analyst",
           "summary": "MICROSERVICES: Distributed architecture with Netflix OSS for the automotive sector."
         },
         "es": {
@@ -237,7 +237,7 @@
           "summary": "ERP CORE: Extensões nativas Java, integrações PL/SQL complexas e relatórios corporativos."
         },
         "en": {
-          "role": "System Analyst",
+          "role": "Systems Analyst",
           "summary": "ERP CORE: Native Java extensions, complex PL/SQL integrations and corporate reports."
         },
         "es": {
@@ -298,7 +298,7 @@
           "summary": "PLATAFORMA ESPORTS: Motor de gamificação para projetos educacionais. Ambiente conteinerizado."
         },
         "en": {
-          "role": "Back End Developer",
+          "role": "Backend Developer",
           "summary": "ESPORTS PLATFORM: Gamification engine for educational projects. Containerized environment."
         },
         "es": {
@@ -327,7 +327,7 @@
           "summary": "RELATÓRIOS FINTECH: Dashboard de relatórios de investimento. Gestão de estado com Redux."
         },
         "en": {
-          "role": "Front End Developer",
+          "role": "Frontend Developer",
           "summary": "FINTECH REPORTS: Investment reporting dashboard. State management with Redux."
         },
         "es": {
@@ -353,15 +353,15 @@
       ],
       "i18n": {
         "pt-br": {
-          "role": "Estagiário de Desenvolvimento",
+          "role": "Estagiário de Desenvolvimento de Software",
           "summary": "MOBILIDADE ERP: Integrações com SAP Business One/HANA. Desenvolvimento híbrido."
         },
         "en": {
-          "role": "Dev Intern",
+          "role": "Software Development Intern",
           "summary": "ERP MOBILITY: Integrations with SAP Business One/HANA. Hybrid development."
         },
         "es": {
-          "role": "Pasante de Desarrollo",
+          "role": "Pasante de Desarrollo de Software",
           "summary": "MOVILIDAD ERP: Integraciones con SAP Business One/HANA. Desarrollo híbrido."
         }
       }

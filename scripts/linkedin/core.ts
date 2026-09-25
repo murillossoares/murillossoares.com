@@ -237,7 +237,8 @@ export function mergeCareer(career: CareerJson, incoming: LinkedInPosition[], op
     if (li.location) set("location", li.location);
     set("linkedin", { company: li.company, title: li.title });
     if (changes.length) report.updated.push({ id: position.id, changes });
-    const siteRole = position.i18n["pt-br"]?.role ?? position.i18n.en?.role ?? "";
+    // English titles are the reference kept identical on LinkedIn; the other locales translate them.
+    const siteRole = position.i18n.en?.role ?? position.i18n["pt-br"]?.role ?? "";
     if (li.title && siteRole && companyTokens(li.title).join(" ") !== companyTokens(siteRole).join(" ")) {
       report.titleDiffs.push({ id: position.id, site: siteRole, linkedin: li.title });
     }

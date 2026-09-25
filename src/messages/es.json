@@ -12,7 +12,11 @@
     "theme": "Tema",
     "language": "Idioma",
     "downloadCv": "Descargar CV",
-    "downloadError": "No se pudo generar el CV. Inténtalo de nuevo."
+    "downloadError": "No se pudo generar el CV. Inténtalo de nuevo.",
+    "controls": "Controles",
+    "skipToContent": "Saltar al contenido principal",
+    "building": "Generando…",
+    "cvFooter": "Generado desde {site}"
   },
   "Boot": {
     "skip": "Omitir boot",
@@ -109,7 +113,9 @@
       }
     },
     "chartTitle": "Tecnologías distintas por año",
-    "chartDescription": "Altura de cada columna = número de tecnologías en uso ese año. Las experiencias sin fecha de fin cuentan hasta el inicio de la siguiente."
+    "chartDescription": "Altura de cada columna = número de tecnologías en uso ese año. Las experiencias sin fecha de fin cuentan hasta el inicio de la siguiente.",
+    "chartYear": "Año",
+    "chartCount": "Tecnologías"
   },
   "Persona": {
     "buttonIdle": "MODO_SEGURO",

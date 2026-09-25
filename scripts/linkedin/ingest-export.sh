@@ -6,11 +6,12 @@
 # - Extracts ONLY Positions.csv. The rest of the archive (messages, connections, e-mail addresses, phone numbers)
 #   is never written to disk outside the ZIP, never copied into the repo and never committed.
 # - Validates the file with the same checks CI runs, previews the merge (dry run), then commits
-#   data/linkedin/Positions.csv. With --push it pushes to $LINKEDIN_EXPORT_BRANCH (default: master), which triggers
-#   the Netlify build and the LinkedIn sync workflow.
+#   data/linkedin/Positions.csv on top of master. With --push it pushes that single commit to the drop-box branch
+#   $LINKEDIN_EXPORT_BRANCH (default: linkedin-export/positions), never to master: the LinkedIn sync workflow takes
+#   only the CSV from it, runs the checks and opens a pull request, and the site changes when that PR is merged.
 # - --delete-zip removes the archive after success, since it holds private data.
-# - Meant for a dedicated clone: each run resets the branch to the remote state first, and a failed push drops the
-#   local commit again, so one bad run never blocks the next. Unrelated local changes make it refuse to run.
+# - Meant for a dedicated clone: each run starts from the remote master, and a failed push drops the local commit
+#   again, so one bad run never blocks the next. Unrelated local changes make it refuse to run.
 set -euo pipefail
 
 die() { echo "ingest-export: $1" >&2; exit "${2:-1}"; }
@@ -33,7 +34,12 @@ node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.exit(a
   || die "Node.js 22.18+ is required (found: $(node --version 2>/dev/null || echo none)); check PATH in ~/.config/linkedin-export.env" 69
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-BRANCH="${LINKEDIN_EXPORT_BRANCH:-master}"
+BASE="${LINKEDIN_EXPORT_BASE:-master}"
+BRANCH="${LINKEDIN_EXPORT_BRANCH:-linkedin-export/positions}"
+case "$BRANCH" in
+  linkedin-export/?*) ;;
+  *) die "LINKEDIN_EXPORT_BRANCH must be a linkedin-export/* branch (got: $BRANCH); the automation never pushes to $BASE" 64 ;;
+esac
 TARGET="data/linkedin/Positions.csv"
 TMP="$(mktemp -d)"
 chmod 700 "$TMP"
@@ -56,8 +62,8 @@ if ! git diff --quiet -- "$TARGET" || ! git diff --cached --quiet -- "$TARGET"; 
   git reset --quiet -- "$TARGET" && git checkout --quiet -- "$TARGET" 2>/dev/null || rm -f -- "$TARGET"
 fi
 git diff --quiet && git diff --cached --quiet || die "the repository at $REPO has local changes; use a dedicated clone" 75
-git fetch --quiet origin "$BRANCH"
-git checkout --quiet -B "$BRANCH" "origin/$BRANCH"
+git fetch --quiet origin "$BASE"
+git checkout --quiet -B "$BASE" "origin/$BASE"
 
 restore() { git reset --quiet -- "$TARGET" 2>/dev/null || true; git checkout --quiet -- "$TARGET" 2>/dev/null || rm -f -- "$TARGET"; }
 trap 'restore; rm -rf "$TMP"' EXIT   # until the commit exists, any exit puts the file back
@@ -88,15 +94,13 @@ git commit --quiet -m "data(linkedin): update Positions.csv from LinkedIn export
 trap 'rm -rf "$TMP"' EXIT
 echo "ingest-export: committed $(git rev-parse --short HEAD)."
 if [ "$PUSH" = 1 ]; then
-  if ! git push --quiet origin "HEAD:$BRANCH"; then
-    if ! { git pull --quiet --rebase origin "$BRANCH" && git push --quiet origin "HEAD:$BRANCH"; }; then
-      # Drop the unpublished commit so the next run starts clean; the ZIP is kept for a retry.
-      git rebase --abort 2>/dev/null || true
-      git reset --quiet --hard "origin/$BRANCH"
-      die "push to $BRANCH failed; nothing was published" 75
-    fi
+  # The drop-box branch only ever holds "latest master + this CSV", so replacing it is intended.
+  if ! git push --quiet --force origin "HEAD:refs/heads/$BRANCH"; then
+    # Drop the unpublished commit so the next run starts clean; the ZIP is kept for a retry.
+    git reset --quiet --hard "origin/$BASE"
+    die "push to $BRANCH failed; nothing was published" 75
   fi
-  echo "ingest-export: pushed to $BRANCH."
+  echo "ingest-export: pushed to $BRANCH; the LinkedIn sync workflow will open a pull request."
 fi
 
 if [ "$DELETE_ZIP" = 1 ]; then

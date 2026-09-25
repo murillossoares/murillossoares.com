@@ -12,7 +12,11 @@
     "theme": "Theme",
     "language": "Language",
     "downloadCv": "Download CV",
-    "downloadError": "Could not generate the CV. Try again."
+    "downloadError": "Could not generate the CV. Try again.",
+    "controls": "Controls",
+    "skipToContent": "Skip to main content",
+    "building": "Building…",
+    "cvFooter": "Generated from {site}"
   },
   "Boot": {
     "skip": "Skip boot",
@@ -109,7 +113,9 @@
       }
     },
     "chartTitle": "Distinct technologies per year",
-    "chartDescription": "Column height = number of technologies in use that year. Positions without an end date count until the next one starts."
+    "chartDescription": "Column height = number of technologies in use that year. Positions without an end date count until the next one starts.",
+    "chartYear": "Year",
+    "chartCount": "Technologies"
   },
   "Persona": {
     "buttonIdle": "SAFE_MODE",

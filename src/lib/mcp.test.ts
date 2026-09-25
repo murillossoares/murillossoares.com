@@ -40,6 +40,21 @@ describe("MCP endpoint", () => {
     expect(ids).not.toContain("atuarial");
   });
 
+  it("treats a family name as its members (Spring, AWS)", async () => {
+    const call = async (technology: string) => (await rpc("tools/call", { name: "find_experience_by_technology", arguments: { technology } })).result.structuredContent;
+    const withStack = (needle: RegExp) => careerFile.positions.filter((p) => p.stack.some((t) => needle.test(t))).length;
+    expect((await call("Spring")).matches).toBe(withStack(/^spring\b/i));
+    expect((await call("AWS")).matches).toBeGreaterThanOrEqual(1);
+  });
+
+  it("rejects arguments that do not match the input schema", async () => {
+    const call = async (args: unknown) => (await rpc("tools/call", { name: "list_experience", arguments: args })).result;
+    expect((await call({ since_year: "2020" })).isError).toBe(true);
+    expect((await call({ locale: "fr" })).content[0].text).toMatch(/locale must be one of/);
+    expect((await call({ nope: 1 })).content[0].text).toMatch(/unknown argument: nope/);
+    expect((await call({ since_year: 2024 })).isError).toBe(false);
+  });
+
   it("reports tool errors in-band and protocol errors as JSON-RPC errors", async () => {
     expect((await rpc("tools/call", { name: "find_experience_by_technology", arguments: {} })).result.isError).toBe(true);
     expect((await rpc("tools/call", { name: "nope" })).error.code).toBe(-32602);

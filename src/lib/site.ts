@@ -3,6 +3,12 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || process.env.URL || 
 
 export const LOCALES = ["pt-br", "en", "es"] as const;
 export const DEFAULT_LOCALE = "pt-br";
+/**
+ * Where visitors whose language matches none of the locales land: the hreflang x-default, the "/" fallback and the
+ * 404 link. English, because the audience outside Brazil (Lisbon, international remote) reads English first; Portuguese
+ * and Spanish browsers are still sent to their own locale by the Accept-Language redirects in netlify.toml.
+ */
+export const FALLBACK_LOCALE = "en";
 
 /** BCP 47 tags for hreflang / og:locale. */
 export const LOCALE_TAGS: Record<string, { hreflang: string; og: string; name: string }> = {
@@ -18,7 +24,7 @@ export function absoluteUrl(path = "/"): string {
 export function localeAlternates(path = "") {
   return {
     ...Object.fromEntries(LOCALES.map((l) => [LOCALE_TAGS[l].hreflang, absoluteUrl(`/${l}${path}`)])),
-    "x-default": absoluteUrl(`/${DEFAULT_LOCALE}${path}`),
+    "x-default": absoluteUrl(`/${FALLBACK_LOCALE}${path}`),
   };
 }
 

@@ -20,8 +20,11 @@ Everything after that is automatic: a systemd path unit notices the ZIP and runs
 - extracts **only** `Positions.csv` (never messages, connections, e-mails or phone numbers),
 - validates it with the same test CI runs (expected columns, no contact data),
 - previews the merge with the site data and refuses partial or unreadable files,
-- commits `data/linkedin/Positions.csv` and pushes it to `master` (Netlify rebuilds; the sync workflow opens a PR for
-  new positions),
+- commits `data/linkedin/Positions.csv` on top of `master` and pushes that single commit to the drop-box branch
+  `linkedin-export/positions` — **never to `master`**,
+- the **LinkedIn sync** workflow then takes only the CSV from that branch (it refuses a push that changes anything
+  else and never runs the branch's code), applies it, runs lint, tests and build, and opens a pull request. The site
+  changes only when you merge that PR.
 - deletes the ZIP (it holds private data). On failure the ZIP is moved to `~/Downloads/linkedin-export-failed/`.
 
 ## Filling months by hand instead
@@ -40,38 +43,50 @@ watcher on.
 **1. Prerequisites** — git, unzip and Node.js 22.18 or newer:
 
 ```bash
-sudo apt install -y git unzip
+sudo apt install -y git unzip zip
 node --version   # 22.18+; if missing: curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash && nvm install 22
 ```
 
-**2. Write access limited to this repository** — a deploy key, not your personal credentials:
+**2. A dedicated system user** — the token below must not be readable by anything else running on the machine (other
+agents, bots, MCP servers). Run the automation as its own user:
 
 ```bash
-ssh-keygen -t ed25519 -f ~/.ssh/murillossoares_deploy -N "" -C "mini-pc linkedin export"
-cat ~/.ssh/murillossoares_deploy.pub
+sudo adduser --disabled-password --gecos "" linkedin-export
+sudo -iu linkedin-export      # all following steps run as this user
+mkdir -p ~/Downloads
 ```
 
-Add the printed key at <https://github.com/murillossoares/murillossoares.com/settings/keys> → **Add deploy key**, tick
-**Allow write access**. Then:
+It needs its own Node.js (nvm, as in step 1) and downloads go to *its* `~/Downloads`
+(`/home/linkedin-export/Downloads`). Download the export as that user, or copy the ZIP there
+(`sudo install -o linkedin-export -m 600 ~/Downloads/*LinkedInDataExport*.zip /home/linkedin-export/Downloads/`).
+
+If an earlier version of this guide made you add a deploy key (`murillossoares_deploy`), delete it at
+<https://github.com/murillossoares/murillossoares.com/settings/keys> and remove the key files from `~/.ssh`.
+
+**3. A token that can push data but not workflows** — a fine-grained personal access token, not a deploy key. A deploy
+key with write access can also rewrite `.github/workflows`; a fine-grained token without the *Workflows* permission
+cannot, so it cannot change what the sync workflow runs.
+
+At <https://github.com/settings/personal-access-tokens/new>: *Repository access* → **Only select repositories** →
+`murillossoares.com`; *Permissions* → **Contents: Read and write** (nothing else, in particular **not** *Workflows*);
+expiration of up to one year (put a reminder in your calendar). Then, as `linkedin-export`:
 
 ```bash
-cat >> ~/.ssh/config <<'EOF'
-Host github-murillossoares
-  HostName github.com
-  User git
-  IdentityFile ~/.ssh/murillossoares_deploy
-  IdentitiesOnly yes
-EOF
-ssh -T github-murillossoares   # "successfully authenticated"
-```
-
-**3. Dedicated clone** — used only by the automation, never edited by hand:
-
-```bash
-git clone git@github-murillossoares:murillossoares/murillossoares.com.git ~/automation/murillossoares.com
+git clone https://github.com/murillossoares/murillossoares.com.git ~/automation/murillossoares.com
 cd ~/automation/murillossoares.com && npm ci
 git config user.name "Murillo" && git config user.email "mhsscel@users.noreply.github.com"
+git config credential.helper store
+printf 'https://murillossoares:%s@github.com\n' 'PASTE_TOKEN_HERE' > ~/.git-credentials && chmod 600 ~/.git-credentials
+git push --dry-run origin HEAD:refs/heads/linkedin-export/positions   # no error: the token can push branches
 ```
+
+**Protect `master` (once, in GitHub)** — so no automation credential can change the site by itself. At
+<https://github.com/murillossoares/murillossoares.com/settings/rules> → **New branch ruleset**: target the default
+branch, enable **Restrict deletions**, **Block force pushes**, **Require a pull request before merging** and **Require
+status checks to pass** (`lint-build-test-smoke`); bypass list: only **Repository admin** (you). A leaked token can
+then at most push a branch; `master` changes only through a PR you merge. Pull requests opened by the sync workflow
+run their checks inside the workflow itself (GitHub does not start other workflows for them), so merge those as admin
+after reading the report in the PR.
 
 **4. Environment for systemd** — systemd does not load your shell profile, so give it the paths it needs:
 
@@ -101,15 +116,19 @@ mkdir -p ~/.config/systemd/user
 cp scripts/linkedin/systemd/linkedin-export.path scripts/linkedin/systemd/linkedin-export.service ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now linkedin-export.path
-sudo loginctl enable-linger "$USER"   # keeps it running without an open session
+sudo loginctl enable-linger linkedin-export   # run from your admin user; keeps it running without a login
 ```
 
-From now on, downloading a LinkedIn export on this machine publishes its `Positions.csv` automatically.
+From now on, a LinkedIn export in `/home/linkedin-export/Downloads` becomes a pull request with its `Positions.csv`
+automatically. Review it and merge; Netlify publishes after the merge (and its build runs the unit tests first).
 
 ### Safety notes
 
 - Only `data/linkedin/Positions.csv` is ever committed. The export ZIP and its other files never enter the repository.
-- The deploy key can only reach this repository; revoke it in the repository settings if the machine is lost.
+- The machine can push only to branches, never to `master` (ruleset), and cannot touch workflows (token permissions).
+  The workflow never executes code from the pushed branch; it only reads the CSV from it.
+- The token is readable only by the `linkedin-export` user. If the machine is lost, revoke it at
+  <https://github.com/settings/personal-access-tokens>.
 - Do not automate logging in to LinkedIn; request and download the export yourself.
 
 ## Troubleshooting
@@ -118,6 +137,8 @@ From now on, downloading a LinkedIn export on this machine publishes its `Positi
 - Nothing happens after a download: `systemctl --user status linkedin-export.path`; check the ZIP name contains
   `LinkedInDataExport` and is in the watched folder.
 - `has local changes`: someone edited the automation clone; `git -C ~/automation/murillossoares.com status`.
+- `push ... failed`: the token expired or lost access; create a new one (step 3) and update `~/.git-credentials`.
+- No pull request appears: check the **LinkedIn sync** run for the `linkedin-export/positions` push in the Actions tab.
 - `failed validation`: the CSV has extra columns or contact data; open it from `~/Downloads/linkedin-export-failed/`.
 - `skipped`: the export matched too few site positions (partial) or has unreadable dates. Re-run with `--force` only
   if the file is right.

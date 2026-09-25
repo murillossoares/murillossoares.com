@@ -1,4 +1,4 @@
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Link, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
 import { pdfThemes, type PdfThemeName } from "@/lib/pdf-themes";
 
@@ -17,6 +17,11 @@ export type CVPdfContent = {
   identity?: string;
   locale: string;
   theme: PdfThemeName;
+  /** "Lisboa, PT". */
+  location: string;
+  /** Where to reach the person: the site first, then public profiles. Never an e-mail address or phone number. */
+  contacts: { label: string; href: string }[];
+  footer: string;
   sections: {
     experienceTitle: string;
   };
@@ -32,6 +37,7 @@ export function CVDocument({ content }: { content: CVPdfContent }) {
       backgroundColor: colors.bg,
       color: colors.text,
       padding: 30,
+      paddingBottom: 60, // room for the fixed footer on every page
       fontFamily: "Courier",
       fontSize: 10,
       lineHeight: 1.45,
@@ -52,6 +58,13 @@ export function CVDocument({ content }: { content: CVPdfContent }) {
       fontSize: 11,
       color: colors.muted,
     },
+    contacts: {
+      marginTop: 8,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      fontSize: 9,
+    },
+    contact: { color: colors.accent, marginRight: 14, textDecoration: "none" },
     meta: {
       marginTop: 10,
       fontSize: 8.5,
@@ -107,8 +120,13 @@ export function CVDocument({ content }: { content: CVPdfContent }) {
           <Text style={styles.title}>{content.title}</Text>
           <Text style={styles.headline}>{content.headline}</Text>
           {content.identity ? <Text style={styles.headline}>{content.identity}</Text> : null}
+          <View style={styles.contacts}>
+            {content.contacts.map((c) => (
+              <Link key={c.href} src={c.href} style={styles.contact}>{c.label}</Link>
+            ))}
+          </View>
           <Text style={styles.meta}>
-            ID: M_SOARES_V4.0 | LOC: Lisboa, PT | LANG: {content.locale.toUpperCase()} | THEME:{" "}
+            LOC: {content.location} | LANG: {content.locale.toUpperCase()} | THEME:{" "}
             {content.theme.toUpperCase()}
           </Text>
         </View>
@@ -119,7 +137,7 @@ export function CVDocument({ content }: { content: CVPdfContent }) {
             {content.sections.experienceTitle}
           </Text>
           {content.careerHistory.map((item, index) => (
-            <View key={`${item.company ?? "company"}_${item.year ?? "year"}_${index}`} style={styles.job}>
+            <View key={`${item.company ?? "company"}_${item.year ?? "year"}_${index}`} style={styles.job} wrap={false}>
               <View style={styles.jobHeader}>
                 <Text style={styles.company}>{item.company ?? ""}</Text>
                 <Text style={styles.year}>{item.year ? `[${item.year}]` : ""}</Text>
@@ -131,8 +149,8 @@ export function CVDocument({ content }: { content: CVPdfContent }) {
           ))}
         </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>SYSTEM GENERATED REPORT | END OF FILE</Text>
+        <View style={styles.footer} fixed>
+          <Text style={styles.footerText} render={({ pageNumber, totalPages }) => `${content.footer} | ${pageNumber}/${totalPages}`} />
         </View>
       </Page>
     </Document>

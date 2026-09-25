@@ -18,6 +18,8 @@ test.describe("crawlers and agents", () => {
     expect(html).toMatch(/<meta name="description" content="[^"]{80,}"/);
     expect(html).toMatch(/<link rel="canonical" href="[^"]+\/pt-br"/);
     for (const lang of ["pt-BR", "en", "es", "x-default"]) expect(html).toContain(`hrefLang="${lang}"`);
+    // Visitors whose language matches no locale get English (international audience).
+    expect(html).toMatch(/<link rel="alternate" hrefLang="x-default" href="[^"]+\/en"/);
     expect(html).toContain('property="og:image"');
     for (const p of career.positions) expect(html).toContain(p.company.replace("&", "&amp;"));
     // Visible text only: strip scripts and meta tags, which also carry these names.
@@ -100,6 +102,21 @@ test.describe("career data is shown truthfully", () => {
     }
   });
 
+  test("selecting a position brings its stack into view on narrow screens", async ({ page }) => {
+    await page.goto("/en");
+    await skipBoot(page);
+    const aside = page.locator("aside");
+    const wide = (page.viewportSize()?.width ?? 0) >= 1024;
+    await page.getByRole("button", { name: /@ UFMT/ }).click();
+    await expect(aside.getByText("UFMT", { exact: true })).toBeVisible();
+    if (wide) {
+      // Side-by-side layout: the panel is already visible, so the page must not jump.
+      await expect(page.getByRole("button", { name: /@ UFMT/ })).toBeInViewport();
+    } else {
+      await expect(aside).toBeInViewport();
+    }
+  });
+
   test("KPIs are verifiable facts, not adjectives", async ({ page }) => {
     await page.goto("/pt-br");
     await skipBoot(page);
@@ -139,6 +156,10 @@ test.describe("CV PDF", () => {
       const bytes = await readFile((await download.path())!);
       expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
       expect(bytes.length).toBeGreaterThan(5_000);
+      // Clickable contacts (link annotations), and never an e-mail address.
+      const raw = bytes.toString("latin1");
+      for (const url of [`/${locale}`, career.person.links.linkedin, career.person.links.github]) expect(raw).toContain(url);
+      expect(raw).not.toMatch(/mailto:|[\w.+-]+@[\w-]+\.[\w.]+/);
     });
   }
 });
