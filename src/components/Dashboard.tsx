@@ -191,7 +191,7 @@ function Node({ icon: I, tone, label, size = 20 }: { icon: LucideIcon; tone: Ton
   return <div className="flex flex-col items-center gap-2"><div className={`w-12 h-12 rounded border flex items-center justify-center ${TONE[tone].node}`}><I size={size} aria-hidden="true" /></div><span className="text-[10px] font-mono text-[var(--muted)]">{label}</span></div>;
 }
 function Line({ tone, archType, reduced, delay }: { tone: Tone; archType: ArchType; reduced: boolean | null; delay: number }) {
-  return <div className="flex-1 h-px bg-white/10 relative mx-3" aria-hidden="true">
+  return <div className="flex-1 h-px bg-white/10 relative mx-3 overflow-hidden" aria-hidden="true">
     {!reduced ? <motion.div className={`absolute -top-px left-0 w-8 h-[3px] ${TONE[tone].line} shadow-[0_0_10px]`} animate={{ x: ["0%", "400%"], opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: archType === "monolith" ? 2 : 0.8, delay, ease: "linear" }} /> : <div className={`absolute -top-px left-0 w-full h-[3px] ${TONE[tone].idle}`} />}
   </div>;
 }

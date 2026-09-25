@@ -284,13 +284,15 @@ export default function CyberpunkOverlay() {
 
           {/* Glitch flash */}
           {!reduced && (
-            <motion.div
-              className="pointer-events-none fixed inset-0 bg-cyber-yellow/20"
-              initial={{ opacity: 0, x: 0 }}
-              animate={{ opacity: [0, 0.8, 0], x: [0, -8, 10, 0] }}
-              transition={{ duration: 0.35, times: [0, 0.3, 1] }}
-              aria-hidden="true"
-            />
+            // The flash shakes sideways; the fixed wrapper clips it so the page never gains horizontal overflow.
+            <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+              <motion.div
+                className="absolute inset-0 bg-cyber-yellow/20"
+                initial={{ opacity: 0, x: 0 }}
+                animate={{ opacity: [0, 0.8, 0], x: [0, -8, 10, 0] }}
+                transition={{ duration: 0.35, opacity: { times: [0, 0.3, 1] }, x: { times: [0, 0.3, 0.65, 1] } }}
+              />
+            </div>
           )}
 
           {/* Card */}
