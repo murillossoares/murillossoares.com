@@ -1,5 +1,6 @@
 // LinkedIn → src/data/career.json
 //
+//   npm run linkedin:sync:file                                      (build + CI; reads data/linkedin/Positions.csv)
 //   npm run linkedin:sync                       (CI; needs LINKEDIN_ACCESS_TOKEN)
 //   npm run linkedin:import -- <export.zip | export folder | Positions.csv>
 //
@@ -7,12 +8,15 @@
 // problem (profile temporarily deactivated, expired token, API down, partial data) ends in a warning, exit code 0
 // and an untouched file — unless --strict is passed. The access token is only ever sent as a request header.
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { appendFileSync, existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { mergeCareer, normalizePositions, parseCsv, renderReport, type CareerJson, type LinkedInPosition, type SyncReport } from "./core.ts";
+import { mergeCareer, normalizePositions, parseCsv, POSITIONS_COLUMNS, renderReport, type CareerJson, type LinkedInPosition, type SyncReport } from "./core.ts";
 
 const CAREER_PATH = new URL("../../src/data/career.json", import.meta.url);
+/** The manually refreshed export committed to the repo. Only this CSV — never the export ZIP. */
+const REPO_EXPORT_PATH = new URL("../../data/linkedin/Positions.csv", import.meta.url);
 const API = "https://api.linkedin.com/rest/memberSnapshotData";
 
 class Unavailable extends Error {}
@@ -112,10 +116,25 @@ function fromExport(path: string | undefined): Record<string, unknown>[] {
   return parseCsv(csv);
 }
 
+/**
+ * Repo file source. Applied only when its content hash differs from the one recorded in career.json, so a new
+ * export is picked up once and older exports never overwrite fresher API data synced afterwards.
+ */
+function fromRepoFile(career: CareerJson): { records: Record<string, unknown>[]; hash: string } | { skip: string } {
+  if (!existsSync(REPO_EXPORT_PATH)) return { skip: "no data/linkedin/Positions.csv in the repository" };
+  const csv = readFileSync(REPO_EXPORT_PATH, "utf8");
+  const hash = createHash("sha256").update(csv).digest("hex").slice(0, 16);
+  if (career.sync.exportHash === hash) return { skip: "data/linkedin/Positions.csv is already applied" };
+  const records = parseCsv(csv);
+  const extra = Object.keys(records[0] ?? {}).filter((c) => !POSITIONS_COLUMNS.includes(c));
+  if (extra.length) throw new Unavailable(`data/linkedin/Positions.csv has unexpected columns (${extra.join(", ")}); is it the right file`);
+  return { records, hash };
+}
+
 function summary(markdown: string) {
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, markdown);
   const reportPath = arg("report");
-  if (reportPath) writeFileSync(reportPath, markdown);
+  if (reportPath) appendFileSync(reportPath, `${markdown}\n`);
 }
 
 function output(key: string, value: string) {
@@ -125,27 +144,44 @@ function output(key: string, value: string) {
 async function main() {
   const source = arg("source") ?? "api";
   const career = JSON.parse(readFileSync(CAREER_PATH, "utf8")) as CareerJson;
+  const label = source === "repo" ? "LinkedIn export in repo" : source === "export" ? "LinkedIn export" : "LinkedIn API";
   let report: SyncReport;
+  let write: CareerJson | null = null;
+  const skipped = (reason: string): SyncReport => ({ status: "skipped", reason, updated: [], added: [], notOnLinkedIn: [], titleDiffs: [] });
 
   try {
-    const raw = source === "export" ? fromExport(arg("path")) : await fromApi();
+    let raw: Record<string, unknown>[];
+    let hash: string | undefined;
+    if (source === "repo") {
+      const file = fromRepoFile(career);
+      if ("skip" in file) throw new Unavailable(file.skip);
+      ({ records: raw, hash } = file);
+    } else {
+      raw = source === "export" ? fromExport(arg("path")) : await fromApi();
+    }
     const positions: LinkedInPosition[] = normalizePositions(raw);
+    if (source === "repo" && positions.length === 0) throw new Unavailable("data/linkedin/Positions.csv has no positions");
     const result = mergeCareer(career, positions, { source: `linkedin-${source}`, minMatchRatio: flag("force") ? 0 : 0.5 });
     report = result.report;
-    if (report.status === "updated" && !flag("dry-run")) writeFileSync(CAREER_PATH, `${JSON.stringify(result.career, null, 2)}\n`);
+    if (report.status === "updated") write = result.career;
+    // Record the export as applied even when it changed nothing, so it is not re-applied over newer API data.
+    if (hash && report.status !== "skipped") write = { ...(write ?? career), sync: { ...(write ?? career).sync, exportHash: hash } };
   } catch (error) {
-    // Local export imports fail loudly (bad path is a user error). Anything that goes wrong while talking to the
-    // API — expected or not — must not fail the scheduled job: the site keeps the last committed data.
+    // Local export imports fail loudly (bad path is a user error). The API and the repo file must never fail the
+    // scheduled job or the site build: the site keeps the last committed data.
     if (flag("strict") || (source === "export" && !(error instanceof Unavailable))) throw error;
     const detail = error instanceof Unavailable ? error.message : `unexpected ${(error as Error).name}`;
-    report = { status: "skipped", reason: `LinkedIn unavailable: ${detail.replace(/\.$/, "")}. The site keeps the last synced data.`, updated: [], added: [], notOnLinkedIn: [], titleDiffs: [] };
+    const quiet = source === "repo" && error instanceof Unavailable && /^no data|already applied/.test(detail);
+    report = skipped(quiet ? detail : `${label} unavailable: ${detail.replace(/[.?]$/, "")}. The site keeps the last synced data.`);
+    if (quiet) report.status = "unchanged";
   }
 
-  const markdown = renderReport(report);
+  if (write && !flag("dry-run")) writeFileSync(CAREER_PATH, `${JSON.stringify(write, null, 2)}\n`);
+  const markdown = renderReport(report, label);
   console.log(markdown);
   summary(markdown);
-  output("changed", String(report.status === "updated" && !flag("dry-run")));
-  if (report.status === "skipped") console.log(`::warning title=LinkedIn sync skipped::${report.reason}`);
+  output("changed", String(Boolean(write) && !flag("dry-run")));
+  if (report.status === "skipped") console.log(`::warning title=${label} skipped::${report.reason}`);
 }
 
 main().catch((error) => {
