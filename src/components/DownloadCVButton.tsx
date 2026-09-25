@@ -82,10 +82,10 @@ export default function DownloadCVButton({ label, showLabel = false }: { label?:
 
   return (
     <button type="button" onClick={handleDownload} disabled={loading} aria-busy={loading}
-      className="group flex items-center gap-2 rounded border border-[color-mix(in_srgb,var(--accent)_40%,transparent)] bg-black/50 px-3 py-2 transition-all hover:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
+      className="group flex items-center gap-2 rounded border border-[color-mix(in_srgb,var(--accent)_40%,transparent)] bg-surface-strong px-3 py-2 transition-all hover:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
       aria-label={buttonLabel}>
       {loading ? <Loader2 size={14} className="animate-spin text-[var(--accent)]" aria-hidden="true" /> : <Download size={14} className="text-[var(--accent)]" aria-hidden="true" />}
-      <span role={failed ? "alert" : undefined} aria-live="polite" className={`${showLabel || failed ? "inline" : "hidden md:inline"} text-xs font-mono uppercase text-[var(--muted)] group-hover:text-white`}>
+      <span role={failed ? "alert" : undefined} aria-live="polite" className={`${showLabel || failed ? "inline" : "hidden md:inline"} text-xs font-mono uppercase text-[var(--muted)] group-hover:text-strong`}>
         {loading ? tHeader("building") : failed ? tHeader("downloadError") : buttonLabel}
       </span>
     </button>

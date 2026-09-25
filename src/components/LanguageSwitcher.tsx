@@ -8,7 +8,7 @@ export default function LanguageSwitcher({ currentLocale, label = "Language" }: 
     <nav aria-label={label} className="group flex items-center gap-2 bg-panel border border-border px-3 py-2 rounded hover:border-accent transition-colors">
       {locales.map((l) => (
         <a key={l} href={getPath(l)} aria-current={currentLocale === l ? "page" : undefined}
-          className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded transition-colors focus:ring-2 focus:ring-[var(--accent)] ${currentLocale === l ? "bg-accent text-on-accent" : "text-muted hover:text-white"}`}>{l}</a>
+          className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded transition-colors focus:ring-2 focus:ring-[var(--accent)] ${currentLocale === l ? "bg-accent text-on-accent" : "text-muted hover:text-strong"}`}>{l}</a>
       ))}
     </nav>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -24,6 +25,12 @@ export default function CareerGalaxyScene({ events, activeId, onSelect, label, h
   const { enabled, ready, markReady } = use3DMode();
   const mode = enabled ? "3d" : "static";
   const [visible, setVisible] = useState(true);
+  const { resolvedTheme } = useTheme();
+  const [ink, setInk] = useState({ ink: "#ffffff", dim: "#64748b" });
+  useEffect(() => {
+    const css = getComputedStyle(document.documentElement);
+    setInk({ ink: css.getPropertyValue("--scene-ink").trim() || "#ffffff", dim: css.getPropertyValue("--scene-dim").trim() || "#64748b" });
+  }, [resolvedTheme]);
   const ref = useRef<HTMLDivElement>(null);
 
   // Stop rendering frames while the scene is scrolled out of view.
@@ -35,14 +42,14 @@ export default function CareerGalaxyScene({ events, activeId, onSelect, label, h
   }, []);
 
   return (
-    <figure ref={ref} className="relative h-[240px] md:h-[320px] overflow-hidden rounded-lg border border-[var(--border)] bg-black/40" data-testid="career-galaxy">
+    <figure ref={ref} className="relative h-[240px] md:h-[320px] overflow-hidden rounded-lg border border-[var(--border)] bg-surface" data-testid="career-galaxy">
       <figcaption className="sr-only">{label}</figcaption>
       <div className={`absolute inset-0 transition-opacity duration-300 ${mode === "3d" && ready ? "opacity-0" : "opacity-100"}`} aria-hidden="true">
         <GalaxySvg layout={layout} activeId={activeId} />
       </div>
       {mode === "3d" ? (
         <div className={`absolute inset-0 transition-opacity duration-500 ${ready ? "opacity-100" : "opacity-0"}`}>
-          <CareerGalaxy3D layout={layout} activeId={activeId} onSelect={onSelect} running={visible} onReady={markReady} />
+          <CareerGalaxy3D layout={layout} activeId={activeId} onSelect={onSelect} running={visible} onReady={markReady} ink={ink.ink} dim={ink.dim} />
         </div>
       ) : null}
       <div className="pointer-events-none absolute bottom-2 left-3 right-3 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] text-[var(--muted)]">
@@ -66,14 +73,14 @@ function GalaxySvg({ layout, activeId }: { layout: ReturnType<typeof buildGalaxy
     <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" preserveAspectRatio="xMidYMid meet">
       {layout.years.map((yr) => (
         <g key={yr}>
-          <line x1={x(yearToT(yr, layout))} x2={x(yearToT(yr, layout))} y1={24} y2={H - 44} stroke="rgba(255,255,255,0.05)" />
-          <text x={x(yearToT(yr, layout))} y={H - 30} textAnchor="middle" fontSize="10" fill="rgba(212,212,212,0.55)" fontFamily="monospace">{yr}</text>
+          <line x1={x(yearToT(yr, layout))} x2={x(yearToT(yr, layout))} y1={24} y2={H - 44} stroke="var(--border)" />
+          <text x={x(yearToT(yr, layout))} y={H - 30} textAnchor="middle" fontSize="10" fill="var(--muted)" fontFamily="monospace">{yr}</text>
         </g>
       ))}
       {layout.edges.map((e) => {
         const a = pos.get(e.from)!, b = pos.get(e.to)!;
         const on = activeId === e.from || activeId === e.to;
-        return <line key={`${e.from}-${e.to}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={on ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.1)"} strokeWidth={on ? 1.2 : 0.8} />;
+        return <line key={`${e.from}-${e.to}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={on ? "var(--line-strong)" : "var(--border)"} strokeWidth={on ? 1.2 : 0.8} />;
       })}
       {layout.nodes.map((n) => {
         const p = pos.get(n.id)!;

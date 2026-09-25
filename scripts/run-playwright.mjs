@@ -39,7 +39,8 @@ const env = {
   ...process.env,
   PLAYWRIGHT_HOST: host,
   PLAYWRIGHT_PORT: String(port),
-  PLAYWRIGHT_BASE_URL: `http://${host}:${port}`,
+  // A caller-provided PLAYWRIGHT_BASE_URL means "test that deployed site" (no local server); otherwise the config
+  // derives the URL from host and port and starts the static server itself.
 };
 
 delete env.NO_COLOR;

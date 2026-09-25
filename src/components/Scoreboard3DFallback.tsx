@@ -8,7 +8,7 @@ export default function Scoreboard3DFallback({ rows }: { rows: YearRow[] }) {
       <ol className="flex flex-1 items-end gap-1.5 md:gap-2">
         {rows.map((row, index) => (
           <li key={row.year} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
-            <span className="font-mono text-xs tabular-nums text-white">{row.count}</span>
+            <span className="font-mono text-xs tabular-nums text-strong">{row.count}</span>
             <span
               className={`w-full rounded-t ${index % 2 === 0 ? "bg-[var(--accent)]" : "bg-[var(--accent-2)]"}`}
               style={{ height: `${Math.max(2, (row.count / max) * 100)}%`, opacity: row.count ? 0.9 : 0.25 }}

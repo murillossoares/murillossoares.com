@@ -1,11 +1,7 @@
 "use client";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-const themes = [
-  { id: "vscode-dark", label: "VS Code Dark" },
-  { id: "intellij-darcula", label: "IntelliJ Darcula" },
-  { id: "sublime-monokai", label: "Sublime Monokai" },
-] as const;
+import { THEMES as themes } from "@/lib/themes";
 export default function ThemeSwitcher({ label }: { label?: string }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);

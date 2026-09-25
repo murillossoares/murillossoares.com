@@ -16,13 +16,14 @@ function readThemeColors() {
     accent: styles.getPropertyValue("--accent").trim() || "#007acc",
     secondary: styles.getPropertyValue("--accent-2").trim() || "#22c55e",
     bg: styles.getPropertyValue("--bg").trim() || "#0e1116",
+    light: styles.getPropertyValue("color-scheme").trim() === "light",
   };
 }
 
 export default function ScoreboardScene({ rows, caption, yearLabel, countLabel }: { rows: YearRow[]; caption: string; yearLabel: string; countLabel: string }) {
   const { theme } = useTheme();
   const { enabled: show3D, ready, markReady } = use3DMode();
-  const [colors, setColors] = useState({ accent: "#007acc", secondary: "#22c55e", bg: "#0e1116" });
+  const [colors, setColors] = useState({ accent: "#007acc", secondary: "#22c55e", bg: "#0e1116", light: false });
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setColors(readThemeColors()));
@@ -48,6 +49,7 @@ export default function ScoreboardScene({ rows, caption, yearLabel, countLabel }
             accentColor={colors.accent}
             secondaryColor={colors.secondary}
             bgColor={colors.bg}
+            light={colors.light}
             onReady={markReady}
           />
         </div>
