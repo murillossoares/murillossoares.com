@@ -21,14 +21,14 @@ function readThemeColors() {
 }
 
 export default function ScoreboardScene({ rows, caption, yearLabel, countLabel }: { rows: YearRow[]; caption: string; yearLabel: string; countLabel: string }) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const { enabled: show3D, ready, markReady } = use3DMode();
   const [colors, setColors] = useState({ accent: "#007acc", secondary: "#22c55e", bg: "#0e1116", light: false });
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setColors(readThemeColors()));
     return () => cancelAnimationFrame(frame);
-  }, [theme]);
+  }, [resolvedTheme]);
 
   return (
     <>

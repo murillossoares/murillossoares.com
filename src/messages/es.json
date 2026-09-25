@@ -10,7 +10,8 @@
     "controls": "Controles",
     "skipToContent": "Saltar al contenido principal",
     "building": "Generando…",
-    "cvFooter": "Generado desde {site}"
+    "cvFooter": "Generado desde {site}",
+    "themeSystem": "Sistema"
   },
   "Boot": {
     "skip": "Omitir boot",

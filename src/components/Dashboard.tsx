@@ -64,7 +64,7 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
           <SB icon={Linkedin} label="LINKEDIN" href={links.linkedin} color="text-blue-400 light:text-blue-600" rel="me noreferrer" />
           <SB icon={Github} label="GITHUB" href={links.github} color="text-purple-400 light:text-purple-600" rel="me noreferrer" />
           <SB icon={Send} label="TELEGRAM" href={links.telegram} color="text-sky-400 light:text-sky-700" status="ENCRYPTED" />
-          <ThemeSwitcher label={tHeader("theme")} /><LanguageSwitcher currentLocale={locale} label={tHeader("language")} />
+          <ThemeSwitcher label={tHeader("theme")} systemLabel={tHeader("themeSystem")} /><LanguageSwitcher currentLocale={locale} label={tHeader("language")} />
           <Link href={`/${locale}/scoreboard`} className="group flex items-center gap-2 bg-surface-strong border border-[var(--border)] px-3 py-2 rounded hover:border-line-strong transition-all focus:ring-2 focus:ring-[var(--accent)]" aria-label="Scoreboard">
             <BarChart3 size={14} className="text-[var(--accent)]" aria-hidden="true" /><span className="hidden md:inline text-[10px] font-mono text-[var(--muted)] group-hover:text-strong">SCOREBOARD</span>
           </Link>

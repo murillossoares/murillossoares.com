@@ -1,8 +1,8 @@
 "use client";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { THEMES as themes } from "@/lib/themes";
-export default function ThemeSwitcher({ label }: { label?: string }) {
+import { SYSTEM, THEMES as themes } from "@/lib/themes";
+export default function ThemeSwitcher({ label, systemLabel = "System" }: { label?: string; systemLabel?: string }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -11,8 +11,9 @@ export default function ThemeSwitcher({ label }: { label?: string }) {
   return (
     <div className="group flex items-center gap-2 bg-panel border border-border px-3 py-2 rounded hover:border-accent transition-colors">
       {label ? <label htmlFor="theme-sel" className="sr-only md:not-sr-only text-[10px] font-mono text-muted">{label}</label> : null}
-      <select id="theme-sel" aria-label={label ?? "Theme"} value={mounted ? theme ?? "vscode-dark" : "vscode-dark"} onChange={(e) => setTheme(e.target.value)}
+      <select id="theme-sel" aria-label={label ?? "Theme"} value={mounted ? theme ?? SYSTEM : SYSTEM} onChange={(e) => setTheme(e.target.value)}
         className="cursor-pointer font-mono text-xs outline-none bg-panel-2 text-text border border-border rounded px-2 py-1 focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)]">
+        <option value={SYSTEM} className="bg-panel-2 text-text">{systemLabel}</option>
         {themes.map((t) => <option key={t.id} value={t.id} className="bg-panel-2 text-text">{t.label}</option>)}
       </select>
     </div>

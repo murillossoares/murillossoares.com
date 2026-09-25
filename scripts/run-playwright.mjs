@@ -46,7 +46,7 @@ const env = {
 delete env.NO_COLOR;
 
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
-const child = spawn(npmCommand, ["exec", "playwright", "test", ...args], {
+const child = spawn(npmCommand, ["exec", "--", "playwright", "test", ...args], {
   stdio: "inherit",
   env,
 });

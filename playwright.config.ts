@@ -17,6 +17,8 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]] : "list",
   use: {
     baseURL,
+    // The site follows the system colour scheme; specs run on a dark system unless they say otherwise.
+    colorScheme: "dark",
     trace: "retain-on-failure",
     // Lets sandboxes with a preinstalled browser run the suite (e.g. PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium).
     launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {},

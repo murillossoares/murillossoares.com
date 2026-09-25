@@ -72,3 +72,28 @@ test.describe("Bluloco Light theme", () => {
     expect(download.suggestedFilename()).toBe("cv-murillo-en-bluloco-light.pdf");
   });
 });
+
+test.describe("system colour scheme", () => {
+  test("a first visit follows the operating system, live", async ({ browser }) => {
+    const context = await browser.newContext({ colorScheme: "light" });
+    const page = await context.newPage();
+    await page.goto("/en");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "bluloco-light");
+    await expect(page.getByRole("combobox", { name: "Theme" })).toHaveValue("system");
+    await page.emulateMedia({ colorScheme: "dark" });
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "vscode-dark");
+    await context.close();
+  });
+
+  test("a theme picked in the switcher wins over the system", async ({ browser }) => {
+    const context = await browser.newContext({ colorScheme: "light" });
+    const page = await context.newPage();
+    await page.goto("/en");
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#boot-overlay")).toBeHidden({ timeout: 10_000 });
+    await page.getByRole("combobox", { name: "Theme" }).selectOption("sublime-monokai");
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "sublime-monokai");
+    await context.close();
+  });
+});

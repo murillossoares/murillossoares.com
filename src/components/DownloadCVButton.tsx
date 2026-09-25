@@ -5,6 +5,7 @@ import { Download, Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useLocale, useMessages, useTranslations } from "next-intl";
 
+import { activeTheme } from "@/lib/themes";
 import { isPdfThemeName, type PdfThemeName } from "@/lib/pdf-themes";
 import type { CVPdfContent } from "@/components/pdf/CVDocument";
 import { formatPeriod } from "@/lib/period";
@@ -17,14 +18,15 @@ type MessagesShape = {
 };
 
 export default function DownloadCVButton({ label, showLabel = false }: { label?: string; showLabel?: boolean }) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const locale = useLocale();
   const tHeader = useTranslations("Header");
   const messages = useMessages() as MessagesShape;
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  const pdfTheme: PdfThemeName = isPdfThemeName(theme) ? theme : "vscode-dark";
+  const shown = activeTheme(resolvedTheme);
+  const pdfTheme: PdfThemeName = isPdfThemeName(shown) ? shown : "vscode-dark";
   const content = useMemo<CVPdfContent>(() => {
     const title = messages?.App?.title ?? "Murillo Soares";
     const headline = getHeadline(locale);
