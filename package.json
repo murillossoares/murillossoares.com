@@ -14,7 +14,9 @@
     "test:e2e": "node scripts/run-playwright.mjs",
     "test:smoke": "node scripts/run-playwright.mjs tests/e2e/smoke.spec.ts",
     "linkedin:sync": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source api",
-    "linkedin:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source export --path"
+    "linkedin:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source export --path",
+    "linkedin:sync:file": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source repo",
+    "prebuild": "npm run -s linkedin:sync:file"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.1",

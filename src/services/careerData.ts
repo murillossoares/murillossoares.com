@@ -27,7 +27,7 @@ export interface CareerFile {
     headline: Record<string, string>;
     tagline: string;
   };
-  sync: { source: string; syncedAt: string | null };
+  sync: { source: string; syncedAt: string | null; exportHash?: string };
   positions: CareerPosition[];
 }
 

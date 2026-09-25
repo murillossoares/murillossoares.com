@@ -32,7 +32,7 @@ export interface CareerPositionJson {
 
 export interface CareerJson {
   person: Record<string, unknown>;
-  sync: { source: string; syncedAt: string | null };
+  sync: { source: string; syncedAt: string | null; exportHash?: string };
   positions: CareerPositionJson[];
 }
 
@@ -243,12 +243,15 @@ export function mergeCareer(career: CareerJson, incoming: LinkedInPosition[], op
   });
 
   const changed = report.updated.length > 0 || report.added.length > 0;
-  if (changed) next.sync = { source: opts.source, syncedAt: (opts.now ?? new Date()).toISOString() };
+  if (changed) next.sync = { ...next.sync, source: opts.source, syncedAt: (opts.now ?? new Date()).toISOString() };
   return { career: changed ? next : career, report: { ...report, status: changed ? "updated" : "unchanged" } };
 }
 
-export function renderReport(report: SyncReport): string {
-  const lines = [`## LinkedIn sync: ${report.status}`];
+/** Columns LinkedIn puts in Positions.csv. The committed file may contain nothing else (enforced by tests). */
+export const POSITIONS_COLUMNS = ["Company Name", "Title", "Description", "Location", "Started On", "Finished On"];
+
+export function renderReport(report: SyncReport, heading = "LinkedIn sync"): string {
+  const lines = [`## ${heading}: ${report.status}`];
   if (report.reason) lines.push("", `> ${report.reason}`);
   if (report.updated.length) lines.push("", "### Updated", ...report.updated.map((u) => `- **${u.id}**: ${u.changes.join("; ")}`));
   if (report.added.length) lines.push("", "### Added (translations and stack need review — `needsReview: true`)", ...report.added.map((id) => `- ${id}`));

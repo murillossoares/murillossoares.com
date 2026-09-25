@@ -1,7 +1,9 @@
 name: LinkedIn sync
 
-# Pulls positions from LinkedIn's Member Data Portability API (EEA/Switzerland members) into src/data/career.json
-# and opens a pull request. The site never calls LinkedIn at runtime: if the profile is deactivated, the token has
+# Updates src/data/career.json from two LinkedIn sources, oldest first, then opens a pull request:
+#   1. data/linkedin/Positions.csv — an export committed by hand (see data/linkedin/README.md)
+#   2. LinkedIn's Member Data Portability API (EEA/Switzerland members) — live data, applied last so it wins
+# The site never calls LinkedIn at runtime: if the profile is deactivated, the token has
 # expired or the API is down, this job only logs a warning and the site keeps serving the last committed data.
 #
 # Setup (once): repository secret LINKEDIN_ACCESS_TOKEN (scope r_dma_portability_self_serve, valid 60 days).
@@ -11,6 +13,9 @@ name: LinkedIn sync
 on:
   schedule:
     - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  push:
+    branches: [master]
+    paths: ["data/linkedin/Positions.csv"]
   workflow_dispatch:
 
 permissions:
@@ -42,7 +47,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Sync from LinkedIn
+      - name: Apply the LinkedIn export committed to the repo
+        id: file
+        run: npm run -s linkedin:sync:file -- --report linkedin-sync-report.md
+
+      - name: Sync from the LinkedIn API
         id: sync
         env:
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
@@ -51,14 +60,14 @@ jobs:
 
       # PRs opened with GITHUB_TOKEN do not trigger other workflows, so run the quality gate here.
       - name: Verify the synced data builds
-        if: steps.sync.outputs.changed == 'true'
+        if: (steps.file.outputs.changed == 'true' || steps.sync.outputs.changed == 'true')
         run: |
           npm run lint
           npm test
           npm run build
 
       - name: Open or update the pull request
-        if: steps.sync.outputs.changed == 'true'
+        if: (steps.file.outputs.changed == 'true' || steps.sync.outputs.changed == 'true')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
