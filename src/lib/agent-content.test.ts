@@ -28,7 +28,8 @@ describe("machine-readable content", () => {
     expect(person.name).toBe("Murillo Soares");
     expect(person.alternateName).toEqual(expect.arrayContaining(["Murillo Henrique Silva Soares", "Murillo Henrique"]));
     expect(person).toMatchObject({ givenName: "Murillo", additionalName: "Henrique", familyName: "Silva Soares" });
-    expect(person.alumniOf).toContainEqual(expect.objectContaining({ "@type": "CollegeOrUniversity", alternateName: "IFMT" }));
+    const schools = person.alumniOf.filter((a) => a["@type"] === "CollegeOrUniversity");
+    expect(schools).toEqual([expect.objectContaining({ alternateName: "IFMT" })]);
     expect(JSON.stringify(person)).not.toContain("M_SOARES_V");
     expect(llmsFullTxt(careerFile, now)).toContain("Murillo Henrique Silva Soares");
     expect(jsonResume("en", careerFile, now).education[0]).toMatchObject({ area: "Computer Engineering" });

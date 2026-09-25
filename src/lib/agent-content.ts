@@ -13,6 +13,8 @@ const CATEGORY_NAMES: Record<string, string> = {
   languages: "Languages", backend: "Backend", frontend: "Frontend & Mobile", data: "Data", integration: "Integration", infra: "Infra & DevOps", other: "Other",
 };
 
+const yearRange = (start: string, end: string) => (start.slice(0, 4) === end.slice(0, 4) ? start.slice(0, 4) : `${start.slice(0, 4)}–${end.slice(0, 4)}`);
+
 /** ISO 8601 reduced precision only ("2019-03" or "2019"): what schema.org, JSON Resume and <time> accept. Never a day. */
 export function isoDate(value: string | null | undefined): string | undefined {
   if (!value) return undefined;
@@ -96,7 +98,8 @@ export function personJsonLd(locale: string, file: CareerFile = careerFile, now 
       // invalid (validator warning).
       worksFor: history.filter(endKnown).map(employmentRole),
       alumniOf: [
-        ...person.education.map((e) => ({
+        // One entry per institution, even when several courses were taken there.
+        ...[...new Map(person.education.map((e) => [e.institution, e])).values()].map((e) => ({
           "@type": "CollegeOrUniversity",
           name: e.institution,
           alternateName: e.shortName,
@@ -152,7 +155,7 @@ export function llmsFullTxt(file: CareerFile = careerFile, now = new Date()): st
 > ${summary("en", file, now)}
 
 - Full name: ${file.person.fullName} (also known as ${file.person.alternateNames.filter((n) => n !== file.person.fullName).concat(file.person.name).join(", ")})
-- Education: ${file.person.education.map((e) => `${e.institution} (${e.shortName}), ${e.area.en}`).join("; ")}
+- Education: ${file.person.education.map((e) => `${e.degree.en}, ${e.area.en} — ${e.institution} (${e.shortName}), ${yearRange(e.start, e.end)}`).join("; ")}
 - Location: ${file.person.location.city}, ${file.person.location.country}
 - Experience: ${formatYears(facts)} years since ${facts.since} (${facts.internships} internships included), ${facts.positions} positions, ${facts.companies} companies
 - Architecture models worked with: ${facts.architectures}
@@ -200,7 +203,14 @@ export function jsonResume(locale = "en", file: CareerFile = careerFile, now = n
         keywords: e.stack,
       };
     }),
-    education: person.education.map((e) => ({ institution: e.institution, url: e.url, area: e.area[locale] ?? e.area.en })),
+    education: person.education.map((e) => ({
+      institution: e.institution,
+      url: e.url,
+      area: e.area[locale] ?? e.area.en,
+      studyType: e.degree[locale] ?? e.degree.en,
+      startDate: isoDate(e.start),
+      endDate: isoDate(e.end),
+    })),
     skills: skills(file).map((g) => ({ name: g.category, keywords: g.items })),
     meta: { canonical: absoluteUrl("/resume.json"), lastModified: file.sync.syncedAt ?? undefined },
   };
