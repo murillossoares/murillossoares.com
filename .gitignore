@@ -21,3 +21,15 @@ coverage
 # Test artifacts
 test-results/
 playwright-report/
+
+# LinkedIn data export: contains private messages, contacts and e-mails. Never commit it.
+*.zip
+Basic_LinkedInDataExport*/
+Complete_LinkedInDataExport*/
+linkedin-export/
+Positions.csv
+linkedin-sync-report.md
+
+# Netlify local state
+.netlify
+*.tsbuildinfo

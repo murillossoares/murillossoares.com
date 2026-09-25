@@ -50,13 +50,13 @@ export default function MysteryButton() {
   return (
     <motion.button type="button" onClick={toggleCyberpunk}
       onHoverStart={() => setHovered(true)} onHoverEnd={() => setHovered(false)}
-      aria-label={texts.hover} className="group fixed bottom-8 right-8 z-40"
+      aria-label={texts.hover} className="group fixed bottom-4 right-4 z-40 md:bottom-8 md:right-8"
       whileHover={reduced ? {} : { scale: 1.05 }} whileTap={reduced ? {} : { scale: 0.95 }}>
-      <div className="relative overflow-hidden rounded-lg border-2 border-cyber-yellow bg-black/80 px-5 py-3 shadow-[0_0_18px_rgba(252,238,10,0.45)] backdrop-blur">
+      <div className="relative overflow-hidden rounded-lg border-2 border-cyber-yellow bg-black/80 px-3 py-2.5 md:px-5 md:py-3 shadow-[0_0_18px_rgba(252,238,10,0.45)] backdrop-blur">
         <div className={`absolute inset-0 bg-cyber-yellow opacity-0 transition-opacity duration-150 ${hovered ? "opacity-[0.15] animate-pulse" : ""}`} />
         <div className="relative flex items-center gap-3 font-mono text-xs font-bold tracking-[0.32em] text-cyber-yellow transition-colors group-hover:text-white">
           <Zap size={18} className={hovered && !reduced ? "animate-spin" : ""} aria-hidden="true" />
-          <span className="relative uppercase">
+          <span className="relative hidden uppercase sm:inline">
             <span className="absolute inset-0 -translate-x-[1px] text-cyber-blue opacity-70">{label}</span>
             <span className="absolute inset-0 translate-x-[1px] text-cyber-pink opacity-60">{label}</span>
             <span className="relative">{label}</span>

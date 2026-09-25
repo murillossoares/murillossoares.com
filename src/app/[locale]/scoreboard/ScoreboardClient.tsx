@@ -2,23 +2,20 @@
 
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useMessages, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
 import DownloadCVButton from "@/components/DownloadCVButton";
 import ScoreboardScene from "@/components/ScoreboardScene";
 import SkipLink from "@/components/SkipLink";
-import { calculateScoreboardMetrics } from "@/models/metrics";
-import { parseCareerHistory } from "@/services/careerData";
+import { calculateScoreboardMetrics, technologiesPerYear } from "@/models/metrics";
+import { getCareerHistory } from "@/services/careerData";
 
 export default function ScoreboardClient({ locale }: { locale: string }) {
   const t = useTranslations("Scoreboard");
-  const messages = useMessages() as Record<string, unknown>;
-  const events = useMemo(
-    () => (Array.isArray(messages.careerHistory) ? parseCareerHistory(messages.careerHistory as unknown[]) : []),
-    [messages],
-  );
-  const data = useMemo(() => calculateScoreboardMetrics(events, (key) => t(key)), [events, t]);
+  const events = useMemo(() => getCareerHistory(locale), [locale]);
+  const data = useMemo(() => calculateScoreboardMetrics(events, (key, values) => t(key, values)), [events, t]);
+  const perYear = useMemo(() => technologiesPerYear(events), [events]);
 
   return (
     <div className="min-h-screen bg-[var(--bg)] px-4 py-6 text-[var(--text)] md:px-8 md:py-10">
@@ -38,9 +35,11 @@ export default function ScoreboardClient({ locale }: { locale: string }) {
 
         <main id="main-content">
           <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(18rem,1fr)]">
-            <div className="order-2 lg:order-1">
-              <ScoreboardScene data={data} />
-            </div>
+            <section aria-labelledby="chart-title" className="order-2 lg:order-1">
+              <h2 id="chart-title" className="text-lg font-semibold text-white">{t("chartTitle")}</h2>
+              <p className="mb-3 mt-1 text-sm text-[var(--muted)]">{t("chartDescription")}</p>
+              <ScoreboardScene rows={perYear} />
+            </section>
 
             <section
               aria-labelledby="career-summary-title"

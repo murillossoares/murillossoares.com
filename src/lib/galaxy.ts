@@ -1,0 +1,70 @@
+import type { ArchType, CareerMetric } from "@/models/metrics";
+import { yearOf } from "@/models/metrics";
+import { resolveTech } from "@/lib/tech";
+
+export interface GalaxyNode {
+  id: string;
+  label: string;
+  year: number;
+  archType: ArchType;
+  current: boolean;
+  /** Normalised 0..1 position on the time axis. */
+  t: number;
+  position: [number, number, number];
+  radius: number;
+}
+export interface GalaxyEdge { from: string; to: string; shared: string[]; }
+export interface GalaxyLayout { nodes: GalaxyNode[]; edges: GalaxyEdge[]; years: number[]; }
+
+const WIDTH = 10;
+
+/** Deterministic layout shared by the 3D scene and its 2D fallback: x = start year, spread on y/z within a year. */
+export function buildGalaxy(events: CareerMetric[], minShared = 2): GalaxyLayout {
+  const starts = events.map((e) => yearOf(e.start)).filter(Boolean);
+  if (starts.length === 0) return { nodes: [], edges: [], years: [] };
+  const min = Math.min(...starts);
+  const max = Math.max(...starts);
+  const span = Math.max(1, max - min);
+  const perYear = new Map<number, number>();
+
+  const nodes = [...events]
+    .sort((a, b) => a.start.localeCompare(b.start) || a.id.localeCompare(b.id))
+    .map((e) => {
+      const year = yearOf(e.start);
+      const slot = perYear.get(year) ?? 0;
+      perYear.set(year, slot + 1);
+      const t = (year - min) / span;
+      const angle = slot * 2.4 + year * 0.9;
+      const spread = slot === 0 ? 0.35 : 1.25;
+      return {
+        id: e.id,
+        label: e.company,
+        year,
+        archType: e.archType,
+        current: e.current,
+        t,
+        position: [t * WIDTH - WIDTH / 2, Math.sin(angle) * spread, Math.cos(angle) * spread] as [number, number, number],
+        radius: 0.16 + Math.min(e.stack.length, 8) * 0.025,
+      };
+    });
+
+  const techs = new Map(events.map((e) => [e.id, new Set(e.stack.flatMap(resolveTech).map((r) => r.canonical.toLowerCase()))]));
+  const edges: GalaxyEdge[] = [];
+  for (let i = 0; i < events.length; i++) {
+    for (let j = i + 1; j < events.length; j++) {
+      const a = techs.get(events[i].id)!;
+      const shared = [...techs.get(events[j].id)!].filter((x) => a.has(x));
+      if (shared.length >= minShared) edges.push({ from: events[i].id, to: events[j].id, shared });
+    }
+  }
+
+  const years: number[] = [];
+  for (let y = min; y <= max; y++) years.push(y);
+  return { nodes, edges, years };
+}
+
+export function yearToX(year: number, years: number[]): number {
+  const min = years[0];
+  const span = Math.max(1, years[years.length - 1] - min);
+  return ((year - min) / span) * WIDTH - WIDTH / 2;
+}

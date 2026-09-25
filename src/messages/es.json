@@ -34,210 +34,52 @@
     "systemOnline": "Sistema Online",
     "headline": "Ingeniero Full Stack Senior",
     "kpis": {
-      "uptimeLabel": "UPTIME",
-      "uptimeValue": "9+ anos",
-      "uptimeSub": "Exp. profesional",
-      "stackLabel": "PROFUNDIDAD STACK",
-      "stackValue": "Completo",
-      "stackSub": "Backend + Frontend",
-      "archLabel": "ARCH",
-      "archValue": "Solida",
-      "archSub": "Mono -> Micro"
+      "sinceLabel": "DESDE {since}",
+      "sinceValue": "{years} años",
+      "sinceSub": "incluye {internships} pasantías",
+      "positionsLabel": "EXPERIENCIAS",
+      "positionsValue": "{positions}",
+      "positionsSub": "en {companies} empresas",
+      "techLabel": "TECNOLOGÍAS",
+      "techValue": "{technologies}",
+      "techSub": "distintas, sin contar versiones",
+      "archLabel": "ARQUITECTURAS",
+      "archValue": "{architectures}",
+      "archSub": "monolito → SOA → microservicios"
     },
-    "eventHistoryTitle": "Logs de Ejecucion (Experiencia)",
+    "eventHistoryTitle": "Logs de Ejecución (Experiencia)",
     "eventHistoryHint": "Selecciona un log para inspeccionar",
     "eventHistoryEmpty": "No hay historial cargado.",
     "dependenciesTitle": "Dependencias Activas",
-    "dependenciesGroups": {
-      "backend": "Nodo Backend",
-      "frontend": "Cliente Frontend"
-    },
     "dependenciesEmpty": "No hay dependencias cargadas.",
     "architectureViewLabel": "Vista de Arquitectura",
     "serviceMapNodeLabels": {
       "server": "Servidor",
       "gateway": "Gateway",
       "client": "Cliente"
-    }
+    },
+    "present": "actual",
+    "running": "EN EJECUCIÓN",
+    "exited": "FINALIZADO",
+    "categories": {
+      "languages": "Lenguajes",
+      "backend": "Backend",
+      "frontend": "Frontend y Mobile",
+      "data": "Datos",
+      "integration": "Integración",
+      "infra": "Infra y DevOps",
+      "other": "Otros"
+    },
+    "archNames": {
+      "microservices": "Microservicios",
+      "monolith": "Monolito",
+      "soa": "SOA",
+      "hybrid": "Híbrido"
+    },
+    "galaxyLabel": "Mapa 3D de la carrera: cada nodo es una experiencia ubicada en el tiempo; las líneas unen experiencias que comparten tecnologías.",
+    "galaxyHint": "Haz clic en un nodo para inspeccionar",
+    "about": "Ingeniero full stack en {city}, con {years} años de experiencia en {companies} empresas: Java, Spring Boot, microservicios, SOA, Oracle/PostgreSQL, React y Angular — desde ERPs y portales de gobierno hasta smart grids y banca."
   },
-  "careerHistory": [
-    {
-      "id": "iefp",
-      "year": "2025",
-      "role": "Full Stack Senior",
-      "company": "Conkord | IEFP",
-      "type": "WARN",
-      "desc": "PORTAL GOV: Mantenimiento evolutivo del ecosistema Java 8 (Servlet/JSP) e integracion de servicios digitales.",
-      "stack": [
-        "Java 8",
-        "Spring Web",
-        "Jersey",
-        "SOAP/REST",
-        "Gradle"
-      ],
-      "archType": "soa"
-    },
-    {
-      "id": "ytech",
-      "year": "2023",
-      "role": "Desarrollador Full Stack",
-      "company": "YTech | CGI",
-      "type": "INFO",
-      "desc": "SMART GRIDS: Infraestructura de medicion avanzada (AMI) y gestion de alto volumen de datos de energia.",
-      "stack": [
-        "Java 17",
-        "Spring Boot",
-        "Angular",
-        "Oracle",
-        "BPEL"
-      ],
-      "archType": "microservices"
-    },
-    {
-      "id": "inovaprime",
-      "year": "2022",
-      "role": "Consultor Tecnico",
-      "company": "Inovaprime",
-      "type": "INFO",
-      "desc": "AUTOMATIZACION: Soluciones de gobernanza de TI, dashboards dinamicos y flujo de colas de mensajes.",
-      "stack": [
-        "Java",
-        "Groovy",
-        "PostgreSQL",
-        "SQL Server",
-        "Rest"
-      ],
-      "archType": "hybrid"
-    },
-    {
-      "id": "fnx",
-      "year": "2020",
-      "role": "Analista de Desarrollo",
-      "company": "FNX Participacoes",
-      "type": "SUCCESS",
-      "desc": "MULTIPLATAFORMA: Ecosistema hibrido (Mobile/PWA) y personalizacion profunda de ERP.",
-      "stack": [
-        "Flutter",
-        "React",
-        "Dart",
-        "Java",
-        "Oracle"
-      ],
-      "archType": "soa"
-    },
-    {
-      "id": "nbs",
-      "year": "2020",
-      "role": "Analista de Sistemas",
-      "company": "NBS Informatica",
-      "type": "SUCCESS",
-      "desc": "MICROSERVICES: Arquitectura distribuida con Netflix OSS para el sector automotor.",
-      "stack": [
-        "Spring Cloud",
-        "Netflix Eureka",
-        "Docker",
-        "PostgreSQL"
-      ],
-      "archType": "microservices"
-    },
-    {
-      "id": "sankhya",
-      "year": "2019",
-      "role": "Analista de Sistemas",
-      "company": "Sankhya Gestao",
-      "type": "WARN",
-      "desc": "ERP CORE: Extensiones nativas Java, integraciones PL/SQL complejas e informes corporativos.",
-      "stack": [
-        "Java",
-        "PL/SQL",
-        "JasperReports",
-        "Angular",
-        "HTML/CSS"
-      ],
-      "archType": "monolith"
-    },
-    {
-      "id": "accurate",
-      "year": "2022",
-      "role": "Desarrollador Full Stack",
-      "company": "Accurate Software",
-      "type": "INFO",
-      "desc": "MISION CRITICA: Mantenimiento de apps legadas y cloud-native (AWS Lambda/Serverless) para banca/telco.",
-      "stack": [
-        "Spring Boot",
-        "React",
-        "AWS Lambda",
-        "Docker",
-        "Oracle",
-        "Jenkins"
-      ],
-      "archType": "microservices"
-    },
-    {
-      "id": "playmatch",
-      "year": "2021",
-      "role": "Desarrollador Backend",
-      "company": "PlayMatch",
-      "type": "SUCCESS",
-      "desc": "PLATAFORMA ESPORTS: Motor de gamificacion para proyectos educativos. Entorno contenerizado.",
-      "stack": [
-        "Java",
-        "Spring Boot",
-        "Docker",
-        "Flyway",
-        "Swagger"
-      ],
-      "archType": "microservices"
-    },
-    {
-      "id": "atuarial",
-      "year": "2019",
-      "role": "Desarrollador Frontend",
-      "company": "Atuarial Consultoria",
-      "type": "INFO",
-      "desc": "INFORMES FINTECH: Dashboard de informes de inversion. Gestion de estado con Redux.",
-      "stack": [
-        "React",
-        "Redux",
-        "SQL Server",
-        "Node.js",
-        "Dashboards"
-      ],
-      "archType": "monolith"
-    },
-    {
-      "id": "datalab",
-      "year": "2018",
-      "role": "Pasante de Desarrollo",
-      "company": "Datalab Mobile",
-      "type": "WARN",
-      "desc": "MOVILIDAD ERP: Integraciones con SAP Business One/HANA. Desarrollo hibrido.",
-      "stack": [
-        "SAP HANA",
-        "C#",
-        "Java",
-        "PHP",
-        "SQL Server"
-      ],
-      "archType": "monolith"
-    },
-    {
-      "id": "ufmt",
-      "year": "2017",
-      "role": "Pasante de TI",
-      "company": "UFMT",
-      "type": "INFO",
-      "desc": "INFRA ACADEMICA: Mantenimiento de CMS (Joomla) y soporte de infraestructura de TI del campus.",
-      "stack": [
-        "Joomla",
-        "PHP",
-        "HTML/CSS",
-        "Linux",
-        "Git"
-      ],
-      "archType": "monolith"
-    }
-  ],
   "Scoreboard": {
     "title": "Panel de Carrera",
     "subtitle": "Un resumen factual de la experiencia profesional",
@@ -251,21 +93,23 @@
     "metrics": {
       "experience": {
         "label": "Años de experiencia",
-        "description": "Período cubierto por el historial profesional"
+        "description": "Desde {since}, incluyendo {internships} pasantías"
       },
       "engagements": {
         "label": "Experiencias profesionales",
-        "description": "Funciones y proyectos representados en el historial"
+        "description": "En {companies} empresas"
       },
       "technologies": {
         "label": "Tecnologías",
-        "description": "Tecnologías distintas listadas en las experiencias"
+        "description": "Distintas, sin contar versiones (Java 8 y Java 17 cuentan como Java)"
       },
       "architectures": {
         "label": "Modelos de arquitectura",
         "description": "Monolito, SOA, híbrido y microservicios"
       }
-    }
+    },
+    "chartTitle": "Tecnologías distintas por año",
+    "chartDescription": "Altura de cada columna = número de tecnologías en uso ese año."
   },
   "Persona": {
     "buttonIdle": "MODO_SEGURO",
@@ -276,5 +120,11 @@
     "modulesTitle": "INSTALLED_MODULES",
     "close": "Cerrar",
     "footer": "NetWatch Systems v2.77 // Acceso no autorizado detectado // Rastreo completado"
+  },
+  "Meta": {
+    "title": "Murillo Soares — Ingeniero Full Stack Senior (Java, Spring Boot, React, Angular)",
+    "description": "Portafolio de Murillo Soares, ingeniero full stack senior en Lisboa: {years} años con Java, Spring Boot, microservicios, SOA, React y Angular en {companies} empresas.",
+    "scoreboardTitle": "Panel de Carrera — Murillo Soares",
+    "scoreboardDescription": "Métricas factuales de la carrera de Murillo Soares: años de experiencia, empresas, tecnologías y modelos de arquitectura."
   }
 }

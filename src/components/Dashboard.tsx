@@ -1,127 +1,186 @@
 "use client";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Terminal, Server, Code, Database, Github, Linkedin, Send, BarChart3 } from "lucide-react";
+import { Terminal, Server, Code, Database, Github, Linkedin, Send, BarChart3, Boxes } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useMessages, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import DownloadCVButton from "./DownloadCVButton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
-import type { CareerMetric, ArchType } from "@/models/metrics";
-import { parseCareerHistory, filterStackByCategory } from "@/services/careerData";
+import CareerGalaxyScene from "./CareerGalaxyScene";
+import { careerFacts, type ArchType, type CareerMetric } from "@/models/metrics";
+import { careerFile, formatPeriod, getCareerHistory, getHeadline } from "@/services/careerData";
+import { groupStack } from "@/lib/tech";
+import { ARCH_STYLE } from "@/lib/arch-style";
+import { useUiStore } from "@/store/ui";
 
 export default function Dashboard({ locale }: { locale: string }) {
   const tDash = useTranslations("Dashboard");
   const tApp = useTranslations("App");
-  const messages = useMessages() as Record<string, unknown>;
   const reduced = useReducedMotion();
-  const careerHistory = useMemo(() => Array.isArray(messages?.careerHistory) ? parseCareerHistory(messages.careerHistory as unknown[]) : [], [messages]);
-  const [activeJob, setActiveJob] = useState<CareerMetric | null>(careerHistory[0] ?? null);
-  useEffect(() => { if (careerHistory.length > 0) setActiveJob((p) => (!p || !careerHistory.some((j) => j.id === p.id)) ? careerHistory[0] : p); }, [careerHistory]);
+  const careerHistory = useMemo(() => getCareerHistory(locale), [locale]);
+  const facts = useMemo(() => careerFacts(careerHistory), [careerHistory]);
+  const activeJobId = useUiStore((s) => s.activeJobId);
+  const setActiveJob = useUiStore((s) => s.setActiveJob);
+  const activeJob = careerHistory.find((j) => j.id === activeJobId) ?? careerHistory[0] ?? null;
+  const links = careerFile.person.links;
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-4 md:p-8 font-sans bg-[radial-gradient(circle_at_20%_20%,rgba(34,197,94,0.08),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(59,130,246,0.06),transparent_40%)] bg-fixed">
-      <div className="fixed inset-0 bg-gradient-to-br from-purple-900/10 to-green-900/10 pointer-events-none" />
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-[var(--border)] pb-6 relative z-10">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <div className="relative"><div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" /><div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20" /></div>
-            <span className="font-mono text-xs text-green-500 tracking-widest uppercase">{tDash("systemOnline")}</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">{tApp("title")}</h1>
-          <p className="text-[var(--muted)] font-mono text-sm mt-1">{tDash("headline")}</p>
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-4 pb-28 md:p-8 md:pb-28 font-sans bg-[radial-gradient(circle_at_20%_20%,rgba(34,197,94,0.08),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(59,130,246,0.06),transparent_40%)] bg-fixed">
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-900/10 to-green-900/10 pointer-events-none" aria-hidden="true" />
+      <header className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-[var(--border)] pb-6 relative z-10">
+        <div className="flex items-center gap-3">
+          <div className="relative" aria-hidden="true"><div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" /><div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20" /></div>
+          <span className="font-mono text-xs text-green-500 tracking-widest uppercase">{tDash("systemOnline")}</span>
         </div>
         <nav aria-label="Controls" className="flex flex-wrap gap-3">
-          <SB icon={Linkedin} label="LINKEDIN" href="https://linkedin.com/in/murillossoares" color="text-blue-400" />
-          <SB icon={Github} label="GITHUB" href="https://github.com/mhsscel" color="text-purple-400" />
-          <SB icon={Send} label="TELEGRAM" href="https://t.me/murillossoares" color="text-sky-400" status="ENCRYPTED" />
+          <SB icon={Linkedin} label="LINKEDIN" href={links.linkedin} color="text-blue-400" rel="me noreferrer" />
+          <SB icon={Github} label="GITHUB" href={links.github} color="text-purple-400" rel="me noreferrer" />
+          <SB icon={Send} label="TELEGRAM" href={links.telegram} color="text-sky-400" status="ENCRYPTED" />
           <ThemeSwitcher /><LanguageSwitcher currentLocale={locale} />
           <Link href={`/${locale}/scoreboard`} className="group flex items-center gap-2 bg-black/50 border border-[var(--border)] px-3 py-2 rounded hover:border-white/30 transition-all focus:ring-2 focus:ring-[var(--accent)]" aria-label="Scoreboard">
-            <BarChart3 size={14} className="text-[var(--accent)]" /><span className="hidden md:inline text-[10px] font-mono text-[var(--muted)] group-hover:text-white">SCOREBOARD</span>
+            <BarChart3 size={14} className="text-[var(--accent)]" aria-hidden="true" /><span className="hidden md:inline text-[10px] font-mono text-[var(--muted)] group-hover:text-white">SCOREBOARD</span>
           </Link>
           <DownloadCVButton label="GET_CV.pdf" />
         </nav>
       </header>
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
-        <section className="lg:col-span-2 space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <Kpi label={tDash("kpis.uptimeLabel")} value={tDash("kpis.uptimeValue")} sub={tDash("kpis.uptimeSub")} c="border-green-500/30" />
-            <Kpi label={tDash("kpis.stackLabel")} value={tDash("kpis.stackValue")} sub={tDash("kpis.stackSub")} c="border-blue-500/30" />
-            <Kpi label={tDash("kpis.archLabel")} value={tDash("kpis.archValue")} sub={tDash("kpis.archSub")} c="border-purple-500/30" />
+
+      <section className="relative z-10 mb-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-center" aria-labelledby="profile-name">
+        <div>
+          <h1 id="profile-name" className="text-4xl md:text-6xl font-bold text-white tracking-tight">{tApp("title")}</h1>
+          <p className="mt-2 font-mono text-sm md:text-base text-[var(--accent-2)]">{getHeadline(locale)} · {careerFile.person.location.city}</p>
+          <p className="mt-4 max-w-xl text-sm md:text-base leading-relaxed text-[var(--muted)]">
+            {tDash("about", { city: careerFile.person.location.city, years: facts.years, companies: facts.companies })}
+          </p>
+        </div>
+        <CareerGalaxyScene events={careerHistory} activeId={activeJob?.id ?? null} onSelect={setActiveJob} label={tDash("galaxyLabel")} hint={tDash("galaxyHint")} />
+      </section>
+
+      <section aria-label="KPIs" className="relative z-10 mb-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Kpi label={tDash("kpis.sinceLabel", { since: facts.since })} value={tDash("kpis.sinceValue", { years: facts.years })} sub={tDash("kpis.sinceSub", { internships: facts.internships })} c="border-green-500/30" />
+        <Kpi label={tDash("kpis.positionsLabel")} value={tDash("kpis.positionsValue", { positions: facts.positions })} sub={tDash("kpis.positionsSub", { companies: facts.companies })} c="border-blue-500/30" />
+        <Kpi label={tDash("kpis.techLabel")} value={tDash("kpis.techValue", { technologies: facts.technologies })} sub={tDash("kpis.techSub")} c="border-orange-500/30" />
+        <Kpi label={tDash("kpis.archLabel")} value={tDash("kpis.archValue", { architectures: facts.architectures })} sub={tDash("kpis.archSub")} c="border-purple-500/30" />
+      </section>
+
+      <main id="main-content" className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-6 relative z-10">
+        <section className="bg-black/40 backdrop-blur-md border border-[var(--border)] rounded-lg p-4 md:p-6" aria-labelledby="experience-title">
+          <div className="flex flex-wrap justify-between items-center gap-2 mb-5">
+            <h2 id="experience-title" className="text-sm font-mono text-[var(--muted)] uppercase tracking-widest flex items-center gap-2"><Terminal size={16} aria-hidden="true" />{tDash("eventHistoryTitle")}</h2>
+            <span className="text-[10px] text-[var(--muted)] font-mono">{tDash("eventHistoryHint")}</span>
           </div>
-          <div className="bg-black/40 backdrop-blur-md border border-[var(--border)] rounded-lg p-6 relative overflow-hidden" aria-live="polite">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-sm font-mono text-[var(--muted)] uppercase tracking-widest flex items-center gap-2"><Terminal size={16} aria-hidden="true" />{tDash("eventHistoryTitle")}</h2>
-              <span className="text-[10px] text-gray-600 font-mono">{tDash("eventHistoryHint")}</span>
-            </div>
-            {careerHistory.length === 0 ? <div className="text-[var(--muted)] text-xs font-mono">{tDash("eventHistoryEmpty")}</div> : (
-              <ul className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {careerHistory.map((job) => (
-                  <motion.li key={job.id} whileHover={reduced ? {} : { x: 4 }}>
-                    <button type="button" onClick={() => setActiveJob(job)} aria-expanded={activeJob?.id === job.id}
-                      className={`w-full cursor-pointer p-4 rounded border-l-2 transition-all focus:ring-2 focus:ring-[var(--accent)] outline-none text-left ${activeJob?.id === job.id ? "bg-white/5 border-l-green-500 border border-white/10" : "hover:bg-white/5 border-l-gray-700 border-transparent"}`}>
-                      <div className="flex justify-between items-start mb-1"><span className="font-mono text-green-500 text-xs">[{job.year}]</span><Badge type={job.type} /></div>
-                      <h3 className="text-white font-bold">{job.role} @ {job.company}</h3>
-                      <p className="text-sm text-[var(--muted)] font-mono mt-1">{`> ${job.desc}`}</p>
-                    </button>
-                  </motion.li>
-                ))}
-              </ul>
-            )}
-          </div>
-          {activeJob ? <SvcMap archType={activeJob.archType} reduced={reduced} /> : null}
+          {careerHistory.length === 0 ? <p className="text-[var(--muted)] text-xs font-mono">{tDash("eventHistoryEmpty")}</p> : (
+            <ol className="space-y-2">
+              {careerHistory.map((job) => (
+                <TimelineItem key={job.id} job={job} active={activeJob?.id === job.id} onSelect={() => setActiveJob(job.id)} reduced={reduced}
+                  period={formatPeriod(job, tDash("present"))} status={job.current ? tDash("running") : tDash("exited")} />
+              ))}
+            </ol>
+          )}
         </section>
-        <aside className="space-y-6">
-          <div className="bg-black/40 backdrop-blur-md border border-[var(--border)] rounded-lg p-6 h-full min-h-[300px]">
-            <h2 className="text-sm font-mono text-[var(--muted)] uppercase tracking-widest mb-6 flex items-center gap-2"><Server size={16} aria-hidden="true" />{tDash("dependenciesTitle")}</h2>
-            <AnimatePresence mode="wait">
-              <motion.div key={activeJob?.id ?? "empty"} initial={reduced ? {} : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={reduced ? {} : { opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+
+        <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+          <div className="bg-black/40 backdrop-blur-md border border-[var(--border)] rounded-lg p-5 md:p-6" aria-live="polite">
+            <h2 className="text-sm font-mono text-[var(--muted)] uppercase tracking-widest mb-1 flex items-center gap-2"><Boxes size={16} aria-hidden="true" />{tDash("dependenciesTitle")}</h2>
+            {activeJob ? <p className="mb-5 font-mono text-xs text-white/80">{activeJob.company}</p> : null}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div key={activeJob?.id ?? "empty"} initial={reduced ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={reduced ? undefined : { opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
                 {activeJob ? (
-                  <div className="space-y-6">
-                    <div><h3 className="text-xs text-gray-500 font-mono mb-3 uppercase">{tDash("dependenciesGroups.backend")}</h3><div className="flex flex-wrap gap-2">{filterStackByCategory(activeJob.stack, "backend").map((t) => <TT key={t} label={t} c="bg-orange-500/10 text-orange-400 border-orange-500/20" />)}</div></div>
-                    <div><h3 className="text-xs text-gray-500 font-mono mb-3 uppercase">{tDash("dependenciesGroups.frontend")}</h3><div className="flex flex-wrap gap-2">{filterStackByCategory(activeJob.stack, "frontend").map((t) => <TT key={t} label={t} c="bg-blue-500/10 text-blue-400 border-blue-500/20" />)}</div></div>
+                  <div className="space-y-4">
+                    {groupStack(activeJob.stack).map((group) => (
+                      <div key={group.category}>
+                        <h3 className="text-[11px] text-[var(--muted)] font-mono mb-2 uppercase">{tDash(`categories.${group.category}`)}</h3>
+                        <ul className="flex flex-wrap gap-2">{group.items.map((t) => <li key={t.label}><TT label={t.label} category={group.category} /></li>)}</ul>
+                      </div>
+                    ))}
                   </div>
-                ) : <div className="text-[var(--muted)] text-xs font-mono">{tDash("dependenciesEmpty")}</div>}
+                ) : <p className="text-[var(--muted)] text-xs font-mono">{tDash("dependenciesEmpty")}</p>}
               </motion.div>
             </AnimatePresence>
           </div>
+          {activeJob ? <SvcMap archType={activeJob.archType} reduced={reduced} /> : null}
         </aside>
       </main>
     </div>
   );
 }
 
-function SB({ icon: I, label, href, color, status = "CONN" }: { icon: LucideIcon; label: string; href: string; color: string; status?: string }) {
-  return <a href={href} target="_blank" rel="noreferrer" className="group flex items-center gap-2 bg-black/50 border border-[var(--border)] px-3 py-2 rounded hover:border-white/30 transition-all focus:ring-2 focus:ring-[var(--accent)]" aria-label={`${label} ${status}`}><I size={14} className={color} aria-hidden="true" /><span className="hidden md:inline text-[10px] font-mono text-[var(--muted)] group-hover:text-white">{label}::{status}</span></a>;
+function TimelineItem({ job, active, onSelect, reduced, period, status }: { job: CareerMetric; active: boolean; onSelect: () => void; reduced: boolean | null; period: string; status: string }) {
+  const arch = ARCH_STYLE[job.archType];
+  return (
+    <motion.li whileHover={reduced ? undefined : { x: 3 }} className="relative">
+      <article className={`rounded border-l-2 p-3 md:p-4 transition-colors ${active ? "bg-white/5 border border-white/10 border-l-[var(--accent-2)]" : "border border-transparent border-l-white/15 hover:bg-white/5"}`}>
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-1">
+          <span className="font-mono text-green-500 text-xs">[<time dateTime={job.start}>{period}</time>]</span>
+          <span className="flex items-center gap-2">
+            <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${arch.chip}`}>{job.archType.toUpperCase()}</span>
+            <StatusBadge current={job.current} label={status} />
+          </span>
+        </div>
+        <h3 className="text-white font-semibold leading-snug">{job.role} <span className="text-[var(--muted)] font-normal">@</span> {job.company}</h3>
+        <p className="text-sm text-[var(--muted)] font-mono mt-1">{`> ${job.desc}`}</p>
+        <p className="mt-2 text-[11px] font-mono text-[var(--muted)]/80"><span className="sr-only">Stack: </span>{job.stack.join(" · ")}</p>
+      </article>
+      <button type="button" onClick={onSelect} aria-pressed={active} aria-label={`${job.role} @ ${job.company}`}
+        className="absolute inset-0 rounded cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]" />
+    </motion.li>
+  );
+}
+
+function StatusBadge({ current, label }: { current: boolean; label: string }) {
+  return current
+    ? <span className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded border bg-green-500/10 text-green-400 border-green-500/30"><span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" aria-hidden="true" />{label}</span>
+    : <span className="text-[10px] font-mono px-2 py-0.5 rounded border bg-white/5 text-[var(--muted)] border-white/10">{label}</span>;
+}
+
+function SB({ icon: I, label, href, color, status = "CONN", rel = "noreferrer" }: { icon: LucideIcon; label: string; href: string; color: string; status?: string; rel?: string }) {
+  return <a href={href} target="_blank" rel={rel} className="group flex items-center gap-2 bg-black/50 border border-[var(--border)] px-3 py-2 rounded hover:border-white/30 transition-all focus:ring-2 focus:ring-[var(--accent)]" aria-label={`${label} ${status}`}><I size={14} className={color} aria-hidden="true" /><span className="hidden md:inline text-[10px] font-mono text-[var(--muted)] group-hover:text-white">{label}::{status}</span></a>;
 }
 function Kpi({ label, value, sub, c }: { label: string; value: string; sub: string; c: string }) {
-  return <article className={`bg-black/40 backdrop-blur border ${c} rounded p-3 md:p-4 hover:bg-white/5 transition-colors`} aria-label={`${label}: ${value}`}><div className="text-[10px] text-gray-500 font-mono uppercase mb-1">{label}</div><div className="text-xl md:text-2xl font-bold text-white mb-1">{value}</div><div className="text-[10px] text-gray-600">{sub}</div></article>;
+  return <article className={`bg-black/40 backdrop-blur border ${c} rounded p-3 md:p-4 hover:bg-white/5 transition-colors`}><h2 className="text-[10px] text-[var(--muted)] font-mono uppercase mb-1">{label}</h2><p className="text-xl md:text-2xl font-bold text-white mb-1">{value}</p><p className="text-[11px] text-[var(--muted)]">{sub}</p></article>;
 }
-function Badge({ type }: { type: string }) {
-  const s: Record<string, string> = { INFO: "bg-blue-500/20 text-blue-400 border-blue-500/30", WARN: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30", ERROR: "bg-red-500/10 text-red-400 border-red-500/30", SUCCESS: "bg-green-500/10 text-green-400 border-green-500/30" };
-  return <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${s[type] ?? s.INFO}`}>{type}</span>;
-}
-function TT({ label, c }: { label: string; c: string }) { return <span className={`text-xs font-mono px-2 py-1 rounded border ${c}`}>{label}</span>; }
+
+const CATEGORY_CHIP: Record<string, string> = {
+  languages: "bg-yellow-500/10 text-yellow-300 border-yellow-500/20",
+  backend: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  frontend: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  data: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  integration: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  infra: "bg-sky-500/10 text-sky-400 border-sky-500/20",
+  other: "bg-white/5 text-[var(--muted)] border-white/10",
+};
+function TT({ label, category }: { label: string; category: string }) { return <span className={`inline-block text-xs font-mono px-2 py-1 rounded border ${CATEGORY_CHIP[category]}`}>{label}</span>; }
+
 function SvcMap({ archType, reduced }: { archType: ArchType; reduced: boolean | null }) {
   const t = useTranslations("Dashboard");
   return (
-    <div className="bg-black/40 backdrop-blur-md border border-[var(--border)] rounded-lg p-6 min-h-[180px] flex flex-col justify-center relative overflow-hidden">
-      <h2 className="absolute top-4 left-6 text-sm font-mono text-[var(--muted)] uppercase tracking-widest flex items-center gap-2"><Database size={16} aria-hidden="true" />{t("architectureViewLabel")}: <span className="text-white">{archType}</span></h2>
-      <div className="flex items-center justify-around mt-6 relative z-10">
-        <Node icon={Server} color="orange" label={t("serviceMapNodeLabels.server")} />
-        <Line color="green" archType={archType} reduced={reduced} delay={0} />
-        {archType === "microservices" && <><Node icon={Code} color="purple" size={18} label={t("serviceMapNodeLabels.gateway")} /><Line color="purple" archType={archType} reduced={reduced} delay={0.4} /></>}
-        <Node icon={Terminal} color="blue" label={t("serviceMapNodeLabels.client")} />
+    <div className="bg-black/40 backdrop-blur-md border border-[var(--border)] rounded-lg p-5 md:p-6">
+      <h2 className="text-sm font-mono text-[var(--muted)] uppercase tracking-widest flex items-center gap-2"><Database size={16} aria-hidden="true" />{t("architectureViewLabel")}: <span className="text-white">{t(`archNames.${archType}`)}</span></h2>
+      <div className="flex items-center justify-around mt-6">
+        <Node icon={Server} tone="orange" label={t("serviceMapNodeLabels.server")} />
+        <Line tone="green" archType={archType} reduced={reduced} delay={0} />
+        {archType === "microservices" || archType === "soa" ? <><Node icon={Code} tone="purple" size={18} label={t("serviceMapNodeLabels.gateway")} /><Line tone="purple" archType={archType} reduced={reduced} delay={0.4} /></> : null}
+        <Node icon={Terminal} tone="blue" label={t("serviceMapNodeLabels.client")} />
       </div>
     </div>
   );
 }
-function Node({ icon: I, color, label, size = 20 }: { icon: LucideIcon; color: string; label: string; size?: number }) {
-  return <div className="flex flex-col items-center gap-2"><div className={`w-12 h-12 rounded bg-${color}-500/10 border border-${color}-500/50 flex items-center justify-center text-${color}-500`}><I size={size} aria-hidden="true" /></div><span className="text-[10px] font-mono text-gray-500">{label}</span></div>;
+
+// Full class names spelled out so Tailwind's JIT can see them (template-built names were silently dropped).
+const TONE = {
+  orange: { node: "bg-orange-500/10 border-orange-500/50 text-orange-500", line: "bg-orange-500", idle: "bg-orange-500/30" },
+  purple: { node: "bg-purple-500/10 border-purple-500/50 text-purple-500", line: "bg-purple-500", idle: "bg-purple-500/30" },
+  blue: { node: "bg-blue-500/10 border-blue-500/50 text-blue-500", line: "bg-blue-500", idle: "bg-blue-500/30" },
+  green: { node: "bg-green-500/10 border-green-500/50 text-green-500", line: "bg-green-500", idle: "bg-green-500/30" },
+} as const;
+type Tone = keyof typeof TONE;
+
+function Node({ icon: I, tone, label, size = 20 }: { icon: LucideIcon; tone: Tone; label: string; size?: number }) {
+  return <div className="flex flex-col items-center gap-2"><div className={`w-12 h-12 rounded border flex items-center justify-center ${TONE[tone].node}`}><I size={size} aria-hidden="true" /></div><span className="text-[10px] font-mono text-[var(--muted)]">{label}</span></div>;
 }
-function Line({ color, archType, reduced, delay }: { color: string; archType: ArchType; reduced: boolean | null; delay: number }) {
-  return <div className="flex-1 h-[1px] bg-gray-800 relative mx-4">
-    {!reduced ? <motion.div className={`absolute top-[-1px] left-0 w-8 h-[3px] bg-${color}-500 shadow-[0_0_10px]`} animate={{ x: ["0%", "400%"], opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: archType === "monolith" ? 2 : 0.8, delay, ease: "linear" }} /> : <div className={`absolute top-[-1px] left-0 w-full h-[3px] bg-${color}-500/30`} />}
+function Line({ tone, archType, reduced, delay }: { tone: Tone; archType: ArchType; reduced: boolean | null; delay: number }) {
+  return <div className="flex-1 h-px bg-white/10 relative mx-3" aria-hidden="true">
+    {!reduced ? <motion.div className={`absolute -top-px left-0 w-8 h-[3px] ${TONE[tone].line} shadow-[0_0_10px]`} animate={{ x: ["0%", "400%"], opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: archType === "monolith" ? 2 : 0.8, delay, ease: "linear" }} /> : <div className={`absolute -top-px left-0 w-full h-[3px] ${TONE[tone].idle}`} />}
   </div>;
 }
