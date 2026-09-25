@@ -1,0 +1,356 @@
+{
+  "person": {
+    "name": "Murillo Soares",
+    "alias": "M_SOARES_V",
+    "location": {
+      "city": "Lisboa",
+      "country": "PT"
+    },
+    "links": {
+      "linkedin": "https://www.linkedin.com/in/murillossoares/",
+      "github": "https://github.com/mhsscel",
+      "telegram": "https://t.me/murillossoares"
+    },
+    "headline": {
+      "pt-br": "Engenheiro Full Stack Sênior",
+      "en": "Senior Full Stack Engineer",
+      "es": "Ingeniero Full Stack Senior"
+    },
+    "tagline": "Java 7 → 21 · Spring Boot 3 · Microservices · React · Angular"
+  },
+  "sync": {
+    "source": "manual",
+    "syncedAt": null
+  },
+  "positions": [
+    {
+      "id": "iefp",
+      "company": "Conkord | IEFP",
+      "start": "2025",
+      "end": null,
+      "current": true,
+      "kind": "employment",
+      "archType": "soa",
+      "stack": [
+        "Java 8",
+        "Spring Web",
+        "Jersey",
+        "SOAP/REST",
+        "Gradle"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Full Stack Senior",
+          "summary": "PORTAL GOV: Manutenção evolutiva do ecossistema Java 8 (Servlet/JSP) e integração de serviços digitais."
+        },
+        "en": {
+          "role": "Senior Full Stack",
+          "summary": "GOV PORTAL: Evolutionary maintenance of Java 8 ecosystem (Servlet/JSP) and integration of digital services."
+        },
+        "es": {
+          "role": "Full Stack Senior",
+          "summary": "PORTAL GOV: Mantenimiento evolutivo del ecosistema Java 8 (Servlet/JSP) e integración de servicios digitales."
+        }
+      }
+    },
+    {
+      "id": "ytech",
+      "company": "YTech | CGI",
+      "start": "2023",
+      "end": null,
+      "current": false,
+      "kind": "employment",
+      "archType": "microservices",
+      "stack": [
+        "Java 17",
+        "Spring Boot",
+        "Angular",
+        "Oracle",
+        "BPEL"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Desenvolvedor Full Stack",
+          "summary": "SMART GRIDS: Infraestrutura de medição avançada (AMI) e gestão de alto volume de dados de energia."
+        },
+        "en": {
+          "role": "Full Stack Dev",
+          "summary": "SMART GRIDS: Advanced Metering Infrastructure (AMI) and management of high volume energy data."
+        },
+        "es": {
+          "role": "Desarrollador Full Stack",
+          "summary": "SMART GRIDS: Infraestructura de medición avanzada (AMI) y gestión de alto volumen de datos de energía."
+        }
+      }
+    },
+    {
+      "id": "inovaprime",
+      "company": "Inovaprime",
+      "start": "2022",
+      "end": null,
+      "current": false,
+      "kind": "employment",
+      "archType": "hybrid",
+      "stack": [
+        "Java",
+        "Groovy",
+        "PostgreSQL",
+        "SQL Server",
+        "Rest"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Consultor Técnico",
+          "summary": "AUTOMAÇÃO: Soluções de governança de TI, dashboards dinâmicos e fluxo de filas de mensagens."
+        },
+        "en": {
+          "role": "Technical Consultant",
+          "summary": "AUTOMATION: IT Governance solutions, dynamic dashboards and message queue flow."
+        },
+        "es": {
+          "role": "Consultor Técnico",
+          "summary": "AUTOMATIZACIÓN: Soluciones de gobernanza de TI, dashboards dinámicos y flujo de colas de mensajes."
+        }
+      }
+    },
+    {
+      "id": "fnx",
+      "company": "FNX Participações",
+      "start": "2020",
+      "end": null,
+      "current": false,
+      "kind": "employment",
+      "archType": "soa",
+      "stack": [
+        "Flutter",
+        "React",
+        "Dart",
+        "Java",
+        "Oracle"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Analista de Desenvolvimento",
+          "summary": "MULTIPLATAFORMA: Ecossistema híbrido (Mobile/PWA) e customização profunda de ERP."
+        },
+        "en": {
+          "role": "Development Analyst",
+          "summary": "MULTI-PLATFORM: Hybrid Ecosystem (Mobile/PWA) and deep ERP customization."
+        },
+        "es": {
+          "role": "Analista de Desarrollo",
+          "summary": "MULTIPLATAFORMA: Ecosistema híbrido (Mobile/PWA) y personalización profunda de ERP."
+        }
+      }
+    },
+    {
+      "id": "nbs",
+      "company": "NBS Informática",
+      "start": "2020",
+      "end": null,
+      "current": false,
+      "kind": "employment",
+      "archType": "microservices",
+      "stack": [
+        "Spring Cloud",
+        "Netflix Eureka",
+        "Docker",
+        "PostgreSQL"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Analista de Sistemas",
+          "summary": "MICROSERVICES: Arquitetura distribuída com Netflix OSS para o setor automotivo."
+        },
+        "en": {
+          "role": "System Analyst",
+          "summary": "MICROSERVICES: Distributed architecture with Netflix OSS for the automotive sector."
+        },
+        "es": {
+          "role": "Analista de Sistemas",
+          "summary": "MICROSERVICES: Arquitectura distribuida con Netflix OSS para el sector automotor."
+        }
+      }
+    },
+    {
+      "id": "sankhya",
+      "company": "Sankhya Gestão",
+      "start": "2019",
+      "end": null,
+      "current": false,
+      "kind": "employment",
+      "archType": "monolith",
+      "stack": [
+        "Java",
+        "PL/SQL",
+        "JasperReports",
+        "Angular",
+        "HTML/CSS"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Analista de Sistemas",
+          "summary": "ERP CORE: Extensões nativas Java, integrações PL/SQL complexas e relatórios corporativos."
+        },
+        "en": {
+          "role": "System Analyst",
+          "summary": "ERP CORE: Native Java extensions, complex PL/SQL integrations and corporate reports."
+        },
+        "es": {
+          "role": "Analista de Sistemas",
+          "summary": "ERP CORE: Extensiones nativas Java, integraciones PL/SQL complejas e informes corporativos."
+        }
+      }
+    },
+    {
+      "id": "accurate",
+      "company": "Accurate Software",
+      "start": "2022",
+      "end": null,
+      "current": false,
+      "kind": "employment",
+      "archType": "microservices",
+      "stack": [
+        "Spring Boot",
+        "React",
+        "AWS Lambda",
+        "Docker",
+        "Oracle",
+        "Jenkins"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Desenvolvedor Full Stack",
+          "summary": "MISSÃO CRÍTICA: Manutenção de apps legados e cloud-native (AWS Lambda/Serverless) para banking/telco."
+        },
+        "en": {
+          "role": "Full Stack Developer",
+          "summary": "MISSION CRITICAL: Maintenance of legacy & cloud-native apps (AWS Lambda/Serverless) for banking/telco."
+        },
+        "es": {
+          "role": "Desarrollador Full Stack",
+          "summary": "MISIÓN CRÍTICA: Mantenimiento de apps legadas y cloud-native (AWS Lambda/Serverless) para banca/telco."
+        }
+      }
+    },
+    {
+      "id": "playmatch",
+      "company": "PlayMatch",
+      "start": "2021",
+      "end": null,
+      "current": false,
+      "kind": "employment",
+      "archType": "microservices",
+      "stack": [
+        "Java",
+        "Spring Boot",
+        "Docker",
+        "Flyway",
+        "Swagger"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Desenvolvedor Backend",
+          "summary": "PLATAFORMA ESPORTS: Motor de gamificação para projetos educacionais. Ambiente conteinerizado."
+        },
+        "en": {
+          "role": "Back End Developer",
+          "summary": "ESPORTS PLATFORM: Gamification engine for educational projects. Containerized environment."
+        },
+        "es": {
+          "role": "Desarrollador Backend",
+          "summary": "PLATAFORMA ESPORTS: Motor de gamificación para proyectos educativos. Entorno contenerizado."
+        }
+      }
+    },
+    {
+      "id": "atuarial",
+      "company": "Atuarial Consultoria",
+      "start": "2019",
+      "end": null,
+      "current": false,
+      "kind": "employment",
+      "archType": "monolith",
+      "stack": [
+        "React",
+        "Redux",
+        "SQL Server",
+        "Node.js"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Desenvolvedor Frontend",
+          "summary": "RELATÓRIOS FINTECH: Dashboard de relatórios de investimento. Gestão de estado com Redux."
+        },
+        "en": {
+          "role": "Front End Developer",
+          "summary": "FINTECH REPORTS: Investment reporting dashboard. State management with Redux."
+        },
+        "es": {
+          "role": "Desarrollador Frontend",
+          "summary": "INFORMES FINTECH: Dashboard de informes de inversión. Gestión de estado con Redux."
+        }
+      }
+    },
+    {
+      "id": "datalab",
+      "company": "Datalab Mobile",
+      "start": "2018",
+      "end": null,
+      "current": false,
+      "kind": "internship",
+      "archType": "monolith",
+      "stack": [
+        "SAP HANA",
+        "C#",
+        "Java",
+        "PHP",
+        "SQL Server"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Estagiário de Desenvolvimento",
+          "summary": "MOBILIDADE ERP: Integrações com SAP Business One/HANA. Desenvolvimento híbrido."
+        },
+        "en": {
+          "role": "Dev Intern",
+          "summary": "ERP MOBILITY: Integrations with SAP Business One/HANA. Hybrid development."
+        },
+        "es": {
+          "role": "Pasante de Desarrollo",
+          "summary": "MOVILIDAD ERP: Integraciones con SAP Business One/HANA. Desarrollo híbrido."
+        }
+      }
+    },
+    {
+      "id": "ufmt",
+      "company": "UFMT",
+      "start": "2017",
+      "end": null,
+      "current": false,
+      "kind": "internship",
+      "archType": "monolith",
+      "stack": [
+        "Joomla",
+        "PHP",
+        "HTML/CSS",
+        "Linux",
+        "Git"
+      ],
+      "i18n": {
+        "pt-br": {
+          "role": "Estagiário de TI",
+          "summary": "INFRA ACADÊMICA: Manutenção de CMS (Joomla) e suporte a infraestrutura de TI do campus."
+        },
+        "en": {
+          "role": "IT Intern",
+          "summary": "ACADEMIC INFRA: CMS maintenance (Joomla) and campus IT infrastructure support."
+        },
+        "es": {
+          "role": "Pasante de TI",
+          "summary": "INFRA ACADÉMICA: Mantenimiento de CMS (Joomla) y soporte de infraestructura de TI del campus."
+        }
+      }
+    }
+  ]
+}

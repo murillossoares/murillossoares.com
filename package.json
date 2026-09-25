@@ -12,7 +12,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "node scripts/run-playwright.mjs",
-    "test:smoke": "node scripts/run-playwright.mjs tests/e2e/smoke.spec.ts"
+    "test:smoke": "node scripts/run-playwright.mjs tests/e2e/smoke.spec.ts",
+    "linkedin:sync": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source api",
+    "linkedin:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source export --path",
+    "linkedin:sync:file": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source repo",
+    "prebuild": "npm run -s linkedin:sync:file -- --updates-only"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.1",
@@ -29,6 +33,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@netlify/functions": "^6.0.0",
     "@playwright/test": "^1.59.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -51,5 +56,8 @@
     "next": {
       "postcss": "^8.5.10"
     }
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }

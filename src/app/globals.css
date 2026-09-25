@@ -102,3 +102,5 @@ body { background: var(--bg); color: var(--text); }
     transition-duration: 0.001ms !important; scroll-behavior: auto !important;
   }
 }
+/* Set before first paint by the layout's inline script: skip the boot overlay for returning visitors and bots. */
+html[data-booted] #boot-overlay { display: none; }

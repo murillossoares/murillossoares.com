@@ -7,11 +7,11 @@ import { useLocale, useMessages, useTranslations } from "next-intl";
 
 import { isPdfThemeName, type PdfThemeName } from "@/lib/pdf-themes";
 import type { CVPdfContent } from "@/components/pdf/CVDocument";
+import { formatPeriod, getCareerHistory, getHeadline } from "@/services/careerData";
 
 type MessagesShape = {
   App?: { title?: string };
-  Dashboard?: { headline?: string; eventHistoryTitle?: string };
-  careerHistory?: CVPdfContent["careerHistory"];
+  Dashboard?: { eventHistoryTitle?: string; present?: string };
 };
 
 export default function DownloadCVButton({ label, showLabel = false }: { label?: string; showLabel?: boolean }) {
@@ -28,9 +28,12 @@ export default function DownloadCVButton({ label, showLabel = false }: { label?:
   const pdfTheme: PdfThemeName = isPdfThemeName(theme) ? theme : "vscode-dark";
   const content = useMemo<CVPdfContent>(() => {
     const title = messages?.App?.title ?? "Murillo Soares";
-    const headline = messages?.Dashboard?.headline ?? "Senior Full Stack Engineer";
+    const headline = getHeadline(locale);
     const experienceTitle = messages?.Dashboard?.eventHistoryTitle ?? "Runtime Logs (Experience)";
-    const careerHistory = Array.isArray(messages?.careerHistory) ? messages.careerHistory : [];
+    const present = messages?.Dashboard?.present ?? "present";
+    const careerHistory = getCareerHistory(locale).map((e) => ({
+      year: formatPeriod(e, present), role: e.role, company: e.company, desc: e.desc, stack: e.stack,
+    }));
 
     return {
       title,
