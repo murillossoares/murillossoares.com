@@ -18,7 +18,7 @@
     "linkedin:sync:file": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source repo",
     "prebuild": "node scripts/site-verification.mjs && npm run -s linkedin:sync:file -- --updates-only",
     "og": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/og/render.mjs",
-    "icons": "node scripts/icon/render.mjs"
+    "icons": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/icon/render.mjs"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.1",
