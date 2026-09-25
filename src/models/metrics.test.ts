@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateScoreboardMetrics, careerFacts, sortCareerEvents, technologiesPerYear, type CareerMetric } from "./metrics";
+import { calculateScoreboardMetrics, careerFacts, effectiveEndYear, sortCareerEvents, technologiesPerYear, type CareerMetric } from "./metrics";
 
 const base = { role: "", desc: "", end: null, current: false, kind: "employment" as const };
 const now = new Date("2026-06-01");
@@ -31,10 +31,16 @@ describe("career metrics", () => {
     expect(sortCareerEvents(events).map((e) => e.id)).toEqual(["c", "b", "a"]);
   });
 
+  it("assumes an unknown end lasts until the next position starts", () => {
+    const [a] = events;
+    expect(effectiveEndYear(a, events, now)).toBe(2021);
+    expect(effectiveEndYear(events[2], events, now)).toBe(2026);
+  });
+
   it("counts technologies in use per year", () => {
     expect(technologiesPerYear(events, now)).toEqual([
       { year: 2020, count: 2 },
-      { year: 2021, count: 0 },
+      { year: 2021, count: 2 },
       { year: 2022, count: 2 },
       { year: 2023, count: 2 },
       { year: 2024, count: 1 },

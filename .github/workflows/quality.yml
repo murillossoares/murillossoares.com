@@ -45,8 +45,8 @@ jobs:
       - name: Production build
         run: npm run build
 
-      - name: Smoke tests
-        run: npm run test:smoke
+      - name: End-to-end tests (desktop, Android and iPhone profiles)
+        run: npm run test:e2e
 
       - name: Upload Playwright artifacts
         if: ${{ failure() && !cancelled() }}

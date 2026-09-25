@@ -109,7 +109,7 @@
       }
     },
     "chartTitle": "Distinct technologies per year",
-    "chartDescription": "Column height = number of technologies in use that year."
+    "chartDescription": "Column height = number of technologies in use that year. Positions without an end date count until the next one starts."
   },
   "Persona": {
     "buttonIdle": "SAFE_MODE",
