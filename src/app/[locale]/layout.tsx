@@ -28,7 +28,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const facts = careerFacts(getCareerHistory(locale));
   const title = t("title");
   const description = t("description", { years: formatYears(facts), companies: facts.companies });
-  const [firstName, ...rest] = careerFile.person.name.split(" ");
   const google = googleVerificationTokens();
   return {
     metadataBase: new URL(SITE_URL),
@@ -37,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     applicationName: careerFile.person.name,
     authors: [{ name: careerFile.person.name, url: absoluteUrl(`/${locale}`) }],
     creator: careerFile.person.name,
-    keywords: ["Murillo Soares", "Java", "Spring Boot", "Microservices", "SOA", "React", "Angular", "Full Stack", "Lisboa", "Lisbon"],
+    keywords: [careerFile.person.name, ...careerFile.person.alternateNames, "Java", "Spring Boot", "Microservices", "SOA", "React", "Angular", "Full Stack", "Lisboa", "Lisbon"],
     alternates: {
       canonical: `/${locale}`,
       languages: localeAlternates(),
@@ -51,8 +50,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description,
       locale: LOCALE_TAGS[locale]?.og,
       alternateLocale: Object.entries(LOCALE_TAGS).filter(([l]) => l !== locale).map(([, v]) => v.og),
-      firstName,
-      lastName: rest.join(" "),
+      firstName: careerFile.person.givenName,
+      lastName: careerFile.person.familyName,
       images: [{ url: "/og.png", width: 1200, height: 630, alt: title }],
     },
     twitter: { card: "summary_large_image", title, description, images: ["/og.png"] },

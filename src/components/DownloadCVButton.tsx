@@ -8,7 +8,7 @@ import { useLocale, useMessages, useTranslations } from "next-intl";
 import { isPdfThemeName, type PdfThemeName } from "@/lib/pdf-themes";
 import type { CVPdfContent } from "@/components/pdf/CVDocument";
 import { formatPeriod } from "@/lib/period";
-import { getCareerHistory, getHeadline } from "@/services/careerData";
+import { careerFile, educationLabel, getCareerHistory, getHeadline } from "@/services/careerData";
 
 type MessagesShape = {
   App?: { title?: string };
@@ -39,6 +39,7 @@ export default function DownloadCVButton({ label, showLabel = false }: { label?:
     return {
       title,
       headline,
+      identity: `${careerFile.person.fullName} · ${educationLabel(locale)}`,
       locale,
       theme: pdfTheme,
       sections: { experienceTitle },

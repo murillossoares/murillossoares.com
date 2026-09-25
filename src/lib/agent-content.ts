@@ -63,7 +63,10 @@ export function personJsonLd(locale: string, file: CareerFile = careerFile, now 
       "@type": "Person",
       "@id": `${absoluteUrl("/")}#person`,
       name: person.name,
-      alternateName: person.alias,
+      alternateName: person.alternateNames,
+      givenName: person.givenName,
+      additionalName: person.additionalName,
+      familyName: person.familyName,
       jobTitle: getHeadline(locale, file),
       description: summary(locale, file, now),
       url: pageUrl,
@@ -74,6 +77,12 @@ export function personJsonLd(locale: string, file: CareerFile = careerFile, now 
       // start/end dates say when that employment held, so past jobs carry an endDate. alumniOf would be wrong here: its
       // role dates mean "alumnus since". A bare worksFor inside a hasOccupation Role is invalid (validator warning).
       worksFor: history.map(organizationRole),
+      alumniOf: person.education.map((e) => ({
+        "@type": "CollegeOrUniversity",
+        name: e.institution,
+        alternateName: e.shortName,
+        url: e.url,
+      })),
     },
   };
 }
@@ -121,6 +130,8 @@ export function llmsFullTxt(file: CareerFile = careerFile, now = new Date()): st
 
 > ${summary("en", file, now)}
 
+- Full name: ${file.person.fullName} (also known as ${file.person.alternateNames.filter((n) => n !== file.person.fullName).concat(file.person.name).join(", ")})
+- Education: ${file.person.education.map((e) => `${e.institution} (${e.shortName}), ${e.area.en}`).join("; ")}
 - Location: ${file.person.location.city}, ${file.person.location.country}
 - Experience: ${formatYears(facts)} years since ${facts.since} (${facts.internships} internships included), ${facts.positions} positions, ${facts.companies} companies
 - Architecture models worked with: ${facts.architectures}
@@ -162,6 +173,7 @@ export function jsonResume(locale = "en", file: CareerFile = careerFile, now = n
       highlights: [`Architecture: ${ARCH_NAMES[e.archType]}`],
       keywords: e.stack,
     })),
+    education: person.education.map((e) => ({ institution: e.institution, url: e.url, area: e.area[locale] ?? e.area.en })),
     skills: skills(file).map((g) => ({ name: g.category, keywords: g.items })),
     meta: { canonical: absoluteUrl("/resume.json"), lastModified: file.sync.syncedAt ?? undefined },
   };

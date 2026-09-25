@@ -13,6 +13,8 @@ type CareerItem = {
 export type CVPdfContent = {
   title: string;
   headline: string;
+  /** Full name and education, e.g. "Murillo Henrique Silva Soares · IFMT — Engenharia de Computação". */
+  identity?: string;
   locale: string;
   theme: PdfThemeName;
   sections: {
@@ -104,6 +106,7 @@ export function CVDocument({ content }: { content: CVPdfContent }) {
         <View style={styles.header}>
           <Text style={styles.title}>{content.title}</Text>
           <Text style={styles.headline}>{content.headline}</Text>
+          {content.identity ? <Text style={styles.headline}>{content.identity}</Text> : null}
           <Text style={styles.meta}>
             ID: M_SOARES_V4.0 | LOC: Lisboa, PT | LANG: {content.locale.toUpperCase()} | THEME:{" "}
             {content.theme.toUpperCase()}

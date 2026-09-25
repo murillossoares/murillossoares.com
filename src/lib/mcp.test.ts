@@ -28,7 +28,7 @@ describe("MCP endpoint", () => {
   it("returns the profile with structured content", async () => {
     const { result } = await rpc("tools/call", { name: "get_profile", arguments: { locale: "pt-br" } });
     expect(result.isError).toBe(false);
-    expect(result.structuredContent).toMatchObject({ name: "Murillo Soares", headline: "Engenheiro Full Stack Sênior" });
+    expect(result.structuredContent).toMatchObject({ name: "Murillo Soares", fullName: "Murillo Henrique Silva Soares", headline: "Engenheiro Full Stack Sênior" });
     expect(JSON.parse(result.content[0].text).facts.companies).toBe(new Set(careerFile.positions.map((p) => p.company.toLowerCase())).size);
     expect(result.structuredContent.summary).toMatch(/anos de experiência/);
   });

@@ -20,12 +20,21 @@ export interface CareerPosition {
 
 export interface CareerFile {
   person: {
+    /** Brand name shown on the site. */
     name: string;
+    fullName: string;
+    /** Other names people search for (e.g. the LinkedIn display name). */
+    alternateNames: string[];
+    givenName: string;
+    additionalName?: string;
+    familyName: string;
+    /** Playful persona handle used by the easter egg; not an identity. */
     alias: string;
     location: { city: string; country: string };
     links: Record<string, string>;
     headline: Record<string, string>;
     tagline: string;
+    education: { institution: string; shortName: string; url: string; area: Record<string, string> }[];
   };
   sync: { source: string; syncedAt: string | null; exportHash?: string };
   positions: CareerPosition[];
@@ -62,4 +71,11 @@ export function getCareerHistory(locale: string, file: CareerFile = careerFile):
 
 export function getHeadline(locale: string, file: CareerFile = careerFile): string {
   return file.person.headline[locale] ?? file.person.headline[FALLBACK_LOCALE] ?? "";
+}
+
+/** "IFMT — Engenharia de Computação" for the given locale. */
+export function educationLabel(locale: string, file: CareerFile = careerFile): string {
+  return file.person.education
+    .map((e) => `${e.shortName} — ${e.area[locale] ?? e.area.en ?? Object.values(e.area)[0]}`)
+    .join(" · ");
 }

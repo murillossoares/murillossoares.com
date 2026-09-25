@@ -16,7 +16,18 @@ describe("machine-readable content", () => {
     expect(roles.every((r) => r["@type"] === "OrganizationRole" && r.worksFor["@type"] === "Organization")).toBe(true);
     const current = careerFile.positions.filter((p) => p.current).length;
     expect(roles.filter((r) => r.endDate === undefined).length).toBeGreaterThanOrEqual(current);
-    expect(JSON.stringify(ld)).not.toMatch(/hasOccupation|alumniOf/);
+    expect(JSON.stringify(roles)).not.toMatch(/hasOccupation|alumniOf/);
+  });
+
+  it("ties every name people search for to one person, with education", () => {
+    const person = personJsonLd("pt-br", careerFile, now).mainEntity;
+    expect(person.name).toBe("Murillo Soares");
+    expect(person.alternateName).toEqual(expect.arrayContaining(["Murillo Henrique Silva Soares", "Murillo Henrique"]));
+    expect(person).toMatchObject({ givenName: "Murillo", additionalName: "Henrique", familyName: "Silva Soares" });
+    expect(person.alumniOf).toEqual([expect.objectContaining({ "@type": "CollegeOrUniversity", alternateName: "IFMT" })]);
+    expect(JSON.stringify(person)).not.toContain("M_SOARES_V");
+    expect(llmsFullTxt(careerFile, now)).toContain("Murillo Henrique Silva Soares");
+    expect(jsonResume("en", careerFile, now).education[0]).toMatchObject({ area: "Computer Engineering" });
   });
 
   it("follows the llms.txt shape: H1, blockquote summary, link sections", () => {

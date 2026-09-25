@@ -77,7 +77,8 @@ export function callTool(name: string, args: Record<string, unknown> = {}): { st
   if (name === "get_profile") {
     const facts = careerFacts(getCareerHistory(loc));
     const data = {
-      name: careerFile.person.name, headline: getHeadline(loc), location: careerFile.person.location,
+      name: careerFile.person.name, fullName: careerFile.person.fullName, alternateNames: careerFile.person.alternateNames,
+      headline: getHeadline(loc), location: careerFile.person.location, education: careerFile.person.education,
       summary: summary(loc), links: careerFile.person.links, facts: { ...facts }, skills: skills(),
       lastSynced: careerFile.sync.syncedAt,
     } as unknown as Json;

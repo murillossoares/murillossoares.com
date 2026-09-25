@@ -10,7 +10,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 import CareerGalaxyScene from "./CareerGalaxyScene";
 import { careerFacts, formatYears, type ArchType, type CareerMetric } from "@/models/metrics";
-import { careerFile, getCareerHistory, getHeadline } from "@/services/careerData";
+import { careerFile, educationLabel, getCareerHistory, getHeadline } from "@/services/careerData";
 import { periodParts, type PeriodParts } from "@/lib/period";
 import { groupStack } from "@/lib/tech";
 import { ARCH_STYLE } from "@/lib/arch-style";
@@ -56,6 +56,7 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
         <div>
           <h1 id="profile-name" className="text-4xl md:text-6xl font-bold text-white tracking-tight">{tApp("title")}</h1>
           <p className="mt-2 font-mono text-sm md:text-base text-[var(--accent-2)]">{getHeadline(locale)} · {careerFile.person.location.city}</p>
+          <p className="mt-1 font-mono text-xs text-[var(--muted)]">{careerFile.person.fullName} · {tDash("educationLabel")}: {educationLabel(locale)}</p>
           <p className="mt-4 max-w-xl text-sm md:text-base leading-relaxed text-[var(--muted)]">
             {tDash("about", { city: careerFile.person.location.city, years, companies: facts.companies })}
           </p>

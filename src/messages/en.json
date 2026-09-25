@@ -77,7 +77,8 @@
     },
     "galaxyLabel": "3D career map: each node is a position placed in time; lines link positions that share technologies.",
     "galaxyHint": "Click a node to inspect",
-    "about": "Full stack engineer based in {city}, with {years} years of experience across {companies} companies: Java, Spring Boot, microservices, SOA, Oracle/PostgreSQL, React and Angular — from ERPs and government portals to smart grids and banking."
+    "about": "Full stack engineer based in {city}, with {years} years of experience across {companies} companies: Java, Spring Boot, microservices, SOA, Oracle/PostgreSQL, React and Angular — from ERPs and government portals to smart grids and banking.",
+    "educationLabel": "Education"
   },
   "Scoreboard": {
     "title": "Career Scoreboard",

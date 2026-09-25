@@ -20,6 +20,8 @@ test.describe("crawlers and agents", () => {
     for (const lang of ["pt-BR", "en", "es", "x-default"]) expect(html).toContain(`hrefLang="${lang}"`);
     expect(html).toContain('property="og:image"');
     for (const p of career.positions) expect(html).toContain(p.company.replace("&", "&amp;"));
+    expect(html).toContain(career.person.fullName);
+    expect(html).toContain("IFMT");
 
     const ld = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)![1]);
     expect(ld.mainEntity.name).toBe("Murillo Soares");
