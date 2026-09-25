@@ -1,5 +1,6 @@
 [build]
-  command = "npm run build"
+  # Unit tests gate the deploy too, so a bad data file cannot go live even if it reached master.
+  command = "npm test && npm run build"
   publish = "out"
 
 [build.environment]
@@ -28,6 +29,14 @@
 [[redirects]]
   from = "/"
   to = "/pt-br"
+  status = 302
+  force = true
+  conditions = { Language = ["pt"] }
+
+# Any other language gets English, matching hreflang x-default.
+[[redirects]]
+  from = "/"
+  to = "/en"
   status = 302
   force = true
 

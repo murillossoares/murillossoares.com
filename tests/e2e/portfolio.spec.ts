@@ -18,6 +18,8 @@ test.describe("crawlers and agents", () => {
     expect(html).toMatch(/<meta name="description" content="[^"]{80,}"/);
     expect(html).toMatch(/<link rel="canonical" href="[^"]+\/pt-br"/);
     for (const lang of ["pt-BR", "en", "es", "x-default"]) expect(html).toContain(`hrefLang="${lang}"`);
+    // Visitors whose language matches no locale get English (international audience).
+    expect(html).toMatch(/<link rel="alternate" hrefLang="x-default" href="[^"]+\/en"/);
     expect(html).toContain('property="og:image"');
     for (const p of career.positions) expect(html).toContain(p.company.replace("&", "&amp;"));
     // Visible text only: strip scripts and meta tags, which also carry these names.
@@ -97,6 +99,21 @@ test.describe("career data is shown truthfully", () => {
     await page.getByRole("button", { name: /@ Accurate Software/ }).click();
     for (const tech of ["AWS Lambda", "Jenkins", "Docker", "React"]) {
       await expect(aside.getByText(tech, { exact: true })).toBeVisible();
+    }
+  });
+
+  test("selecting a position brings its stack into view on narrow screens", async ({ page }) => {
+    await page.goto("/en");
+    await skipBoot(page);
+    const aside = page.locator("aside");
+    const wide = (page.viewportSize()?.width ?? 0) >= 1024;
+    await page.getByRole("button", { name: /@ UFMT/ }).click();
+    await expect(aside.getByText("UFMT", { exact: true })).toBeVisible();
+    if (wide) {
+      // Side-by-side layout: the panel is already visible, so the page must not jump.
+      await expect(page.getByRole("button", { name: /@ UFMT/ })).toBeInViewport();
+    } else {
+      await expect(aside).toBeInViewport();
     }
   });
 

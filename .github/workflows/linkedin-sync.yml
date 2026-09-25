@@ -1,7 +1,8 @@
 name: LinkedIn sync
 
 # Updates src/data/career.json from two LinkedIn sources, oldest first, then opens a pull request:
-#   1. data/linkedin/Positions.csv — an export committed by hand (see data/linkedin/README.md)
+#   1. data/linkedin/Positions.csv — an export committed by hand (see data/linkedin/README.md), or pushed by the
+#      mini PC automation to a linkedin-export/* branch (see docs/linkedin-export-automation.md)
 #   2. LinkedIn's Member Data Portability API (EEA/Switzerland members) — live data, applied last so it wins
 # The site never calls LinkedIn at runtime: if the profile is deactivated, the token has
 # expired or the API is down, this job only logs a warning and the site keeps serving the last committed data.
@@ -14,7 +15,7 @@ on:
   schedule:
     - cron: "17 6 * * 1" # Mondays 06:17 UTC
   push:
-    branches: [master]
+    branches: [master, "linkedin-export/**"]
     paths: ["data/linkedin/Positions.csv"]
   workflow_dispatch:
 
@@ -35,8 +36,25 @@ jobs:
       BRANCH: automation/linkedin-sync
 
     steps:
+      # Always run the default branch's code. A linkedin-export/* push contributes data only: its code is never
+      # executed here, so a leaked automation credential cannot run scripts with this job's write token.
       - name: Check out repository
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Take Positions.csv from the export branch
+        if: startsWith(github.ref, 'refs/heads/linkedin-export/')
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          changed=$(git diff --name-only "$(git merge-base HEAD "$SHA")" "$SHA")
+          if [ "$changed" != "data/linkedin/Positions.csv" ]; then
+            echo "::error title=LinkedIn export::$GITHUB_REF_NAME must change only data/linkedin/Positions.csv; it changes:%0A$changed"
+            exit 1
+          fi
+          git show "$SHA:data/linkedin/Positions.csv" > data/linkedin/Positions.csv
 
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
@@ -82,7 +100,7 @@ jobs:
             fi
           fi
           git switch -C "$BRANCH"
-          git add src/data/career.json
+          git add src/data/career.json data/linkedin/Positions.csv
           git commit -m "chore(data): sync career history from LinkedIn"
           git push --force origin "$BRANCH"
           if gh pr view "$BRANCH" --json state -q .state 2>/dev/null | grep -q OPEN; then

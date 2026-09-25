@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Terminal, Server, Code, Database, Github, Linkedin, Send, BarChart3, Boxes } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -31,6 +31,14 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
   const setActiveJob = useUiStore((s) => s.setActiveJob);
   const activeJob = careerHistory.find((j) => j.id === activeJobId) ?? careerHistory[0] ?? null;
   const links = careerFile.person.links;
+  // In the single-column layout (below lg) the stack panel sits under the whole timeline, so picking a position would
+  // change content off-screen. Bring the panel into view there; on desktop it is already visible beside the list.
+  const detailsRef = useRef<HTMLElement>(null);
+  const selectFromTimeline = (id: string) => {
+    setActiveJob(id);
+    if (!window.matchMedia("(max-width: 1023.98px)").matches) return;
+    requestAnimationFrame(() => detailsRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }));
+  };
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-4 pb-28 md:p-8 md:pb-28 font-sans bg-[radial-gradient(circle_at_20%_20%,rgba(34,197,94,0.08),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(59,130,246,0.06),transparent_40%)] bg-fixed">
@@ -80,14 +88,14 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
           {careerHistory.length === 0 ? <p className="text-[var(--muted)] text-xs font-mono">{tDash("eventHistoryEmpty")}</p> : (
             <ol className="space-y-2">
               {careerHistory.map((job) => (
-                <TimelineItem key={job.id} job={job} active={activeJob?.id === job.id} onSelect={() => setActiveJob(job.id)} reduced={reduced}
+                <TimelineItem key={job.id} job={job} active={activeJob?.id === job.id} onSelect={() => selectFromTimeline(job.id)} reduced={reduced}
                   period={periodParts(job, locale, new Date(now))} status={job.current ? tDash("running") : tDash("exited")} />
               ))}
             </ol>
           )}
         </section>
 
-        <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+        <aside ref={detailsRef} className="space-y-6 scroll-mt-4 lg:sticky lg:top-6 lg:self-start">
           <div className="bg-black/40 backdrop-blur-md border border-[var(--border)] rounded-lg p-5 md:p-6" aria-live="polite">
             <h2 className="text-sm font-mono text-[var(--muted)] uppercase tracking-widest mb-1 flex items-center gap-2"><Boxes size={16} aria-hidden="true" />{tDash("dependenciesTitle")}</h2>
             {activeJob ? <p className="mb-5 font-mono text-xs text-white/80">{activeJob.company}</p> : null}

@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, googleVerificationTokens, LOCALES, LOCALE_TAGS } from "@/lib/site";
+import { FALLBACK_LOCALE, googleVerificationTokens, LOCALES, LOCALE_TAGS } from "@/lib/site";
 
 // In production Netlify answers "/" with an HTTP redirect (see netlify.toml), so this page is only
 // a no-JS fallback: a meta refresh plus plain links that crawlers can follow.
@@ -6,8 +6,8 @@ export default function RootPage() {
   return (
     <html lang="en">
       <head>
-        <meta httpEquiv="refresh" content={`0; url=/${DEFAULT_LOCALE}`} />
-        <link rel="canonical" href={`/${DEFAULT_LOCALE}`} />
+        <meta httpEquiv="refresh" content={`0; url=/${FALLBACK_LOCALE}`} />
+        <link rel="canonical" href={`/${FALLBACK_LOCALE}`} />
         <title>Murillo Soares</title>
         {googleVerificationTokens().map((token) => <meta key={token} name="google-site-verification" content={token} />)}
       </head>
