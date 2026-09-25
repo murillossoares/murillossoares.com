@@ -55,7 +55,7 @@ export function sortCareerEvents(events: CareerMetric[]): CareerMetric[] {
  */
 export function effectiveEndYear(event: CareerMetric, events: CareerMetric[], now: Date): number {
   const start = yearOf(event.start);
-  if (event.current) return now.getFullYear();
+  if (event.current) return now.getUTCFullYear();
   if (event.end) return Math.max(start, yearOf(event.end));
   const laterStarts = events.map((e) => yearOf(e.start)).filter((y) => y > start);
   return laterStarts.length ? Math.max(start, Math.min(...laterStarts) - 1) : start;

@@ -3,20 +3,13 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { use3DMode } from "@/lib/use-3d";
 import { ARCH_STYLE } from "@/lib/arch-style";
 import { buildGalaxy } from "@/lib/galaxy";
 import type { CareerMetric } from "@/models/metrics";
 
 const CareerGalaxy3D = dynamic(() => import("./CareerGalaxy3D"), { ssr: false, loading: () => null });
 
-function supportsWebGL() {
-  try {
-    const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Chooses between the interactive three.js galaxy (desktop, WebGL, motion allowed) and a static SVG rendering of
@@ -26,20 +19,10 @@ export default function CareerGalaxyScene({ events, activeId, onSelect, label, h
   events: CareerMetric[]; activeId: string | null; onSelect: (id: string) => void; label: string; hint: string;
 }) {
   const layout = useMemo(() => buildGalaxy(events), [events]);
-  const [mode, setMode] = useState<"static" | "3d">("static");
-  const [ready, setReady] = useState(false);
+  const { enabled, ready, markReady } = use3DMode();
+  const mode = enabled ? "3d" : "static";
   const [visible, setVisible] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const wide = window.matchMedia("(min-width: 768px)");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setMode(wide.matches && !reduced.matches && supportsWebGL() ? "3d" : "static");
-    update();
-    wide.addEventListener("change", update);
-    reduced.addEventListener("change", update);
-    return () => { wide.removeEventListener("change", update); reduced.removeEventListener("change", update); };
-  }, []);
 
   // Stop rendering frames while the scene is scrolled out of view.
   useEffect(() => {
@@ -57,7 +40,7 @@ export default function CareerGalaxyScene({ events, activeId, onSelect, label, h
       </div>
       {mode === "3d" ? (
         <div className={`absolute inset-0 transition-opacity duration-500 ${ready ? "opacity-100" : "opacity-0"}`}>
-          <CareerGalaxy3D layout={layout} activeId={activeId} onSelect={onSelect} running={visible} onReady={() => setReady(true)} />
+          <CareerGalaxy3D layout={layout} activeId={activeId} onSelect={onSelect} running={visible} onReady={markReady} />
         </div>
       ) : null}
       <div className="pointer-events-none absolute bottom-2 left-3 right-3 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] text-[var(--muted)]">

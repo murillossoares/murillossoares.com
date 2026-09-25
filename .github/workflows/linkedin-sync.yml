@@ -73,6 +73,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Never overwrite review work: if someone committed to the open sync PR, leave it alone.
+          if git fetch --quiet origin "$BRANCH" 2>/dev/null; then
+            manual=$(git log "HEAD..FETCH_HEAD" --format='%ae' | grep -v 'github-actions\[bot\]' || true)
+            if [ -n "$manual" ]; then
+              echo "::warning title=LinkedIn sync::$BRANCH has manual commits; not overwriting it. Merge or close that PR first."
+              exit 0
+            fi
+          fi
           git switch -C "$BRANCH"
           git add src/data/career.json
           git commit -m "chore(data): sync career history from LinkedIn"
