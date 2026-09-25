@@ -19,7 +19,7 @@ function readThemeColors() {
   };
 }
 
-export default function ScoreboardScene({ rows }: { rows: YearRow[] }) {
+export default function ScoreboardScene({ rows, caption, yearLabel, countLabel }: { rows: YearRow[]; caption: string; yearLabel: string; countLabel: string }) {
   const { theme } = useTheme();
   const { enabled: show3D, ready, markReady } = use3DMode();
   const [colors, setColors] = useState({ accent: "#007acc", secondary: "#22c55e", bg: "#0e1116" });
@@ -30,6 +30,13 @@ export default function ScoreboardScene({ rows }: { rows: YearRow[] }) {
   }, [theme]);
 
   return (
+    <>
+    {/* The bars are decorative; screen readers get the same numbers as a table. */}
+    <table className="sr-only">
+      <caption>{caption}</caption>
+      <thead><tr><th scope="col">{yearLabel}</th><th scope="col">{countLabel}</th></tr></thead>
+      <tbody>{rows.map((r) => <tr key={r.year}><th scope="row">{r.year}</th><td>{r.count}</td></tr>)}</tbody>
+    </table>
     <div className="relative h-[280px] md:h-[360px]" aria-hidden="true" data-testid="scoreboard-scene">
       <div className={`absolute inset-0 transition-opacity duration-200 ease-out ${ready ? "opacity-0" : "opacity-100"}`}>
         <Scoreboard3DFallback rows={rows} />
@@ -46,5 +53,6 @@ export default function ScoreboardScene({ rows }: { rows: YearRow[] }) {
         </div>
       ) : null}
     </div>
+    </>
   );
 }

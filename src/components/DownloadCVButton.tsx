@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Download, Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useLocale, useMessages, useTranslations } from "next-intl";
@@ -9,6 +9,7 @@ import { isPdfThemeName, type PdfThemeName } from "@/lib/pdf-themes";
 import type { CVPdfContent } from "@/components/pdf/CVDocument";
 import { formatPeriod } from "@/lib/period";
 import { careerFile, educationLabel, getCareerHistory, getHeadline } from "@/services/careerData";
+import { absoluteUrl } from "@/lib/site";
 
 type MessagesShape = {
   App?: { title?: string };
@@ -20,11 +21,8 @@ export default function DownloadCVButton({ label, showLabel = false }: { label?:
   const locale = useLocale();
   const tHeader = useTranslations("Header");
   const messages = useMessages() as MessagesShape;
-  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   const pdfTheme: PdfThemeName = isPdfThemeName(theme) ? theme : "vscode-dark";
   const content = useMemo<CVPdfContent>(() => {
@@ -36,18 +34,22 @@ export default function DownloadCVButton({ label, showLabel = false }: { label?:
       year: formatPeriod(e, locale, now), role: e.role, company: e.company, desc: e.desc, stack: e.stack,
     }));
 
+    const { links, location } = careerFile.person;
+    const site = absoluteUrl(`/${locale}`);
+    const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
     return {
       title,
       headline,
       identity: `${careerFile.person.fullName} · ${educationLabel(locale)}`,
       locale,
+      location: [location.city, location.country].filter(Boolean).join(", "),
+      contacts: [site, links.linkedin, links.github, links.telegram].filter(Boolean).map((href) => ({ label: bare(href), href })),
+      footer: tHeader("cvFooter", { site: bare(absoluteUrl("/")) }),
       theme: pdfTheme,
       sections: { experienceTitle },
       careerHistory,
     };
-  }, [locale, messages, pdfTheme]);
-
-  if (!mounted) return null;
+  }, [locale, messages, pdfTheme, tHeader]);
 
   const fileName = `cv-murillo-${locale}-${pdfTheme}.pdf`;
   const buttonLabel = label ?? tHeader("downloadCv");
@@ -80,11 +82,11 @@ export default function DownloadCVButton({ label, showLabel = false }: { label?:
 
   return (
     <button type="button" onClick={handleDownload} disabled={loading} aria-busy={loading}
-      className="group flex items-center gap-2 rounded border border-[var(--accent)]/40 bg-black/50 px-3 py-2 transition-all hover:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
+      className="group flex items-center gap-2 rounded border border-[color-mix(in_srgb,var(--accent)_40%,transparent)] bg-black/50 px-3 py-2 transition-all hover:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
       aria-label={buttonLabel}>
       {loading ? <Loader2 size={14} className="animate-spin text-[var(--accent)]" aria-hidden="true" /> : <Download size={14} className="text-[var(--accent)]" aria-hidden="true" />}
-      <span role={failed ? "alert" : undefined} aria-live="polite" className={`${showLabel ? "inline" : "hidden md:inline"} text-xs font-mono uppercase text-[var(--muted)] group-hover:text-white`}>
-        {loading ? "BUILDING..." : failed ? tHeader("downloadError") : buttonLabel}
+      <span role={failed ? "alert" : undefined} aria-live="polite" className={`${showLabel || failed ? "inline" : "hidden md:inline"} text-xs font-mono uppercase text-[var(--muted)] group-hover:text-white`}>
+        {loading ? tHeader("building") : failed ? tHeader("downloadError") : buttonLabel}
       </span>
     </button>
   );

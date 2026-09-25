@@ -43,6 +43,8 @@ jobs:
         with:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
+          # No token on disk while npm ci and the build run; only the final step gets it.
+          persist-credentials: false
 
       - name: Take Positions.csv from the export branch
         if: startsWith(github.ref, 'refs/heads/linkedin-export/')
@@ -102,7 +104,7 @@ jobs:
           git switch -C "$BRANCH"
           git add src/data/career.json data/linkedin/Positions.csv
           git commit -m "chore(data): sync career history from LinkedIn"
-          git push --force origin "$BRANCH"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$BRANCH"
           if gh pr view "$BRANCH" --json state -q .state 2>/dev/null | grep -q OPEN; then
             gh pr edit "$BRANCH" --body-file linkedin-sync-report.md
           else

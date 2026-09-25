@@ -156,6 +156,10 @@ test.describe("CV PDF", () => {
       const bytes = await readFile((await download.path())!);
       expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
       expect(bytes.length).toBeGreaterThan(5_000);
+      // Clickable contacts (link annotations), and never an e-mail address.
+      const raw = bytes.toString("latin1");
+      for (const url of [`/${locale}`, career.person.links.linkedin, career.person.links.github]) expect(raw).toContain(url);
+      expect(raw).not.toMatch(/mailto:|[\w.+-]+@[\w-]+\.[\w.]+/);
     });
   }
 });

@@ -27,7 +27,7 @@ export const pdfThemes = {
     text: "#f8f8f2",
     muted: "rgba(248, 248, 242, 0.7)",
     accent: "#a6e22e",
-    accent2: "#f92672",
+    accent2: "#ff4f8b",
   },
 } as const;
 

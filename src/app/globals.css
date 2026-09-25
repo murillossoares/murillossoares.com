@@ -4,25 +4,25 @@
 :root {
   --bg: #0e1116; --panel: #1e1e1e; --panel-2: #161a1f;
   --border: rgba(255,255,255,0.09); --text: #d4d4d4;
-  --muted: rgba(212,212,212,0.7); --accent: #007acc; --accent-2: #22c55e;
+  --muted: rgba(212,212,212,0.7); --accent: #007acc; --accent-2: #22c55e; --on-accent: #ffffff;
   --glow-accent: rgba(0,122,204,0.16); --glow-accent-2: rgba(34,197,94,0.14);
 }
 :root[data-theme="vscode-dark"] {
   --bg: #0e1116; --panel: #1e1e1e; --panel-2: #161a1f;
   --border: rgba(255,255,255,0.09); --text: #d4d4d4; --muted: rgba(212,212,212,0.7);
-  --accent: #007acc; --accent-2: #22c55e;
+  --accent: #007acc; --accent-2: #22c55e; --on-accent: #ffffff;
   --glow-accent: rgba(0,122,204,0.16); --glow-accent-2: rgba(34,197,94,0.14);
 }
 :root[data-theme="intellij-darcula"] {
   --bg: #1f1f1f; --panel: #2b2b2b; --panel-2: #232323;
   --border: rgba(255,255,255,0.09); --text: #d7dae0; --muted: rgba(215,218,224,0.7);
-  --accent: #9876aa; --accent-2: #ffc66d;
+  --accent: #9876aa; --accent-2: #ffc66d; --on-accent: #000000;
   --glow-accent: rgba(152,118,170,0.16); --glow-accent-2: rgba(255,198,109,0.16);
 }
 :root[data-theme="sublime-monokai"] {
   --bg: #141414; --panel: #272822; --panel-2: #1f201b;
   --border: rgba(255,255,255,0.1); --text: #f8f8f2; --muted: rgba(248,248,242,0.7);
-  --accent: #a6e22e; --accent-2: #f92672;
+  --accent: #a6e22e; --accent-2: #ff4f8b; --on-accent: #141414;
   --glow-accent: rgba(166,226,46,0.16); --glow-accent-2: rgba(249,38,114,0.16);
 }
 html, body { height: 100%; }

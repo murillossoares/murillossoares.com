@@ -8,6 +8,7 @@ import Link from "next/link";
 import DownloadCVButton from "./DownloadCVButton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
+import SkipLink from "./SkipLink";
 import CareerGalaxyScene from "./CareerGalaxyScene";
 import { careerFacts, formatYears, type ArchType, type CareerMetric } from "@/models/metrics";
 import { careerFile, educationLabel, getCareerHistory, getHeadline } from "@/services/careerData";
@@ -19,7 +20,13 @@ import { useUiStore } from "@/store/ui";
 export default function Dashboard({ locale, asOf }: { locale: string; asOf: string }) {
   const tDash = useTranslations("Dashboard");
   const tApp = useTranslations("App");
-  const reduced = useReducedMotion();
+  const tHeader = useTranslations("Header");
+  const prefersReduced = useReducedMotion();
+  // The server cannot know the visitor's motion preference, so the first client render uses the server's (animated)
+  // markup and the preference applies right after hydration; branching on it earlier caused a hydration mismatch.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  const reduced = hydrated ? prefersReduced : false;
   const careerHistory = useMemo(() => getCareerHistory(locale), [locale]);
   // Server HTML and first client render use the build date (identical output, no hydration mismatch); afterwards the
   // browser switches to today so durations and years do not go stale between deploys.
@@ -42,17 +49,18 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-4 pb-28 md:p-8 md:pb-28 font-sans bg-[radial-gradient(circle_at_20%_20%,rgba(34,197,94,0.08),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(59,130,246,0.06),transparent_40%)] bg-fixed">
+      <SkipLink label={tHeader("skipToContent")} />
       <div className="fixed inset-0 bg-gradient-to-br from-purple-900/10 to-green-900/10 pointer-events-none" aria-hidden="true" />
       <header className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-[var(--border)] pb-6 relative z-10">
         <div className="flex items-center gap-3">
           <div className="relative" aria-hidden="true"><div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" /><div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20" /></div>
           <span className="font-mono text-xs text-green-500 tracking-widest uppercase">{tDash("systemOnline")}</span>
         </div>
-        <nav aria-label="Controls" className="flex flex-wrap gap-3">
+        <nav aria-label={tHeader("controls")} className="flex flex-wrap gap-3">
           <SB icon={Linkedin} label="LINKEDIN" href={links.linkedin} color="text-blue-400" rel="me noreferrer" />
           <SB icon={Github} label="GITHUB" href={links.github} color="text-purple-400" rel="me noreferrer" />
           <SB icon={Send} label="TELEGRAM" href={links.telegram} color="text-sky-400" status="ENCRYPTED" />
-          <ThemeSwitcher /><LanguageSwitcher currentLocale={locale} />
+          <ThemeSwitcher label={tHeader("theme")} /><LanguageSwitcher currentLocale={locale} label={tHeader("language")} />
           <Link href={`/${locale}/scoreboard`} className="group flex items-center gap-2 bg-black/50 border border-[var(--border)] px-3 py-2 rounded hover:border-white/30 transition-all focus:ring-2 focus:ring-[var(--accent)]" aria-label="Scoreboard">
             <BarChart3 size={14} className="text-[var(--accent)]" aria-hidden="true" /><span className="hidden md:inline text-[10px] font-mono text-[var(--muted)] group-hover:text-white">SCOREBOARD</span>
           </Link>
@@ -89,7 +97,7 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
             <ol className="space-y-2">
               {careerHistory.map((job) => (
                 <TimelineItem key={job.id} job={job} active={activeJob?.id === job.id} onSelect={() => selectFromTimeline(job.id)} reduced={reduced}
-                  period={periodParts(job, locale, new Date(now))} status={job.current ? tDash("running") : tDash("exited")} />
+                  period={periodParts(job, locale, new Date(now))} status={job.current ? tDash("running") : tDash("exited")} archLabel={tDash(`archNames.${job.archType}`)} />
               ))}
             </ol>
           )}
@@ -121,7 +129,7 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
   );
 }
 
-function TimelineItem({ job, active, onSelect, reduced, period, status }: { job: CareerMetric; active: boolean; onSelect: () => void; reduced: boolean | null; period: PeriodParts; status: string }) {
+function TimelineItem({ job, active, onSelect, reduced, period, status, archLabel }: { job: CareerMetric; active: boolean; onSelect: () => void; reduced: boolean | null; period: PeriodParts; status: string; archLabel: string }) {
   const arch = ARCH_STYLE[job.archType];
   return (
     <motion.li whileHover={reduced ? undefined : { x: 3 }} className="relative">
@@ -133,13 +141,13 @@ function TimelineItem({ job, active, onSelect, reduced, period, status }: { job:
             {period.duration ? <span className="ml-2 text-[var(--muted)]">{period.duration}</span> : null}
           </span>
           <span className="flex items-center gap-2">
-            <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${arch.chip}`}>{job.archType.toUpperCase()}</span>
+            <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${arch.chip}`}>{archLabel.toUpperCase()}</span>
             <StatusBadge current={job.current} label={status} />
           </span>
         </div>
         <h3 className="text-white font-semibold leading-snug">{job.role} <span className="text-[var(--muted)] font-normal">@</span> {job.company}</h3>
         <p className="text-sm text-[var(--muted)] font-mono mt-1">{`> ${job.desc}`}</p>
-        <p className="mt-2 text-[11px] font-mono text-[var(--muted)]/80"><span className="sr-only">Stack: </span>{job.stack.join(" · ")}</p>
+        <p className="mt-2 text-[11px] font-mono text-[var(--muted)] opacity-80"><span className="sr-only">Stack: </span>{job.stack.join(" · ")}</p>
       </article>
       <button type="button" onClick={onSelect} aria-pressed={active} aria-label={`${job.role} @ ${job.company}`}
         className="absolute inset-0 rounded cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]" />

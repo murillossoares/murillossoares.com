@@ -21,8 +21,12 @@ export default defineConfig({
     // Lets sandboxes with a preinstalled browser run the suite (e.g. PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium).
     launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {},
   },
+  // Tests run against the production static export (run "npm run build" first), the same files Netlify serves.
+  // PLAYWRIGHT_DEV=1 uses the Next.js dev server instead, for quick local iteration.
   webServer: {
-    command: `npm exec next dev -- --hostname ${host} -p ${port}`,
+    command: process.env.PLAYWRIGHT_DEV
+      ? `npm exec next dev -- --hostname ${host} -p ${port}`
+      : `node scripts/serve-static.mjs --dir out --host ${host} --port ${port}`,
     env: webServerEnv,
     url: `${baseURL}/pt-br`,
     reuseExistingServer: !process.env.CI,

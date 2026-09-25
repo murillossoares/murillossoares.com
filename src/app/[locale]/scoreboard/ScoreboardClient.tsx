@@ -40,7 +40,7 @@ export default function ScoreboardClient({ locale, asOf }: { locale: string; asO
             <section aria-labelledby="chart-title" className="order-2 lg:order-1">
               <h2 id="chart-title" className="text-lg font-semibold text-white">{t("chartTitle")}</h2>
               <p className="mb-3 mt-1 text-sm text-[var(--muted)]">{t("chartDescription")}</p>
-              <ScoreboardScene rows={perYear} />
+              <ScoreboardScene rows={perYear} caption={t("chartTitle")} yearLabel={t("chartYear")} countLabel={t("chartCount")} />
             </section>
 
             <section

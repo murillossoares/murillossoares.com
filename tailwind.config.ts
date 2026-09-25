@@ -20,6 +20,7 @@ const config: Config = {
         muted: "var(--muted)",
         accent: "var(--accent)",
         "accent-2": "var(--accent-2)",
+        "on-accent": "var(--on-accent)",
         "glow-accent": "var(--glow-accent)",
         "glow-accent-2": "var(--glow-accent-2)",
         cyber: { yellow: "#fcee0a", blue: "#00f0ff", pink: "#ff00ff", black: "#0a0a0a" },

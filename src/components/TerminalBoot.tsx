@@ -101,7 +101,7 @@ export default function TerminalBoot({ locale, onComplete }: { locale: string; o
       <div ref={scrollRef} className="scrollbar-terminal flex-1 overflow-y-auto px-4 py-3">
         {lines.map((line) => (
           <div key={line.id} className={`whitespace-pre-wrap break-words text-sm ${levelColor(line.level)}`}>
-            <span className="mr-2 text-white/40">{line.timestamp}</span>
+            <span className="mr-2 text-white/60">{line.timestamp}</span>
             <span className="mr-2 text-white/50">{line.level.padEnd(7, " ")}</span>
             <span className="opacity-95">{line.message[k]}</span>
           </div>

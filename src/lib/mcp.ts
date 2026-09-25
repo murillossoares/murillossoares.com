@@ -1,7 +1,7 @@
 // Minimal, stateless Model Context Protocol server (Streamable HTTP transport, JSON responses only).
 // Read-only by design: it exposes the same public career data as the website — no secrets, no writes.
 // Relative imports only: bundled by Netlify Functions.
-import { careerFacts } from "../models/metrics";
+import { careerFacts, effectiveEndYear } from "../models/metrics";
 import { careerFile, getCareerHistory, getHeadline } from "../services/careerData";
 import { jsonResume, llmsFullTxt, skills, summary } from "./agent-content";
 import { LOCALES } from "./site";
@@ -72,7 +72,27 @@ function experience(loc: string) {
   }));
 }
 
-export function callTool(name: string, args: Record<string, unknown> = {}): { structured: Json; text: string } {
+type PropSchema = { type: string; enum?: readonly string[] };
+/** Checks arguments against the tool's inputSchema, so a wrong type is reported instead of silently matching nothing. */
+function validateArgs(name: string, args: unknown): Record<string, unknown> {
+  const tool = TOOLS.find((t) => t.name === name);
+  if (!tool) return {};
+  if (typeof args !== "object" || args === null || Array.isArray(args)) throw new RpcError(-32602, "arguments must be an object");
+  const schema = tool.inputSchema as { properties: Record<string, PropSchema>; required?: readonly string[] };
+  const record = args as Record<string, unknown>;
+  for (const key of schema.required ?? []) if (record[key] === undefined) throw new RpcError(-32602, `${key} is required`);
+  for (const [key, value] of Object.entries(record)) {
+    const prop = schema.properties[key];
+    if (!prop) throw new RpcError(-32602, `unknown argument: ${key}`);
+    const ok = prop.type === "integer" ? Number.isInteger(value) : typeof value === prop.type;
+    if (!ok) throw new RpcError(-32602, `${key} must be ${prop.type === "integer" ? "an integer" : `a ${prop.type}`}`);
+    if (prop.enum && !prop.enum.includes(value as string)) throw new RpcError(-32602, `${key} must be one of: ${prop.enum.join(", ")}`);
+  }
+  return record;
+}
+
+export function callTool(name: string, rawArgs: unknown = {}): { structured: Json; text: string } {
+  const args = validateArgs(name, rawArgs);
   const loc = locale(args);
   if (name === "get_profile") {
     const facts = careerFacts(getCareerHistory(loc));
@@ -86,7 +106,11 @@ export function callTool(name: string, args: Record<string, unknown> = {}): { st
   }
   if (name === "list_experience") {
     const since = Number(args.since_year) || 0;
-    const items = experience(loc).filter((e) => !since || e.current || Number(String(e.end ?? e.start).slice(0, 4)) >= since);
+    // Same end-year rule as the scoreboard and resume.json, so every channel agrees on what "active" means.
+    const history = getCareerHistory(loc);
+    const now = new Date();
+    const active = new Set(history.filter((e) => !since || effectiveEndYear(e, history, now) >= since).map((e) => e.id));
+    const items = experience(loc).filter((e) => active.has(e.id));
     const data = { positions: items } as unknown as Json;
     return { structured: data, text: JSON.stringify(data, null, 2) };
   }
@@ -94,7 +118,12 @@ export function callTool(name: string, args: Record<string, unknown> = {}): { st
     const wanted = String(args.technology ?? "").trim();
     if (!wanted) throw new RpcError(-32602, "technology is required");
     const target = (resolveTech(wanted)[0]?.canonical ?? wanted).toLowerCase();
-    const items = experience(loc).filter((e) => e.stack.flatMap(resolveTech).some((r) => r.canonical.toLowerCase() === target || r.label.toLowerCase() === wanted.toLowerCase()));
+    // "Spring" also finds Spring Boot/Web/Cloud and "AWS" finds AWS Lambda: a family name matches its members.
+    const matches = (r: { canonical: string; label: string }) => {
+      const canonical = r.canonical.toLowerCase();
+      return canonical === target || canonical.startsWith(`${target} `) || r.label.toLowerCase() === wanted.toLowerCase();
+    };
+    const items = experience(loc).filter((e) => e.stack.flatMap(resolveTech).some(matches));
     const data = { technology: wanted, matches: items.length, positions: items } as unknown as Json;
     return { structured: data, text: JSON.stringify(data, null, 2) };
   }
@@ -119,7 +148,7 @@ function dispatch(req: RpcRequest): unknown {
     case "tools/call": {
       const name = String(req.params?.name ?? "");
       try {
-        const { structured, text } = callTool(name, (req.params?.arguments as Record<string, unknown>) ?? {});
+        const { structured, text } = callTool(name, req.params?.arguments ?? {});
         return { content: [{ type: "text", text }], structuredContent: structured, isError: false };
       } catch (error) {
         if (error instanceof RpcError && error.message.startsWith("Unknown tool")) throw error;
