@@ -30,9 +30,11 @@ Complete_LinkedInDataExport*/
 linkedin-export/
 /data/linkedin/*
 !/data/linkedin/Positions.csv
+!/data/linkedin/Positions.template.csv
 !/data/linkedin/README.md
 linkedin-sync-report.md
 
 # Netlify local state
 .netlify
 *.tsbuildinfo
+

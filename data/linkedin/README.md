@@ -5,15 +5,21 @@ Use it when the API token has expired or while the LinkedIn profile is deactivat
 
 ## Updating
 
-1. LinkedIn → Settings → Data privacy → **Get a copy of your data** → select **Positions** (or the full archive).
-2. Open the ZIP you receive and copy **only `Positions.csv`** into this folder, replacing the old one.
-3. Commit and push. The Netlify build applies it immediately; the LinkedIn sync workflow also records it in
-   `src/data/career.json` through a pull request.
+Dates are month and year (`Feb 2025`); days are never used.
+
+- **By hand:** fill in `Positions.template.csv` (replace every `MMM`, and `YYYY` in *Finished On*; leave *Finished On*
+  empty for the current role), save it as `Positions.csv`, commit and push.
+- **From a LinkedIn export:** LinkedIn → Settings → Data privacy → **Get a copy of your data** → **Positions**. Copy
+  **only `Positions.csv`** from the ZIP into this folder, or let `scripts/linkedin/ingest-export.sh <zip>` do it.
+- **Automatically on a Ubuntu machine:** see [`docs/linkedin-export-automation.md`](../../docs/linkedin-export-automation.md).
+
+After a push the Netlify build applies it immediately; the LinkedIn sync workflow also records it in
+`src/data/career.json` through a pull request.
 
 ## Never commit anything else from the export
 
 The archive also contains private messages, connections, e-mail addresses and phone numbers, and this repository
-is public. `.gitignore` blocks every other file in this folder, and a test fails if `Positions.csv` has columns
+is public. `.gitignore` blocks every other file in this folder except the template, and a test fails if `Positions.csv` has columns
 other than `Company Name, Title, Description, Location, Started On, Finished On`.
 
 ## How the sources are combined

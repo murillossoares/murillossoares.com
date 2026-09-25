@@ -1,0 +1,11 @@
+# Watches the downloads folder for a LinkedIn data export and triggers linkedin-export.service.
+# Install: see docs/linkedin-export-automation.md
+[Unit]
+Description=Watch for a LinkedIn data export ZIP
+
+[Path]
+PathExistsGlob=%h/Downloads/*LinkedInDataExport*.zip
+Unit=linkedin-export.service
+
+[Install]
+WantedBy=default.target
