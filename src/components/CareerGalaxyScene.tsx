@@ -15,8 +15,10 @@ const CareerGalaxy3D = dynamic(() => import("./CareerGalaxy3D"), { ssr: false, l
  * Chooses between the interactive three.js galaxy (desktop, WebGL, motion allowed) and a static SVG rendering of
  * the same layout. The SVG is what the static HTML ships, so the section is never empty for crawlers or slow devices.
  */
-export default function CareerGalaxyScene({ events, activeId, onSelect, label, hint }: {
+export default function CareerGalaxyScene({ events, activeId, onSelect, label, hint, archLabels }: {
   events: CareerMetric[]; activeId: string | null; onSelect: (id: string) => void; label: string; hint: string;
+  /** Localized names for the architecture legend, keyed like ARCH_STYLE. */
+  archLabels: Record<string, string>;
 }) {
   const layout = useMemo(() => buildGalaxy(events), [events]);
   const { enabled, ready, markReady } = use3DMode();
@@ -46,7 +48,7 @@ export default function CareerGalaxyScene({ events, activeId, onSelect, label, h
       <div className="pointer-events-none absolute bottom-2 left-3 right-3 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] text-[var(--muted)]">
         <span className="flex flex-wrap gap-3">
           {(Object.keys(ARCH_STYLE) as (keyof typeof ARCH_STYLE)[]).map((k) => (
-            <span key={k} className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ background: ARCH_STYLE[k].hex }} aria-hidden="true" />{k}</span>
+            <span key={k} className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ background: ARCH_STYLE[k].hex }} aria-hidden="true" />{archLabels[k] ?? k}</span>
           ))}
         </span>
         {mode === "3d" ? <span>{hint}</span> : null}

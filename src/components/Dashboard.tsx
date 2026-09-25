@@ -15,6 +15,8 @@ import { careerFile, educationLabel, getCareerHistory, getHeadline } from "@/ser
 import { periodParts, type PeriodParts } from "@/lib/period";
 import { groupStack } from "@/lib/tech";
 import { ARCH_STYLE } from "@/lib/arch-style";
+
+const ARCH_TYPES = Object.keys(ARCH_STYLE) as ArchType[];
 import { useUiStore } from "@/store/ui";
 
 export default function Dashboard({ locale, asOf }: { locale: string; asOf: string }) {
@@ -77,7 +79,8 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
             {tDash("about", { city: careerFile.person.location.city, years, companies: facts.companies })}
           </p>
         </div>
-        <CareerGalaxyScene events={careerHistory} activeId={activeJob?.id ?? null} onSelect={setActiveJob} label={tDash("galaxyLabel")} hint={tDash("galaxyHint")} />
+        <CareerGalaxyScene events={careerHistory} activeId={activeJob?.id ?? null} onSelect={setActiveJob} label={tDash("galaxyLabel")} hint={tDash("galaxyHint")}
+          archLabels={Object.fromEntries(ARCH_TYPES.map((k) => [k, tDash(`archNames.${k}`)]))} />
       </section>
 
       <section aria-label="KPIs" className="relative z-10 mb-6 grid grid-cols-2 lg:grid-cols-4 gap-4">

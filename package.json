@@ -16,7 +16,8 @@
     "linkedin:sync": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source api",
     "linkedin:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source export --path",
     "linkedin:sync:file": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source repo",
-    "prebuild": "node scripts/site-verification.mjs && npm run -s linkedin:sync:file -- --updates-only"
+    "prebuild": "node scripts/site-verification.mjs && npm run -s linkedin:sync:file -- --updates-only",
+    "og": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/og/render.mjs"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.1",
@@ -50,7 +51,7 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
-    "vitest": "^4.1.4"
+    "vitest": "^4.1.11"
   },
   "overrides": {
     "next": {

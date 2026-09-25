@@ -17,7 +17,7 @@
     "message": {
       "pt": "Montando volume de memória: IFMT (Engenharia de Computação) verificado.",
       "en": "Mounting memory volume: IFMT (Computer Engineering) verified.",
-      "es": "Montando volumen de memoria: IFMT (Ingenieria Informática) verificado."
+      "es": "Montando volumen de memoria: IFMT (Ingeniería de Computación) verificado."
     },
     "delay": 450
   },
@@ -60,7 +60,7 @@
     "level": "SUCCESS",
     "message": {
       "pt": "SISTEMA PRONTO. Iniciando Interface Gráfica (GUI) na porta 8080...",
-      "en": "SYSTEM READY. Starting Graphic User Interface (GUI) on port 8080...",
+      "en": "SYSTEM READY. Starting Graphical User Interface (GUI) on port 8080...",
       "es": "SISTEMA LISTO. Iniciando Interfaz Gráfica (GUI) en el puerto 8080..."
     },
     "delay": 680

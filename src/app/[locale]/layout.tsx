@@ -52,9 +52,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       alternateLocale: Object.entries(LOCALE_TAGS).filter(([l]) => l !== locale).map(([, v]) => v.og),
       firstName: careerFile.person.givenName,
       lastName: careerFile.person.familyName,
-      images: [{ url: "/og.png", width: 1200, height: 630, alt: title }],
+      images: [{ url: `/og/${locale}.png`, width: 1200, height: 630, alt: title }],
     },
-    twitter: { card: "summary_large_image", title, description, images: ["/og.png"] },
+    twitter: { card: "summary_large_image", title, description, images: [`/og/${locale}.png`] },
     ...(google.length ? { verification: { google } } : {}),
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
   };
