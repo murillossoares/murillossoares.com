@@ -31,5 +31,7 @@ describe("committed LinkedIn export", () => {
     expect(rows.length).toBeLessThan(100);
     expect(csv).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/); // e-mail addresses
     expect(csv).not.toMatch(/\+?\d[\d\s().-]{9,}\d/); // phone numbers
+    // Every row must be usable: a half-filled template (MMM left in place) is caught here, not silently skipped.
+    expect(normalizePositionsWithIssues(rows).rejected).toEqual([]);
   });
 });

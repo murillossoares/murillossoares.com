@@ -45,6 +45,23 @@ describe("career metrics", () => {
     expect(formatYears(careerFacts(yearOnly, now))).toBe("8+");
   });
 
+  it("counts only completed months, so the minimum is never reached early", () => {
+    const yearOnly: CareerMetric[] = [{ ...base, id: "q", company: "Q", start: "2017", current: true, stack: [], archType: "soa" }];
+    // Worst case start is Dec 2017: on 1 Nov 2026 that is 8 years 11 months, so still "8+".
+    expect(formatYears(careerFacts(yearOnly, new Date("2026-11-01T00:00:00Z")))).toBe("8+");
+    expect(formatYears(careerFacts(yearOnly, new Date("2026-12-01T00:00:00Z")))).toBe("9+");
+    const exact: CareerMetric[] = [{ ...base, id: "e", company: "E", start: "2017-10", current: true, stack: [], archType: "soa" }];
+    expect(formatYears(careerFacts(exact, new Date("2026-09-01T00:00:00Z")))).toBe("8");
+  });
+
+  it("ignores a position with an unreadable start instead of zeroing the count", () => {
+    const withBlank: CareerMetric[] = [
+      { ...base, id: "ok", company: "OK", start: "2017-03", current: true, stack: [], archType: "soa" },
+      { ...base, id: "blank", company: "B", start: "", stack: [], archType: "soa" },
+    ];
+    expect(careerFacts(withBlank, now)).toMatchObject({ years: 9, yearsExact: false });
+  });
+
   it("counts completed years from months when every position has them", () => {
     const monthly: CareerMetric[] = [
       { ...base, id: "x", company: "X", start: "2017-11", end: "2019-06", stack: [], archType: "monolith" },

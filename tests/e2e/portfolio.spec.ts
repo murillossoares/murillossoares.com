@@ -20,12 +20,15 @@ test.describe("crawlers and agents", () => {
     for (const lang of ["pt-BR", "en", "es", "x-default"]) expect(html).toContain(`hrefLang="${lang}"`);
     expect(html).toContain('property="og:image"');
     for (const p of career.positions) expect(html).toContain(p.company.replace("&", "&amp;"));
-    expect(html).toContain(career.person.fullName);
-    expect(html).toContain("IFMT");
+    // Visible text only: strip scripts and meta tags, which also carry these names.
+    const visible = html.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<meta[^>]*>/g, "");
+    expect(visible).toContain(career.person.fullName);
+    expect(visible).toContain("IFMT");
 
     const ld = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)![1]);
     expect(ld.mainEntity.name).toBe("Murillo Soares");
-    expect(ld.mainEntity.worksFor).toHaveLength(career.positions.length);
+    const former = ld.mainEntity.alumniOf.filter((a: { "@type": string }) => a["@type"] === "OrganizationRole");
+    expect(ld.mainEntity.worksFor.length + former.length).toBe(career.positions.length);
   });
 
   test("robots, sitemap, llms.txt and resume.json are served", async ({ request }) => {

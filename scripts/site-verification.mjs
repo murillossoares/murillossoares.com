@@ -4,6 +4,16 @@
 import { writeFileSync } from "node:fs";
 
 const PUBLIC = new URL("../public/", import.meta.url);
+
+// Surface a misconfigured meta-tag variable in the deploy log instead of silently emitting nothing.
+const metaVar = (process.env.GOOGLE_SITE_VERIFICATION ?? "").trim();
+if (metaVar) {
+  const tokens = [...metaVar.matchAll(/content\s*=\s*["']?([^"'\s>]+)/gi)].map((m) => m[1]);
+  const ok = (tokens.length ? tokens : metaVar.split(/[\s,]+/)).filter((t) => /^[A-Za-z0-9_-]{10,100}$/.test(t));
+  console.log(ok.length
+    ? `Search Console meta verification: ${ok.length} token(s) configured.`
+    : "::warning title=Search Console::GOOGLE_SITE_VERIFICATION is set but contains no valid token; no meta tag will be emitted.");
+}
 const name = (process.env.GOOGLE_SITE_VERIFICATION_FILE ?? "").trim();
 
 // Only ever writes: a googleXXXX.html committed to public/ by hand (Google's other suggested route) must survive.

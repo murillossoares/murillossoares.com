@@ -29,8 +29,8 @@ Everything after that is automatic: a systemd path unit notices the ZIP and runs
 `data/linkedin/Positions.template.csv` lists the current positions with `MMM` placeholders. Replace each `MMM` with the
 month as LinkedIn writes it (`Jan`, `Feb` … `Dec`; Portuguese and Spanish abbreviations also work, e.g. `fev`, `dic`),
 replace `YYYY` in *Finished On* with the year, leave *Finished On* empty for the current role, save it as
-`data/linkedin/Positions.csv`, commit and push. Days are never used. Until every `MMM` is filled the file is rejected,
-so a half-filled template cannot reach the site.
+`data/linkedin/Positions.csv`, commit and push. Days are never used. Rows that still contain `MMM` are ignored by the
+build, flagged by CI, and refused by `ingest-export.sh`, so a half-filled template cannot change the site.
 
 ## Setup on the mini PC
 

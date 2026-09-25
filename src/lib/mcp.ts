@@ -186,11 +186,12 @@ function preflightHeaders(request: Request): Record<string, string> {
 /**
  * The spec requires an Origin policy. Here any well-formed serialized origin is valid, whatever its scheme: besides
  * https pages that includes browser extensions (chrome-extension://…), editor webviews (vscode-webview://…) and
- * desktop shells (tauri://localhost), all real MCP clients. "null" (sandboxed/opaque) is valid too. Only a malformed
+ * desktop shells (tauri://localhost), all real MCP clients. "null" (sandboxed/opaque) and "file://" (Chromium
+ * shells loading their UI from disk) are valid too. Only a malformed
  * value — spaces, a path, a query, no scheme — gets 403.
  */
 function isValidOrigin(origin: string | null): boolean {
-  if (origin === null || origin === "null") return true;
+  if (origin === null || origin === "null" || origin.toLowerCase() === "file://") return true;
   return /^[a-z][a-z0-9+.-]*:\/\/[^\s/?#@]+$/i.test(origin);
 }
 

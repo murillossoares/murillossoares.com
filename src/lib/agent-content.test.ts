@@ -10,13 +10,17 @@ describe("machine-readable content", () => {
     const ld = personJsonLd("en", careerFile, now);
     expect(ld["@type"]).toBe("ProfilePage");
     expect(ld.mainEntity).toMatchObject({ "@type": "Person", name: "Murillo Soares", sameAs: expect.arrayContaining(["https://www.linkedin.com/in/murillossoares/"]) });
-    const roles = ld.mainEntity.worksFor;
-    expect(roles).toHaveLength(careerFile.positions.length);
-    // Role pattern: worksFor repeats inside each OrganizationRole; past roles end, the current one does not.
-    expect(roles.every((r) => r["@type"] === "OrganizationRole" && r.worksFor["@type"] === "Organization")).toBe(true);
-    const current = careerFile.positions.filter((p) => p.current).length;
-    expect(roles.filter((r) => r.endDate === undefined).length).toBeGreaterThanOrEqual(current);
-    expect(JSON.stringify(roles)).not.toMatch(/hasOccupation|alumniOf/);
+    const employed = ld.mainEntity.worksFor;
+    const former = ld.mainEntity.alumniOf.filter((a) => a["@type"] === "OrganizationRole");
+    expect(employed.length + former.length).toBe(careerFile.positions.length);
+    // Nothing past may read as current: every worksFor role is current or has an endDate...
+    for (const r of employed) {
+      const p = careerFile.positions.find((x) => x.i18n.en.role === r.roleName && x.company === r.worksFor.name)!;
+      expect(p.current || typeof r.endDate === "string", r.worksFor.name).toBe(true);
+    }
+    // ...and past roles without a recorded end are former memberships with no dates at all.
+    for (const r of former) expect(r).not.toHaveProperty("startDate");
+    expect(JSON.stringify(ld)).not.toContain("hasOccupation");
   });
 
   it("ties every name people search for to one person, with education", () => {
@@ -24,10 +28,19 @@ describe("machine-readable content", () => {
     expect(person.name).toBe("Murillo Soares");
     expect(person.alternateName).toEqual(expect.arrayContaining(["Murillo Henrique Silva Soares", "Murillo Henrique"]));
     expect(person).toMatchObject({ givenName: "Murillo", additionalName: "Henrique", familyName: "Silva Soares" });
-    expect(person.alumniOf).toEqual([expect.objectContaining({ "@type": "CollegeOrUniversity", alternateName: "IFMT" })]);
+    expect(person.alumniOf).toContainEqual(expect.objectContaining({ "@type": "CollegeOrUniversity", alternateName: "IFMT" }));
     expect(JSON.stringify(person)).not.toContain("M_SOARES_V");
     expect(llmsFullTxt(careerFile, now)).toContain("Murillo Henrique Silva Soares");
     expect(jsonResume("en", careerFile, now).education[0]).toMatchObject({ area: "Computer Engineering" });
+  });
+
+  it("never shows a past role as Present in resume.json", () => {
+    const work = jsonResume("en", careerFile, now).work;
+    for (const w of work) {
+      const p = careerFile.positions.find((x) => x.company === w.name)!;
+      if (!p.current) expect(w.endDate, w.name).toMatch(/^\d{4}(-\d{2})?$/);
+      if (!p.current && !p.end) expect(w.highlights.join(" ")).toMatch(/estimated/);
+    }
   });
 
   it("follows the llms.txt shape: H1, blockquote summary, link sections", () => {

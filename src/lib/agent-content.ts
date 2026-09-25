@@ -1,7 +1,7 @@
 // Machine-readable views of the career data, shared by the static routes (/llms.txt, /resume.json, JSON-LD)
 // and the MCP function so every consumer — Google, LLM crawlers, agents — reads the same facts.
 // Relative imports only: this module is also bundled by Netlify Functions, which do not know the "@/" alias.
-import { careerFacts, formatYears, type CareerMetric } from "../models/metrics";
+import { careerFacts, effectiveEndYear, formatYears, type CareerMetric } from "../models/metrics";
 import { hasMonth } from "./period";
 import { careerFile, getCareerHistory, getHeadline, type CareerFile } from "../services/careerData";
 import { formatPeriod } from "./period";
@@ -37,7 +37,8 @@ export function skills(file: CareerFile = careerFile): { category: string; items
   return groupStack(all).map((g) => ({ category: CATEGORY_NAMES[g.category], items: g.items.map((i) => i.canonical) }));
 }
 
-function organizationRole(e: CareerMetric) {
+/** Employment whose period is known: the current role, or a past role with a recorded end. */
+function employmentRole(e: CareerMetric) {
   return {
     "@type": "OrganizationRole",
     roleName: e.role,
@@ -47,6 +48,22 @@ function organizationRole(e: CareerMetric) {
     worksFor: { "@type": "Organization", name: e.company },
   };
 }
+
+/**
+ * A past role whose end is not recorded. Listing it under worksFor without an endDate would read as current
+ * employment; alumniOf says "former member" without inventing a date. Role dates are omitted on purpose: inside
+ * alumniOf they would mean "alumnus since". Once an end month is known the role moves to worksFor.
+ */
+function formerRole(e: CareerMetric) {
+  return {
+    "@type": "OrganizationRole",
+    roleName: e.role,
+    description: e.desc,
+    alumniOf: { "@type": "Organization", name: e.company },
+  };
+}
+
+const endKnown = (e: CareerMetric) => e.current || Boolean(isoDate(e.end));
 
 export function personJsonLd(locale: string, file: CareerFile = careerFile, now = new Date()) {
   const history = getCareerHistory(locale, file);
@@ -73,16 +90,20 @@ export function personJsonLd(locale: string, file: CareerFile = careerFile, now 
       address: { "@type": "PostalAddress", addressLocality: person.location.city, addressCountry: person.location.country },
       sameAs: Object.values(person.links),
       knowsAbout: distinctTechnologies(file.positions.map((p) => p.stack)),
-      // schema.org Role pattern: the wrapped property (worksFor) repeats inside each OrganizationRole, and the role's
-      // start/end dates say when that employment held, so past jobs carry an endDate. alumniOf would be wrong here: its
-      // role dates mean "alumnus since". A bare worksFor inside a hasOccupation Role is invalid (validator warning).
-      worksFor: history.map(organizationRole),
-      alumniOf: person.education.map((e) => ({
-        "@type": "CollegeOrUniversity",
-        name: e.institution,
-        alternateName: e.shortName,
-        url: e.url,
-      })),
+      // schema.org Role pattern: the wrapped property repeats inside each OrganizationRole. worksFor carries roles with
+      // a known period (current, or ended with a recorded end); past roles without a recorded end are former
+      // memberships (alumniOf) so nothing reads as current employment. A bare worksFor inside a hasOccupation Role is
+      // invalid (validator warning).
+      worksFor: history.filter(endKnown).map(employmentRole),
+      alumniOf: [
+        ...person.education.map((e) => ({
+          "@type": "CollegeOrUniversity",
+          name: e.institution,
+          alternateName: e.shortName,
+          url: e.url,
+        })),
+        ...history.filter((e) => !endKnown(e)).map(formerRole),
+      ],
     },
   };
 }
@@ -154,6 +175,7 @@ ${careerMarkdown("pt-br", file, now)}
 /** https://jsonresume.org/schema */
 export function jsonResume(locale = "en", file: CareerFile = careerFile, now = new Date()) {
   const person = file.person;
+  const history = getCareerHistory(locale, file);
   return {
     $schema: "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
     basics: {
@@ -164,15 +186,20 @@ export function jsonResume(locale = "en", file: CareerFile = careerFile, now = n
       location: { city: person.location.city, countryCode: person.location.country },
       profiles: Object.entries(person.links).map(([network, url]) => ({ network, url, username: url.replace(/\/$/, "").split("/").pop() })),
     },
-    work: getCareerHistory(locale, file).map((e) => ({
-      name: e.company,
-      position: e.role,
-      startDate: isoDate(e.start),
-      endDate: e.current ? undefined : isoDate(e.end),
-      summary: e.desc,
-      highlights: [`Architecture: ${ARCH_NAMES[e.archType]}`],
-      keywords: e.stack,
-    })),
+    // JSON Resume has no "ended, date unknown": a missing endDate renders as "Present". Past roles without a
+    // recorded end use the same estimate the site states on its scoreboard, and say so in their highlights.
+    work: history.map((e) => {
+      const estimated = !e.current && !isoDate(e.end);
+      return {
+        name: e.company,
+        position: e.role,
+        startDate: isoDate(e.start),
+        endDate: e.current ? undefined : isoDate(e.end) ?? String(effectiveEndYear(e, history, now)),
+        summary: e.desc,
+        highlights: [`Architecture: ${ARCH_NAMES[e.archType]}`, ...(estimated ? ["End date estimated: year before the next position started"] : [])],
+        keywords: e.stack,
+      };
+    }),
     education: person.education.map((e) => ({ institution: e.institution, url: e.url, area: e.area[locale] ?? e.area.en })),
     skills: skills(file).map((g) => ({ name: g.category, keywords: g.items })),
     meta: { canonical: absoluteUrl("/resume.json"), lastModified: file.sync.syncedAt ?? undefined },

@@ -8,6 +8,10 @@ describe("Search Console verification tokens", () => {
     expect(googleVerificationTokens({ GOOGLE_SITE_VERIFICATION: "tokenAAAAAAA1, tokenBBBBBBB2" })).toEqual(["tokenAAAAAAA1", "tokenBBBBBBB2"]);
   });
 
+  it("accepts the whole tag as Search Console copies it", () => {
+    expect(googleVerificationTokens({ GOOGLE_SITE_VERIFICATION: '<meta name="google-site-verification" content="AbCdEf0123456789_-xyz" />' })).toEqual(["AbCdEf0123456789_-xyz"]);
+  });
+
   it("emits nothing when unset and drops values that could break out of the attribute", () => {
     expect(googleVerificationTokens({})).toEqual([]);
     expect(googleVerificationTokens({ GOOGLE_SITE_VERIFICATION: '"><script>alert(1)</script>' })).toEqual([]);

@@ -9,7 +9,8 @@
 #   data/linkedin/Positions.csv. With --push it pushes to $LINKEDIN_EXPORT_BRANCH (default: master), which triggers
 #   the Netlify build and the LinkedIn sync workflow.
 # - --delete-zip removes the archive after success, since it holds private data.
-# - Refuses to run on a working tree with local changes: use a dedicated clone for automation.
+# - Meant for a dedicated clone: each run resets the branch to the remote state first, and a failed push drops the
+#   local commit again, so one bad run never blocks the next. Unrelated local changes make it refuse to run.
 set -euo pipefail
 
 die() { echo "ingest-export: $1" >&2; exit "${2:-1}"; }
@@ -28,6 +29,8 @@ for arg in "$@"; do
 done
 [ -f "$ZIP" ] || die "ZIP not found: $ZIP" 66
 command -v unzip >/dev/null || die "unzip is not installed (sudo apt install unzip)" 69
+node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.exit(a>22||(a===22&&b>=18)?0:1)' 2>/dev/null \
+  || die "Node.js 22.18+ is required (found: $(node --version 2>/dev/null || echo none)); check PATH in ~/.config/linkedin-export.env" 69
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BRANCH="${LINKEDIN_EXPORT_BRANCH:-master}"
@@ -43,13 +46,21 @@ entry="$(unzip -Z1 "$ZIP" 2>/dev/null | grep -E '(^|/)Positions\.csv$' | head -n
 [ -n "$entry" ] || die "Positions.csv not found in $ZIP (request the archive with 'Positions' selected)" 65
 unzip -p "$ZIP" "$entry" > "$TMP/Positions.csv"
 [ -s "$TMP/Positions.csv" ] || die "Positions.csv in $ZIP is empty" 65
+if grep -qE '(^|,)"?(MMM|YYYY)\b' "$TMP/Positions.csv"; then
+  die "Positions.csv still has MMM/YYYY template placeholders; fill in every month and year" 65
+fi
 
-# 2. Start from the latest remote state on a clean tree.
+# 2. Start from the latest remote state. A previous run that died mid-way may have left only our file changed.
+if [ -z "$(git config user.email || true)" ]; then die "git user.email is not set in $REPO (git config user.email ...)" 78; fi
+if ! git diff --quiet -- "$TARGET" || ! git diff --cached --quiet -- "$TARGET"; then
+  git reset --quiet -- "$TARGET" && git checkout --quiet -- "$TARGET" 2>/dev/null || rm -f -- "$TARGET"
+fi
 git diff --quiet && git diff --cached --quiet || die "the repository at $REPO has local changes; use a dedicated clone" 75
 git fetch --quiet origin "$BRANCH"
-git checkout --quiet "$BRANCH"
-git merge --quiet --ff-only "origin/$BRANCH" || die "cannot fast-forward $BRANCH to origin/$BRANCH" 75
+git checkout --quiet -B "$BRANCH" "origin/$BRANCH"
 
+restore() { git reset --quiet -- "$TARGET" 2>/dev/null || true; git checkout --quiet -- "$TARGET" 2>/dev/null || rm -f -- "$TARGET"; }
+trap 'restore; rm -rf "$TMP"' EXIT   # until the commit exists, any exit puts the file back
 cp "$TMP/Positions.csv" "$TARGET"
 if git diff --quiet -- "$TARGET" && git ls-files --error-unmatch "$TARGET" >/dev/null 2>&1; then
   echo "ingest-export: Positions.csv is unchanged; nothing to publish."
@@ -57,27 +68,33 @@ if git diff --quiet -- "$TARGET" && git ls-files --error-unmatch "$TARGET" >/dev
   exit 0
 fi
 
-# 3. Validate exactly as CI does (columns, no contact data, only allowed files), then preview the merge.
-restore() { git checkout --quiet -- "$TARGET" 2>/dev/null || rm -f -- "$TARGET"; }
+# 3. Validate exactly as CI does (columns, readable dates, no contact data, only allowed files), then preview.
 if ! npx --no-install vitest run scripts/linkedin/repo-file.test.ts >"$TMP/test.log" 2>&1; then
   cat "$TMP/test.log" >&2
-  restore
   die "Positions.csv failed validation; nothing was committed" 65
 fi
-preview="$(npm run -s linkedin:sync:file -- --dry-run 2>&1 || true)"
+if ! preview="$(npm run -s linkedin:sync:file -- --dry-run 2>&1)"; then
+  echo "$preview" >&2
+  die "the sync preview failed to run; nothing was committed" 70
+fi
 echo "$preview"
-if [ "$FORCE" != 1 ] && echo "$preview" | grep -q ": skipped"; then
-  restore
-  die "the sync preview skipped this file (see above); nothing was committed. Re-run with --force to publish anyway" 65
+if [ "$FORCE" != 1 ] && ! echo "$preview" | grep -qE '^## .*: (updated|unchanged)$'; then
+  die "the sync preview did not accept this file (see above); nothing was committed. Re-run with --force to publish anyway" 65
 fi
 
 # 4. Commit (and push).
 git add -- "$TARGET"
 git commit --quiet -m "data(linkedin): update Positions.csv from LinkedIn export" -- "$TARGET"
+trap 'rm -rf "$TMP"' EXIT
 echo "ingest-export: committed $(git rev-parse --short HEAD)."
 if [ "$PUSH" = 1 ]; then
   if ! git push --quiet origin "HEAD:$BRANCH"; then
-    git pull --quiet --rebase origin "$BRANCH" && git push --quiet origin "HEAD:$BRANCH" || die "push to $BRANCH failed" 75
+    if ! { git pull --quiet --rebase origin "$BRANCH" && git push --quiet origin "HEAD:$BRANCH"; }; then
+      # Drop the unpublished commit so the next run starts clean; the ZIP is kept for a retry.
+      git rebase --abort 2>/dev/null || true
+      git reset --quiet --hard "origin/$BRANCH"
+      die "push to $BRANCH failed; nothing was published" 75
+    fi
   fi
   echo "ingest-export: pushed to $BRANCH."
 fi

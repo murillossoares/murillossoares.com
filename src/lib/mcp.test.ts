@@ -90,7 +90,7 @@ describe("MCP endpoint", () => {
     }));
     expect((await withOrigin("https://client.example.org")).status).toBe(200);
     expect((await withOrigin("null")).status).toBe(200);
-    for (const client of ["chrome-extension://abcdefghijklmnop", "moz-extension://1234-5678", "vscode-webview://abc123", "tauri://localhost", "capacitor://localhost", "http://localhost:6274"]) {
+    for (const client of ["chrome-extension://abcdefghijklmnop", "moz-extension://1234-5678", "vscode-webview://abc123", "tauri://localhost", "capacitor://localhost", "http://localhost:6274", "file://"]) {
       expect((await withOrigin(client)).status, client).toBe(200);
     }
     for (const bad of ["https://a.example/path", "https://a.example?x=1", "https://user@a.example"]) {

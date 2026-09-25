@@ -8,5 +8,7 @@ Type=oneshot
 WorkingDirectory=%h/automation/murillossoares.com
 # PATH must reach node/npm (e.g. nvm or /usr/bin) and git; set it in this file:
 EnvironmentFile=-%h/.config/linkedin-export.env
+# Default watched folder; keep it equal to PathExistsGlob in linkedin-export.path (the env file can override it).
+Environment=LINKEDIN_EXPORT_DIR=%h/Downloads
 ExecStart=%h/automation/murillossoares.com/scripts/linkedin/watch-downloads.sh
 Nice=10

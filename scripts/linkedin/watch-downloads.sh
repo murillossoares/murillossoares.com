@@ -13,7 +13,13 @@ notify() {
 }
 
 shopt -s nullglob
-for zip in "$DIR"/*LinkedInDataExport*.zip; do
+zips=("$DIR"/*LinkedInDataExport*.zip)
+if [ "${#zips[@]}" -eq 0 ]; then
+  # The .path unit and LINKEDIN_EXPORT_DIR must point at the same folder; say so instead of exiting silently.
+  echo "no *LinkedInDataExport*.zip in $DIR (check LINKEDIN_EXPORT_DIR and PathExistsGlob point to the same folder)"
+  exit 0
+fi
+for zip in "${zips[@]}"; do
   # Wait until the browser has finished writing the file (size stable for 5 seconds).
   prev=-1
   for _ in $(seq 1 60); do

@@ -1,5 +1,5 @@
 import { yearOf } from "../lib/dates";
-import { hasMonth, monthsBetween, toMonth } from "../lib/period";
+import { hasMonth, toMonth } from "../lib/period";
 import { distinctTechnologies } from "../lib/tech";
 
 export { yearOf };
@@ -75,18 +75,24 @@ export function careerSpan(events: CareerMetric[], now = new Date()): { from: nu
  * then, and the UI shows "8+". Once every date has a month the count is exact. Never rounds up.
  */
 function experienceYears(events: CareerMetric[], now: Date): { years: number; exact: boolean } {
+  // Positions without a readable start are ignored here, as careerSpan does (one bad row must not zero the count).
+  const dated = events.filter((e) => yearOf(e.start) > 0);
+  if (dated.length === 0) return { years: 0, exact: true };
   const startBound = (d: string) => (hasMonth(d) ? d : `${d.slice(0, 4)}-12`);
   const endBound = (e: CareerMetric) => {
     if (e.current) return toMonth(now);
     if (hasMonth(e.end)) return e.end!;
-    return `${effectiveEndYear(e, events, now)}-01`;
+    return `${effectiveEndYear(e, dated, now)}-01`;
   };
-  const first = events.map((e) => startBound(e.start)).sort()[0];
-  const last = events.map(endBound).sort().at(-1)!;
-  const months = monthsBetween(first, last) ?? 0;
-  const exact = events.every((e) => hasMonth(e.start) && (e.current || hasMonth(e.end)));
+  const first = dated.map((e) => startBound(e.start)).sort()[0];
+  const last = dated.map(endBound).sort().at(-1)!;
+  // Completed months only (no inclusive +1): a count that must never overstate cannot credit the current month.
+  const months = Math.max(0, monthIndex(last) - monthIndex(first));
+  const exact = dated.length === events.length && dated.every((e) => hasMonth(e.start) && (e.current || hasMonth(e.end)));
   return { years: Math.floor(months / 12), exact };
 }
+
+const monthIndex = (d: string) => Number(d.slice(0, 4)) * 12 + Number(d.slice(5, 7)) - 1;
 
 export interface CareerFacts {
   since: number;
