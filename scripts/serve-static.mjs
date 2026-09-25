@@ -1,7 +1,9 @@
 // Serves the static export (out/) the way Netlify does for these routes: "/en" → en.html, "/en/" → en/index.html,
 // unknown paths → 404.html with status 404. Used by the end-to-end tests so they exercise the production build.
+// Like Netlify, it injects a comment wrapped in newlines after <meta charset> in every HTML page, so tests catch
+// markup that only breaks once the host rewrites the page.
 //   node scripts/serve-static.mjs [--dir out] [--host 127.0.0.1] [--port 3100]
-import { createReadStream, existsSync, statSync } from "node:fs";
+import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize, resolve, sep } from "node:path";
 
@@ -41,5 +43,9 @@ createServer((req, res) => {
   const path = file ?? join(root, "404.html");
   res.writeHead(status, { "Content-Type": TYPES[extname(path)] ?? "application/octet-stream" });
   if (req.method === "HEAD") return res.end();
+  if (extname(path) === ".html") {
+    const html = readFileSync(path, "utf8").replace('<meta charSet="utf-8"/>', '<meta charSet="utf-8"/>\n<!-- injected by the host, as Netlify does -->\n');
+    return res.end(html);
+  }
   createReadStream(path).pipe(res);
 }).listen(port, host, () => console.log(`serve-static: ${root} on http://${host}:${port}`));
