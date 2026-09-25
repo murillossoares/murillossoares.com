@@ -16,7 +16,7 @@
     "linkedin:sync": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source api",
     "linkedin:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source export --path",
     "linkedin:sync:file": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/linkedin/sync.ts --source repo",
-    "prebuild": "npm run -s linkedin:sync:file -- --updates-only"
+    "prebuild": "node scripts/site-verification.mjs && npm run -s linkedin:sync:file -- --updates-only"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.1",

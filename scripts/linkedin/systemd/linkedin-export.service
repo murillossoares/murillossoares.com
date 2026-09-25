@@ -1,0 +1,14 @@
+# Publishes Positions.csv from a LinkedIn data export (only that file; the ZIP is deleted afterwards).
+# Paths assume the dedicated clone at ~/automation/murillossoares.com; adjust if yours differs.
+[Unit]
+Description=Publish Positions.csv from a LinkedIn data export
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/automation/murillossoares.com
+# PATH must reach node/npm (e.g. nvm or /usr/bin) and git; set it in this file:
+EnvironmentFile=-%h/.config/linkedin-export.env
+# Default watched folder; keep it equal to PathExistsGlob in linkedin-export.path (the env file can override it).
+Environment=LINKEDIN_EXPORT_DIR=%h/Downloads
+ExecStart=%h/automation/murillossoares.com/scripts/linkedin/watch-downloads.sh
+Nice=10

@@ -7,7 +7,7 @@ import { jsonResume, llmsFullTxt, skills, summary } from "./agent-content";
 import { LOCALES } from "./site";
 import { resolveTech } from "./tech";
 
-const SUPPORTED_VERSIONS = ["2025-06-18", "2025-03-26", "2024-11-05"];
+const SUPPORTED_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
 const SERVER_INFO = { name: "murillo-soares-portfolio", title: "Murillo Soares — career data", version: "1.0.0" };
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json | undefined };
@@ -77,7 +77,8 @@ export function callTool(name: string, args: Record<string, unknown> = {}): { st
   if (name === "get_profile") {
     const facts = careerFacts(getCareerHistory(loc));
     const data = {
-      name: careerFile.person.name, headline: getHeadline(loc), location: careerFile.person.location,
+      name: careerFile.person.name, fullName: careerFile.person.fullName, alternateNames: careerFile.person.alternateNames,
+      headline: getHeadline(loc), location: careerFile.person.location, education: careerFile.person.education,
       summary: summary(loc), links: careerFile.person.links, facts: { ...facts }, skills: skills(),
       lastSynced: careerFile.sync.syncedAt,
     } as unknown as Json;
@@ -154,31 +155,95 @@ function handleOne(req: RpcRequest | null): RpcResponse | null {
   }
 }
 
-/** Transport-level handler: Web Request in, Web Response out. */
+// CORS: this endpoint serves public, read-only data and never uses cookies, credentials or sessions, so any origin may
+// call it; that is what lets browser-based MCP clients (MCP Inspector, web agents) reach it. A cross-origin page gains
+// nothing it could not get by fetching the URL directly. DNS rebinding, the threat behind the spec's Origin rule, needs
+// a hostname-agnostic target; Netlify routes by Host/SNI, so a rebinding request never reaches this function.
+// Netlify's _headers do not apply to functions, so every response sets these itself.
+const CORS_HEADERS: Record<string, string> = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Expose-Headers": "Mcp-Session-Id",
+};
+const DEFAULT_ALLOWED_HEADERS = "Content-Type, Accept, Authorization, Mcp-Session-Id, MCP-Protocol-Version, Mcp-Method, Mcp-Name, Last-Event-ID";
+
+/**
+ * Preflight: echo the headers the browser asks for (newer spec revisions and tools add their own, e.g. Mcp-Method,
+ * Mcp-Name or MCP Inspector's custom headers). Authorization is never covered by a wildcard, so it is always listed.
+ */
+function preflightHeaders(request: Request): Record<string, string> {
+  const requested = request.headers.get("access-control-request-headers") ?? "";
+  // RFC 9110 token characters only, so nothing but a comma-separated list of header names is ever reflected.
+  const token = "[!#$%&'*+.^_`|~0-9A-Za-z-]+";
+  const safe = new RegExp(`^${token}(\\s*,\\s*${token})*$`).test(requested.trim()) ? requested.trim() : "";
+  return {
+    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": safe ? `${safe}, Authorization` : DEFAULT_ALLOWED_HEADERS,
+    "Access-Control-Max-Age": "7200",
+    Vary: "Access-Control-Request-Headers",
+  };
+}
+
+/**
+ * The spec requires an Origin policy. Here any well-formed serialized origin is valid, whatever its scheme: besides
+ * https pages that includes browser extensions (chrome-extension://…), editor webviews (vscode-webview://…) and
+ * desktop shells (tauri://localhost), all real MCP clients. "null" (sandboxed/opaque) and "file://" (Chromium
+ * shells loading their UI from disk) are valid too. Only a malformed
+ * value — spaces, a path, a query, no scheme — gets 403.
+ */
+function isValidOrigin(origin: string | null): boolean {
+  if (origin === null || origin === "null" || origin.toLowerCase() === "file://") return true;
+  return /^[a-z][a-z0-9+.-]*:\/\/[^\s/?#@]+$/i.test(origin);
+}
+
+function respond(body: unknown, status: number, extra: Record<string, string> = {}): Response {
+  const headers: Record<string, string> = { ...CORS_HEADERS, "Cache-Control": "no-store", ...extra };
+  if (body === null) return new Response(null, { status, headers });
+  return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...headers } });
+}
+
+const rpcError = (code: number, message: string, data?: unknown) => ({ jsonrpc: "2.0", id: null, error: { code, message, ...(data ? { data } : {}) } });
+
+/** Transport-level handler: Web Request in, Web Response out. Never throws: a Netlify 500 page would lack CORS headers. */
 export async function handleMcpHttp(request: Request): Promise<Response> {
-  const headers = { "Content-Type": "application/json", "Cache-Control": "no-store" };
+  // Preflight comes before every other check and must always succeed.
+  if (request.method === "OPTIONS") return respond(null, 204, preflightHeaders(request));
+  try {
+    return await handle(request);
+  } catch {
+    return respond(rpcError(-32603, "Internal error"), 500);
+  }
+}
+
+async function handle(request: Request): Promise<Response> {
+  if (!isValidOrigin(request.headers.get("origin"))) return respond(rpcError(-32600, "Invalid Origin header"), 403);
   if (request.method === "GET") {
     // No server-initiated stream: this server is stateless.
-    return new Response(JSON.stringify({ name: SERVER_INFO.name, transport: "streamable-http", endpoint: "/mcp", methods: ["POST"] }), { status: 405, headers: { ...headers, Allow: "POST" } });
+    return respond({ name: SERVER_INFO.name, transport: "streamable-http", endpoint: "/mcp", methods: ["POST"] }, 405, { Allow: "POST, OPTIONS" });
   }
-  if (request.method === "DELETE") return new Response(null, { status: 405, headers: { Allow: "POST" } });
-  if (request.method !== "POST") return new Response(null, { status: 405, headers: { Allow: "POST" } });
+  if (request.method !== "POST") return respond(null, 405, { Allow: "POST, OPTIONS" });
 
   let body: unknown;
   try {
     const raw = await request.text();
-    if (raw.length > 64_000) return new Response(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Request too large" } }), { status: 413, headers });
+    if (raw.length > 64_000) return respond(rpcError(-32600, "Request too large"), 413);
     body = JSON.parse(raw);
   } catch {
-    return new Response(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }), { status: 400, headers });
+    return respond(rpcError(-32700, "Parse error"), 400);
   }
 
   const batch = Array.isArray(body);
   const messages = (batch ? body : [body]) as (RpcRequest | null)[];
-  if (messages.length === 0 || messages.length > 20) {
-    return new Response(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Invalid Request" } }), { status: 400, headers });
+  if (messages.length === 0 || messages.length > 20) return respond(rpcError(-32600, "Invalid Request"), 400);
+
+  // Clients send MCP-Protocol-Version on every request after initialize; an unsupported value must get a 400.
+  // initialize itself negotiates the version in its body, so it is exempt.
+  const version = request.headers.get("mcp-protocol-version");
+  const onlyInitialize = messages.every((m) => m && typeof m === "object" && m.method === "initialize");
+  if (version && !SUPPORTED_VERSIONS.includes(version) && !onlyInitialize) {
+    return respond(rpcError(-32600, `Unsupported MCP-Protocol-Version: ${version.slice(0, 32)}. Supported: ${SUPPORTED_VERSIONS.join(", ")}`, { supported: SUPPORTED_VERSIONS }), 400);
   }
+
   const responses = messages.map(handleOne).filter((r): r is RpcResponse => r !== null);
-  if (responses.length === 0) return new Response(null, { status: 202 });
-  return new Response(JSON.stringify(batch ? responses : responses[0]), { status: 200, headers });
+  if (responses.length === 0) return respond(null, 202);
+  return respond(batch ? responses : responses[0], 200);
 }

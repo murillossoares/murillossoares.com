@@ -7,11 +7,12 @@ import { useLocale, useMessages, useTranslations } from "next-intl";
 
 import { isPdfThemeName, type PdfThemeName } from "@/lib/pdf-themes";
 import type { CVPdfContent } from "@/components/pdf/CVDocument";
-import { formatPeriod, getCareerHistory, getHeadline } from "@/services/careerData";
+import { formatPeriod } from "@/lib/period";
+import { careerFile, educationLabel, getCareerHistory, getHeadline } from "@/services/careerData";
 
 type MessagesShape = {
   App?: { title?: string };
-  Dashboard?: { eventHistoryTitle?: string; present?: string };
+  Dashboard?: { eventHistoryTitle?: string };
 };
 
 export default function DownloadCVButton({ label, showLabel = false }: { label?: string; showLabel?: boolean }) {
@@ -30,14 +31,15 @@ export default function DownloadCVButton({ label, showLabel = false }: { label?:
     const title = messages?.App?.title ?? "Murillo Soares";
     const headline = getHeadline(locale);
     const experienceTitle = messages?.Dashboard?.eventHistoryTitle ?? "Runtime Logs (Experience)";
-    const present = messages?.Dashboard?.present ?? "present";
+    const now = new Date();
     const careerHistory = getCareerHistory(locale).map((e) => ({
-      year: formatPeriod(e, present), role: e.role, company: e.company, desc: e.desc, stack: e.stack,
+      year: formatPeriod(e, locale, now), role: e.role, company: e.company, desc: e.desc, stack: e.stack,
     }));
 
     return {
       title,
       headline,
+      identity: `${careerFile.person.fullName} · ${educationLabel(locale)}`,
       locale,
       theme: pdfTheme,
       sections: { experienceTitle },

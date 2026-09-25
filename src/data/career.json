@@ -1,6 +1,14 @@
 {
   "person": {
     "name": "Murillo Soares",
+    "fullName": "Murillo Henrique Silva Soares",
+    "alternateNames": [
+      "Murillo Henrique Silva Soares",
+      "Murillo Henrique"
+    ],
+    "givenName": "Murillo",
+    "additionalName": "Henrique",
+    "familyName": "Silva Soares",
     "alias": "M_SOARES_V",
     "location": {
       "city": "Lisboa",
@@ -16,7 +24,19 @@
       "en": "Senior Full Stack Engineer",
       "es": "Ingeniero Full Stack Senior"
     },
-    "tagline": "Java 7 → 21 · Spring Boot 3 · Microservices · React · Angular"
+    "tagline": "Java 7 → 21 · Spring Boot 3 · Microservices · React · Angular",
+    "education": [
+      {
+        "institution": "Instituto Federal de Educação, Ciência e Tecnologia de Mato Grosso",
+        "shortName": "IFMT",
+        "url": "https://ifmt.edu.br",
+        "area": {
+          "pt-br": "Engenharia de Computação",
+          "en": "Computer Engineering",
+          "es": "Ingeniería Informática"
+        }
+      }
+    ]
   },
   "sync": {
     "source": "manual",

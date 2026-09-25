@@ -58,7 +58,6 @@
       "gateway": "Gateway",
       "client": "Cliente"
     },
-    "present": "actual",
     "running": "EN EJECUCIÓN",
     "exited": "FINALIZADO",
     "categories": {
@@ -78,7 +77,8 @@
     },
     "galaxyLabel": "Mapa 3D de la carrera: cada nodo es una experiencia ubicada en el tiempo; las líneas unen experiencias que comparten tecnologías.",
     "galaxyHint": "Haz clic en un nodo para inspeccionar",
-    "about": "Ingeniero full stack en {city}, con {years} años de experiencia en {companies} empresas: Java, Spring Boot, microservicios, SOA, Oracle/PostgreSQL, React y Angular — desde ERPs y portales de gobierno hasta smart grids y banca."
+    "about": "Ingeniero full stack en {city}, con {years} años de experiencia en {companies} empresas: Java, Spring Boot, microservicios, SOA, Oracle/PostgreSQL, React y Angular — desde ERPs y portales de gobierno hasta smart grids y banca.",
+    "educationLabel": "Formación"
   },
   "Scoreboard": {
     "title": "Panel de Carrera",

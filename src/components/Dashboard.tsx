@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Terminal, Server, Code, Database, Github, Linkedin, Send, BarChart3, Boxes } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -9,8 +9,9 @@ import DownloadCVButton from "./DownloadCVButton";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 import CareerGalaxyScene from "./CareerGalaxyScene";
-import { careerFacts, type ArchType, type CareerMetric } from "@/models/metrics";
-import { careerFile, formatPeriod, getCareerHistory, getHeadline } from "@/services/careerData";
+import { careerFacts, formatYears, type ArchType, type CareerMetric } from "@/models/metrics";
+import { careerFile, educationLabel, getCareerHistory, getHeadline } from "@/services/careerData";
+import { periodParts, type PeriodParts } from "@/lib/period";
 import { groupStack } from "@/lib/tech";
 import { ARCH_STYLE } from "@/lib/arch-style";
 import { useUiStore } from "@/store/ui";
@@ -20,7 +21,12 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
   const tApp = useTranslations("App");
   const reduced = useReducedMotion();
   const careerHistory = useMemo(() => getCareerHistory(locale), [locale]);
-  const facts = useMemo(() => careerFacts(careerHistory, new Date(asOf)), [careerHistory, asOf]);
+  // Server HTML and first client render use the build date (identical output, no hydration mismatch); afterwards the
+  // browser switches to today so durations and years do not go stale between deploys.
+  const [now, setNow] = useState(asOf);
+  useEffect(() => setNow(new Date().toISOString()), []);
+  const facts = useMemo(() => careerFacts(careerHistory, new Date(now)), [careerHistory, now]);
+  const years = formatYears(facts);
   const activeJobId = useUiStore((s) => s.activeJobId);
   const setActiveJob = useUiStore((s) => s.setActiveJob);
   const activeJob = careerHistory.find((j) => j.id === activeJobId) ?? careerHistory[0] ?? null;
@@ -50,15 +56,16 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
         <div>
           <h1 id="profile-name" className="text-4xl md:text-6xl font-bold text-white tracking-tight">{tApp("title")}</h1>
           <p className="mt-2 font-mono text-sm md:text-base text-[var(--accent-2)]">{getHeadline(locale)} · {careerFile.person.location.city}</p>
+          <p className="mt-1 font-mono text-xs text-[var(--muted)]">{careerFile.person.fullName} · {tDash("educationLabel")}: {educationLabel(locale)}</p>
           <p className="mt-4 max-w-xl text-sm md:text-base leading-relaxed text-[var(--muted)]">
-            {tDash("about", { city: careerFile.person.location.city, years: facts.years, companies: facts.companies })}
+            {tDash("about", { city: careerFile.person.location.city, years, companies: facts.companies })}
           </p>
         </div>
         <CareerGalaxyScene events={careerHistory} activeId={activeJob?.id ?? null} onSelect={setActiveJob} label={tDash("galaxyLabel")} hint={tDash("galaxyHint")} />
       </section>
 
       <section aria-label="KPIs" className="relative z-10 mb-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Kpi label={tDash("kpis.sinceLabel", { since: facts.since })} value={tDash("kpis.sinceValue", { years: facts.years })} sub={tDash("kpis.sinceSub", { internships: facts.internships })} c="border-green-500/30" />
+        <Kpi label={tDash("kpis.sinceLabel", { since: facts.since })} value={tDash("kpis.sinceValue", { years })} sub={tDash("kpis.sinceSub", { internships: facts.internships })} c="border-green-500/30" />
         <Kpi label={tDash("kpis.positionsLabel")} value={tDash("kpis.positionsValue", { positions: facts.positions })} sub={tDash("kpis.positionsSub", { companies: facts.companies })} c="border-blue-500/30" />
         <Kpi label={tDash("kpis.techLabel")} value={tDash("kpis.techValue", { technologies: facts.technologies })} sub={tDash("kpis.techSub")} c="border-orange-500/30" />
         <Kpi label={tDash("kpis.archLabel")} value={tDash("kpis.archValue", { architectures: facts.architectures })} sub={tDash("kpis.archSub")} c="border-purple-500/30" />
@@ -74,7 +81,7 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
             <ol className="space-y-2">
               {careerHistory.map((job) => (
                 <TimelineItem key={job.id} job={job} active={activeJob?.id === job.id} onSelect={() => setActiveJob(job.id)} reduced={reduced}
-                  period={formatPeriod(job, tDash("present"))} status={job.current ? tDash("running") : tDash("exited")} />
+                  period={periodParts(job, locale, new Date(now))} status={job.current ? tDash("running") : tDash("exited")} />
               ))}
             </ol>
           )}
@@ -106,13 +113,17 @@ export default function Dashboard({ locale, asOf }: { locale: string; asOf: stri
   );
 }
 
-function TimelineItem({ job, active, onSelect, reduced, period, status }: { job: CareerMetric; active: boolean; onSelect: () => void; reduced: boolean | null; period: string; status: string }) {
+function TimelineItem({ job, active, onSelect, reduced, period, status }: { job: CareerMetric; active: boolean; onSelect: () => void; reduced: boolean | null; period: PeriodParts; status: string }) {
   const arch = ARCH_STYLE[job.archType];
   return (
     <motion.li whileHover={reduced ? undefined : { x: 3 }} className="relative">
       <article className={`rounded border-l-2 p-3 md:p-4 transition-colors ${active ? "bg-white/5 border border-white/10 border-l-[var(--accent-2)]" : "border border-transparent border-l-white/15 hover:bg-white/5"}`}>
         <div className="flex flex-wrap justify-between items-center gap-2 mb-1">
-          <span className="font-mono text-green-500 text-xs">[<time dateTime={job.start}>{period}</time>]</span>
+          <span className="font-mono text-green-500 text-xs">
+            [<time dateTime={period.start.iso}>{period.start.label}</time>
+            {period.presentLabel ? <> – {period.presentLabel}</> : period.end ? <> – <time dateTime={period.end.iso}>{period.end.label}</time></> : null}]
+            {period.duration ? <span className="ml-2 text-[var(--muted)]">{period.duration}</span> : null}
+          </span>
           <span className="flex items-center gap-2">
             <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${arch.chip}`}>{job.archType.toUpperCase()}</span>
             <StatusBadge current={job.current} label={status} />
