@@ -179,15 +179,15 @@ function preflightHeaders(request: Request): Record<string, string> {
   };
 }
 
-/** The spec requires an Origin policy: any well-formed origin (or "null") is valid here; a malformed one gets 403. */
+/**
+ * The spec requires an Origin policy. Here any well-formed serialized origin is valid, whatever its scheme: besides
+ * https pages that includes browser extensions (chrome-extension://…), editor webviews (vscode-webview://…) and
+ * desktop shells (tauri://localhost), all real MCP clients. "null" (sandboxed/opaque) is valid too. Only a malformed
+ * value — spaces, a path, a query, no scheme — gets 403.
+ */
 function isValidOrigin(origin: string | null): boolean {
   if (origin === null || origin === "null") return true;
-  try {
-    const url = new URL(origin);
-    return (url.protocol === "https:" || url.protocol === "http:") && url.origin === origin;
-  } catch {
-    return false;
-  }
+  return /^[a-z][a-z0-9+.-]*:\/\/[^\s/?#@]+$/i.test(origin);
 }
 
 function respond(body: unknown, status: number, extra: Record<string, string> = {}): Response {
