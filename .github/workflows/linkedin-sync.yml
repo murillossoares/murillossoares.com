@@ -1,0 +1,76 @@
+name: LinkedIn sync
+
+# Pulls positions from LinkedIn's Member Data Portability API (EEA/Switzerland members) into src/data/career.json
+# and opens a pull request. The site never calls LinkedIn at runtime: if the profile is deactivated, the token has
+# expired or the API is down, this job only logs a warning and the site keeps serving the last committed data.
+#
+# Setup (once): repository secret LINKEDIN_ACCESS_TOKEN (scope r_dma_portability_self_serve, valid 60 days).
+# Optional repository variable LINKEDIN_API_VERSION (YYYYMM). Also enable
+# Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: linkedin-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'murillossoares/murillossoares.com'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BRANCH: automation/linkedin-sync
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync from LinkedIn
+        id: sync
+        env:
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION }}
+        run: npm run -s linkedin:sync -- --report linkedin-sync-report.md
+
+      # PRs opened with GITHUB_TOKEN do not trigger other workflows, so run the quality gate here.
+      - name: Verify the synced data builds
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          npm run lint
+          npm test
+          npm run build
+
+      - name: Open or update the pull request
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git add src/data/career.json
+          git commit -m "chore(data): sync career history from LinkedIn"
+          git push --force origin "$BRANCH"
+          if gh pr view "$BRANCH" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit "$BRANCH" --body-file linkedin-sync-report.md
+          else
+            gh pr create --base "${{ github.event.repository.default_branch }}" --head "$BRANCH" \
+              --title "chore(data): sync career history from LinkedIn" --body-file linkedin-sync-report.md
+          fi

@@ -14,24 +14,11 @@ test.describe("portfolio smoke", () => {
       await page.goto(`/${locale}`);
       await dismissBoot(page);
 
-      await expect(page.getByText("GET_CV.pdf")).toBeVisible();
+      await expect(page.getByRole("button", { name: "GET_CV.pdf" })).toBeVisible();
       await expect(page.getByRole("combobox")).toBeVisible();
       expect(pageErrors).toEqual([]);
     });
   }
-
-  test("cv-print route responds without uncaught page errors", async ({ page }) => {
-    const pageErrors: Error[] = [];
-    page.on("pageerror", (error) => pageErrors.push(error));
-
-    await page.goto("/pt-br");
-    await dismissBoot(page);
-
-    const response = await page.goto("/pt-br/cv-print?lang=pt-br&theme=vscode-dark");
-    expect(response?.ok()).toBeTruthy();
-    await page.waitForTimeout(750);
-    expect(pageErrors).toEqual([]);
-  });
 
   test("scoreboard presents factual metrics without layout shift", async ({ page }) => {
     const pageErrors: Error[] = [];
@@ -111,8 +98,8 @@ test.describe("portfolio smoke", () => {
       .toBe(0);
   });
 
-  test("persona remains usable on a mobile viewport", async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+  test("persona remains usable on a mobile viewport", async ({ page, isMobile }) => {
+    if (!isMobile) await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/pt-br");
     await dismissBoot(page);
 

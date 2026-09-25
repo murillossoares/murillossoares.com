@@ -4,8 +4,7 @@ import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-import type { ScoreboardData } from "@/models/metrics";
-import Scoreboard3DFallback from "./Scoreboard3DFallback";
+import Scoreboard3DFallback, { type YearRow } from "./Scoreboard3DFallback";
 
 const Scoreboard3D = dynamic(() => import("./Scoreboard3D"), { ssr: false, loading: () => null });
 
@@ -27,7 +26,7 @@ function readThemeColors() {
   };
 }
 
-export default function ScoreboardScene({ data }: { data: ScoreboardData }) {
+export default function ScoreboardScene({ rows }: { rows: YearRow[] }) {
   const { theme } = useTheme();
   const [show3D, setShow3D] = useState(false);
   const [ready, setReady] = useState(false);
@@ -58,12 +57,12 @@ export default function ScoreboardScene({ data }: { data: ScoreboardData }) {
   return (
     <div className="relative h-[280px] md:h-[360px]" aria-hidden="true" data-testid="scoreboard-scene">
       <div className={`absolute inset-0 transition-opacity duration-200 ease-out ${ready ? "opacity-0" : "opacity-100"}`}>
-        <Scoreboard3DFallback data={data} />
+        <Scoreboard3DFallback rows={rows} />
       </div>
       {show3D ? (
         <div className={`pointer-events-none absolute inset-0 transition-opacity duration-200 ease-out ${ready ? "opacity-100" : "opacity-0"}`}>
           <Scoreboard3D
-            data={data}
+            rows={rows}
             accentColor={colors.accent}
             secondaryColor={colors.secondary}
             bgColor={colors.bg}
