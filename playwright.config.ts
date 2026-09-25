@@ -18,6 +18,8 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "retain-on-failure",
+    // Lets sandboxes with a preinstalled browser run the suite (e.g. PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium).
+    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {},
   },
   webServer: {
     command: `npm exec next dev -- --hostname ${host} -p ${port}`,
@@ -27,10 +29,11 @@ export default defineConfig({
     timeout: 120_000,
     gracefulShutdown: { signal: "SIGTERM", timeout: 5_000 },
   },
+  // Every spec runs on desktop and on two phone profiles. The iPhone profile keeps its viewport, touch and
+  // user agent but runs on Chromium, the only engine CI installs.
   projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
+    { name: "desktop", use: { ...devices["Desktop Chrome"] } },
+    { name: "mobile-android", use: { ...devices["Pixel 7"] } },
+    { name: "mobile-iphone", use: { ...devices["iPhone 14"], browserName: "chromium" } },
   ],
 });

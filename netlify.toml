@@ -4,3 +4,40 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# "/" used to depend on a client-side NEXT_REDIRECT payload, leaving crawlers and no-JS visitors on a blank page.
+# Netlify now answers with a real HTTP redirect, honouring Accept-Language (302 so the choice is not cached).
+[[redirects]]
+  from = "/"
+  to = "/en"
+  status = 302
+  force = true
+  conditions = { Language = ["en"] }
+
+[[redirects]]
+  from = "/"
+  to = "/es"
+  status = 302
+  force = true
+  conditions = { Language = ["es"] }
+
+[[redirects]]
+  from = "/"
+  to = "/pt-br"
+  status = 302
+  force = true
+
+# Friendly aliases for agents that guess conventional paths.
+[[redirects]]
+  from = "/.well-known/llms.txt"
+  to = "/llms.txt"
+  status = 301
+
+[[redirects]]
+  from = "/resume"
+  to = "/resume.json"
+  status = 301

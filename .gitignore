@@ -21,3 +21,18 @@ coverage
 # Test artifacts
 test-results/
 playwright-report/
+
+# LinkedIn data export: the ZIP and its other CSVs hold private messages, contacts and e-mails. Never commit them.
+# The single exception is data/linkedin/Positions.csv (public profile positions), validated by tests.
+*.zip
+Basic_LinkedInDataExport*/
+Complete_LinkedInDataExport*/
+linkedin-export/
+/data/linkedin/*
+!/data/linkedin/Positions.csv
+!/data/linkedin/README.md
+linkedin-sync-report.md
+
+# Netlify local state
+.netlify
+*.tsbuildinfo

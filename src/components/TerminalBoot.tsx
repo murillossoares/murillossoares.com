@@ -61,12 +61,13 @@ export default function TerminalBoot({ locale, onComplete }: { locale: string; o
         return;
       }
       if (index >= logs.length) {
-        timeoutRef.current = setTimeout(() => onCompleteRef.current(), 500);
+        timeoutRef.current = setTimeout(() => onCompleteRef.current(), 300);
         return;
       }
       const entry = logs[index++];
       setLines((prev) => prev.some((p) => p.id === entry.id) ? prev : [...prev, entry]);
-      timeoutRef.current = setTimeout(tick, Math.max(30, entry.delay ?? 140));
+      // Paced at ~45% of the authored delays: the whole sequence stays under ~1.5s.
+      timeoutRef.current = setTimeout(tick, Math.max(30, Math.round((entry.delay ?? 140) * 0.45)));
     };
     tick();
 
@@ -87,12 +88,12 @@ export default function TerminalBoot({ locale, onComplete }: { locale: string; o
   }, [requestSkip]);
 
   return (
-    <motion.div className="fixed inset-0 z-50 flex flex-col bg-black font-mono text-green-400"
+    <motion.div id="boot-overlay" onClick={requestSkip} className="fixed inset-0 z-50 flex cursor-pointer flex-col bg-black font-mono text-green-400"
       initial={{ opacity: 1 }} exit={{ opacity: 0, filter: "blur(10px)", scale: 1.04 }}
       transition={{ duration: 0.55, ease: "easeOut" }}>
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div className="text-xs text-white/70">:: Spring Boot :: (v3.x)</div>
-        <button type="button" onClick={requestSkip}
+        <button type="button" onClick={(e) => { e.stopPropagation(); requestSkip(); }}
           className="rounded-md border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80 hover:bg-white/10 focus:ring-2 focus:ring-white/30">
           {t("skip")} <span className="text-white/50">({t("hint")})</span>
         </button>

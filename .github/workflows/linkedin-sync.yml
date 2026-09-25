@@ -1,0 +1,93 @@
+name: LinkedIn sync
+
+# Updates src/data/career.json from two LinkedIn sources, oldest first, then opens a pull request:
+#   1. data/linkedin/Positions.csv — an export committed by hand (see data/linkedin/README.md)
+#   2. LinkedIn's Member Data Portability API (EEA/Switzerland members) — live data, applied last so it wins
+# The site never calls LinkedIn at runtime: if the profile is deactivated, the token has
+# expired or the API is down, this job only logs a warning and the site keeps serving the last committed data.
+#
+# Setup (once): repository secret LINKEDIN_ACCESS_TOKEN (scope r_dma_portability_self_serve, valid 60 days).
+# Optional repository variable LINKEDIN_API_VERSION (YYYYMM). Also enable
+# Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  push:
+    branches: [master]
+    paths: ["data/linkedin/Positions.csv"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: linkedin-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'murillossoares/murillossoares.com'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BRANCH: automation/linkedin-sync
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply the LinkedIn export committed to the repo
+        id: file
+        run: npm run -s linkedin:sync:file -- --report linkedin-sync-report.md
+
+      - name: Sync from the LinkedIn API
+        id: sync
+        env:
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION }}
+        run: npm run -s linkedin:sync -- --report linkedin-sync-report.md
+
+      # PRs opened with GITHUB_TOKEN do not trigger other workflows, so run the quality gate here.
+      - name: Verify the synced data builds
+        if: (steps.file.outputs.changed == 'true' || steps.sync.outputs.changed == 'true')
+        run: |
+          npm run lint
+          npm test
+          npm run build
+
+      - name: Open or update the pull request
+        if: (steps.file.outputs.changed == 'true' || steps.sync.outputs.changed == 'true')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Never overwrite review work: if someone committed to the open sync PR, leave it alone.
+          if git fetch --quiet origin "$BRANCH" 2>/dev/null; then
+            manual=$(git log "HEAD..FETCH_HEAD" --format='%ae' | grep -v 'github-actions\[bot\]' || true)
+            if [ -n "$manual" ]; then
+              echo "::warning title=LinkedIn sync::$BRANCH has manual commits; not overwriting it. Merge or close that PR first."
+              exit 0
+            fi
+          fi
+          git switch -C "$BRANCH"
+          git add src/data/career.json
+          git commit -m "chore(data): sync career history from LinkedIn"
+          git push --force origin "$BRANCH"
+          if gh pr view "$BRANCH" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit "$BRANCH" --body-file linkedin-sync-report.md
+          else
+            gh pr create --base "${{ github.event.repository.default_branch }}" --head "$BRANCH" \
+              --title "chore(data): sync career history from LinkedIn" --body-file linkedin-sync-report.md
+          fi
