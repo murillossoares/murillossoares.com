@@ -2,9 +2,9 @@
   "profile": {
     "alias": "M_SOARES_V",
     "class": {
-      "pt": "Tecnomante Nvl. 8",
-      "en": "Technomancer Lvl. 8",
-      "es": "Tecnomante Nvl. 8"
+      "pt": "Tecnomante Nvl. {level}",
+      "en": "Technomancer Lvl. {level}",
+      "es": "Tecnomante Nvl. {level}"
     },
     "origin": {
       "pt": "Brasil > Lisboa",

@@ -20,6 +20,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef } from "react";
 
 import personaData from "@/data/persona.json";
+import { careerFacts } from "@/models/metrics";
+import { getCareerHistory } from "@/services/careerData";
 import { useUiStore } from "@/store/ui";
 
 /* ------------------------------------------------------------------ */
@@ -196,6 +198,9 @@ export default function CyberpunkOverlay() {
   const stats = useMemo(() => personaData.stats as PersonaStat[], []);
   const modules = useMemo(() => personaData.modules as PersonaModule[], []);
   const interests = useMemo(() => personaData.interests, []);
+  // The character level is the years of experience, computed like the KPIs so the two never disagree. The overlay only
+  // renders after a click, so reading today's date here cannot cause a hydration mismatch.
+  const level = useMemo(() => careerFacts(getCareerHistory(locale), new Date()).years, [locale]);
 
   useEffect(() => {
     if (!cyberpunkOpen) return;
@@ -343,7 +348,7 @@ export default function CyberpunkOverlay() {
                 </h2>
                 <div className="flex flex-wrap gap-3 font-mono text-xs text-cyber-blue">
                   <span className="border border-cyber-blue/30 px-2 py-1">
-                    {personaData.profile.class[k]}
+                    {personaData.profile.class[k].replace("{level}", String(level))}
                   </span>
                   <span className="border border-cyber-blue/30 px-2 py-1">
                     {personaData.profile.origin[k]}
