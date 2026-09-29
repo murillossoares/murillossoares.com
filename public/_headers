@@ -43,3 +43,9 @@
 
 /es/scoreboard.txt
   X-Robots-Tag: noindex
+
+# Sonda de conectividade (/pvd/probe): precisa falar com gateways externos por HTTPS/WSS.
+# Se o Netlify concatenar em vez de sobrescrever a CSP de /*, a sonda usa os links diretos.
+/pvd/probe/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https: wss:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Robots-Tag: noindex
