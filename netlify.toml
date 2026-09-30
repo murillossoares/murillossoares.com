@@ -54,10 +54,10 @@
 # Atalho para o gateway VNC (Tailscale Funnel + login GitHub). O alvo só responde enquanto a janela estiver aberta.
 [[redirects]]
   from = "/pvd/vnc"
-  to = "https://thinkcentre-m93p.tail68e134.ts.net:10000/vnc.html?autoconnect=1&resize=remote"
+  to = "https://vncgw.tail68e134.ts.net/vnc.html?autoconnect=1&resize=remote"
   status = 302
 
 [[redirects]]
   from = "/pvd/vnc/"
-  to = "https://thinkcentre-m93p.tail68e134.ts.net:10000/vnc.html?autoconnect=1&resize=remote"
+  to = "https://vncgw.tail68e134.ts.net/vnc.html?autoconnect=1&resize=remote"
   status = 302
